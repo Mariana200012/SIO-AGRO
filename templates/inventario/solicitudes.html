@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitudes de Material - Koppert Biofactory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="bg-slate-50 flex flex-col h-screen font-sans overflow-hidden">
+
+    <!-- Navbar Ejecutivo (Mismo que los anteriores) -->
+    <nav class="bg-emerald-950 text-emerald-100 shadow-lg z-20 flex-shrink-0 border-b border-emerald-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="w-9 h-9 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center font-bold text-white mr-3 shadow-md shadow-emerald-900/50">K</div>
+                    <span class="text-white text-base font-extrabold tracking-wider">KOPPERT <span class="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded-full font-semibold uppercase ml-1">Inventario</span></span>
+                </div>
+                
+                <div class="hidden md:block flex-1 mx-6">
+                    <div class="flex space-x-1 overflow-x-auto">
+                        <a href="{{ url_for('inv_dashboard') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Stock General</a>
+                        <a href="{{ url_for('inv_solicitudes') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">Solicitudes de Área</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs font-medium text-emerald-200 bg-emerald-900/80 px-3 py-1.5 rounded-lg border border-emerald-800"> <strong class="text-white">Encargado Almacén</strong></span>
+                    <a href="{{ url_for('auth.logout') }}" class="text-xs px-4 py-2 text-white font-bold bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-400 rounded-xl transition-all shadow-sm">Cerrar Sesión</a>                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Área de Trabajo Principal -->
+    <main class="flex-1 overflow-y-auto p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
+            
+            <!-- Encabezado y Pestañas de Filtrado -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">Centro de Surtido a Producción</h1>
+                    <p class="text-xs text-slate-500 font-medium mt-1">Gestión de tickets de materiales agrupados por área operativa.</p>
+                </div>
+                <div class="flex items-center space-x-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                    <button class="tab-btn active bg-white text-slate-800 shadow-sm px-4 py-2 rounded-lg text-sm font-bold transition-all" data-target="all">Todas las Áreas</button>
+                    <button class="tab-btn text-slate-500 hover:text-slate-700 px-4 py-2 rounded-lg text-sm font-bold transition-all" data-target="chrysopa">Chrysopa</button>
+                    <button class="tab-btn text-slate-500 hover:text-slate-700 px-4 py-2 rounded-lg text-sm font-bold transition-all" data-target="catopar">Catopar</button>
+                </div>
+            </div>
+
+            <!-- KPIs Rápidos -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-amber-50 p-6 rounded-3xl border border-amber-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-amber-700 uppercase tracking-widest">Tickets Pendientes</p>
+                        <p class="text-3xl font-black text-amber-900 mt-1">2</p>
+                    </div>
+                </div>
+                <div class="bg-emerald-50 p-6 rounded-3xl border border-emerald-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-emerald-700 uppercase tracking-widest">Tickets Surtidos Hoy</p>
+                        <p class="text-3xl font-black text-emerald-900 mt-1">5</p>
+                    </div>
+                </div>
+                <div class="bg-rose-50 p-6 rounded-3xl border border-rose-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-bold text-rose-700 uppercase tracking-widest">Artículos sin Stock</p>
+                        <p class="text-3xl font-black text-rose-900 mt-1">1</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR DE TICKETS (Agrupados por área) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-10">
+                
+                <!-- ============================== -->
+                <!-- TICKET DE SOLICITUD: CHRYSOPA  -->
+                <!-- ============================== -->
+                <div class="req-card bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden flex flex-col" data-area="chrysopa">
+                    <!-- Cabecera del Ticket -->
+                    <div class="bg-blue-50/50 p-5 border-b border-blue-100 flex justify-between items-start">
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-100 border border-blue-200 text-blue-800 text-[10px] font-black uppercase tracking-wider mb-2">
+                                Área: Chrysopa
+                            </div>
+                            <h2 class="text-lg font-black text-slate-800">TICKET #REQ-8902</h2>
+                            <p class="text-xs text-slate-500 font-medium mt-1">Solicitado por: <span class="font-bold text-slate-700">María G. (OP-02)</span></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800 uppercase shadow-sm">
+                                Pendiente
+                            </span>
+                            <p class="text-[10px] text-slate-400 font-medium mt-2">Hace 15 min</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de Materiales (Detalle) -->
+                    <div class="p-5 flex-1">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Lista de Materiales Solicitados</h3>
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-slate-400 text-[10px] uppercase border-b border-slate-100">
+                                    <th class="pb-2 font-bold">Insumo</th>
+                                    <th class="pb-2 font-bold text-center">Requerido</th>
+                                    <th class="pb-2 font-bold text-right">Stock Actual</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                <tr>
+                                    <td class="py-3 font-semibold text-slate-700">Charolas de Cartón</td>
+                                    <td class="py-3 text-center font-black text-slate-800">50</td>
+                                    <td class="py-3 text-right text-xs font-medium text-emerald-600">500 uds</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 font-semibold text-slate-700">Algodón (Paquetes)</td>
+                                    <td class="py-3 text-center font-black text-slate-800">5</td>
+                                    <td class="py-3 text-right text-xs font-medium text-emerald-600">24 paq</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 font-semibold text-slate-700">Dieta Preparada (Botes)</td>
+                                    <td class="py-3 text-center font-black text-slate-800">10</td>
+                                    <td class="py-3 text-right text-xs font-medium text-rose-500 font-bold">2 uds (Falta)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="bg-slate-50 p-4 border-t border-slate-100 flex justify-end gap-3">
+                        <button class="bg-white border border-slate-300 text-slate-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-100 transition-colors">Rechazar / Ajustar</button>
+                        <button class="bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors shadow-md">Autorizar y Surtir Ticket</button>
+                    </div>
+                </div>
+
+                <!-- ============================== -->
+                <!-- TICKET DE SOLICITUD: CATOPAR   -->
+                <!-- ============================== -->
+                <div class="req-card bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden flex flex-col" data-area="catopar">
+                    <!-- Cabecera del Ticket -->
+                    <div class="bg-orange-50/50 p-5 border-b border-orange-100 flex justify-between items-start">
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-orange-100 border border-orange-200 text-orange-800 text-[10px] font-black uppercase tracking-wider mb-2">
+                                Área: Catopar
+                            </div>
+                            <h2 class="text-lg font-black text-slate-800">TICKET #REQ-8901</h2>
+                            <p class="text-xs text-slate-500 font-medium mt-1">Solicitado por: <span class="font-bold text-slate-700">Carlos R. (OP-05)</span></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800 uppercase shadow-sm">
+                                Pendiente
+                            </span>
+                            <p class="text-[10px] text-slate-400 font-medium mt-2">Hace 1 hora</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de Materiales (Detalle) -->
+                    <div class="p-5 flex-1">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Lista de Materiales Solicitados</h3>
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-slate-400 text-[10px] uppercase border-b border-slate-100">
+                                    <th class="pb-2 font-bold">Insumo</th>
+                                    <th class="pb-2 font-bold text-center">Requerido</th>
+                                    <th class="pb-2 font-bold text-right">Stock Actual</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                <tr>
+                                    <td class="py-3 font-semibold text-slate-700">Tubos 500ml (Vacíos)</td>
+                                    <td class="py-3 text-center font-black text-slate-800">100</td>
+                                    <td class="py-3 text-right text-xs font-medium text-emerald-600">850 uds</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 font-semibold text-slate-700">Etiquetas Adhesivas</td>
+                                    <td class="py-3 text-center font-black text-slate-800">200</td>
+                                    <td class="py-3 text-right text-xs font-medium text-emerald-600">3,000 uds</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Botones de Acción -->
+                    <div class="bg-slate-50 p-4 border-t border-slate-100 flex justify-end gap-3">
+                        <button class="bg-white border border-slate-300 text-slate-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-100 transition-colors">Rechazar / Ajustar</button>
+                        <button class="bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors shadow-md">Autorizar y Surtir Ticket</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Filtro visual de pestañas -->
+    <script>
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const cards = document.querySelectorAll('.req-card');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Limpiar estilos de pestañas
+                tabBtns.forEach(b => {
+                    b.classList.remove('bg-white', 'text-slate-800', 'shadow-sm');
+                    b.classList.add('text-slate-500');
+                });
+                
+                // Activar pestaña clickeada
+                btn.classList.add('bg-white', 'text-slate-800', 'shadow-sm');
+                btn.classList.remove('text-slate-500');
+
+                // Filtrar tarjetas
+                const target = btn.getAttribute('data-target');
+
+                cards.forEach(card => {
+                    if (target === 'all' || card.getAttribute('data-area') === target) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

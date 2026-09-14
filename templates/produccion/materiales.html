@@ -1,0 +1,164 @@
+{% extends "produccion/base_produc.html" %}
+
+{% block title %}Monitoreo de Ocupación - Koppert Biofactory{% endblock %}
+
+{% block navbar_menu %}
+<div class="hidden md:block flex-1 mx-6">
+    <div class="flex space-x-1 overflow-x-auto">
+        
+        <!-- Si el operador viene desde Catopar, mostramos el menú de Catopar -->
+        {% if origen == 'catopar' %}
+            <a href="{{ url_for('prod_catopar.pre') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors flex items-center gap-1.5">
+                <span>🫘</span> Pre-Parasitismo (21)
+            </a>            
+            <a href="{{ url_for('prod_catopar.post') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors flex items-center gap-1.5">
+                <span>📦</span> Post-Parasitismo
+            </a>
+            <a href="{{ url_for('prod_catopar.materiales') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm flex items-center gap-1.5">
+                <span>📋</span> Solicitar Material
+            </a>
+            
+        <!-- Si el operador viene desde Chrysopa, mostramos el menú de Chrysopa -->
+        {% elif origen == 'chrysopa' %}
+            <a href="{{ url_for('prod_chrysopa.ocupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Ocupación</a>
+            <a href="{{ url_for('prod_chrysopa.pupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Pupación</a>
+            <a href="{{ url_for('prod_chrysopa.eclosion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Eclosión</a>
+             <a href="{{ url_for('prod_chrysopa.mortalidad') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Mortalidad</a>
+            <a href="{{ url_for('prod_chrysopa.fallas') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Fallas</a>
+            <a href="{{ url_for('prod_chrysopa.materiales') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm flex items-center gap-1.5">Solicitar Material</a>
+        {% endif %}
+        
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+    <!-- Área de Trabajo Principal -->
+    <main class="flex-1 overflow-y-auto p-6 lg:p-10">
+        <div class="max-w-5xl mx-auto space-y-6">
+            
+            <!-- Encabezado de Sección (Sólido) -->
+            <div class="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-widest uppercase mb-2">
+                        Estación de Piso &bull; Catálogo Frecuente
+                    </div>
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-1">Solicitud de Materiales de Línea</h1>
+                    <p class="text-xs text-slate-500 font-medium">Seleccione los insumos habituales de producción e indique las cantidades requeridas.</p>
+                </div>
+                <button onclick="document.getElementById('modal-solicitud').classList.remove('hidden')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center gap-2 whitespace-nowrap">
+                    <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                    Nuevo Pedido de Material
+                </button>
+            </div>
+
+            <!-- Historial de Solicitudes Propias -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-6">
+                <div class="bg-slate-50 px-7 py-5 border-b border-slate-100 flex justify-between items-center">
+                    <h2 class="text-[15px] font-bold text-slate-800 tracking-tight">Tus Solicitudes Recientes</h2>
+                    <span class="text-[10px] text-slate-500 font-mono bg-white border border-slate-200 px-2 py-1 rounded-md shadow-sm">Tabla: SOLICITUD_MATERIALES</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-white sticky top-0 z-10 shadow-sm border-b border-slate-200">
+                            <tr>
+                                <th class="px-7 py-4 text-left font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Folio / Fecha</th>
+                                <th class="px-7 py-4 text-left font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Materiales Solicitados</th>
+                                <th class="px-7 py-4 text-left font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Operador Solicitante</th>
+                                <th class="px-7 py-4 text-center font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Estatus</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white text-xs">
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-7 py-4 whitespace-nowrap">
+                                    <div class="font-bold text-slate-900 text-sm">SOL-2026-042</div>
+                                    <div class="text-[11px] text-slate-500 font-medium mt-0.5">22/Jul/2026 - 10:30 AM</div>
+                                </td>
+                                <td class="px-7 py-4 font-medium text-slate-700 space-y-1">
+                                    <span class="block">&bull; Rejillas plásticas de 100 orificios (15 pzas)</span>
+                                    <span class="block">&bull; Papel filtro base (5 pzas)</span>
+                                </td>
+                                <td class="px-7 py-4 text-slate-600 font-medium">Juan Pérez <span class="font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded ml-1">OP-04</span></td>
+                                <td class="px-7 py-4 whitespace-nowrap text-center">
+                                    <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-amber-100 text-amber-800 uppercase tracking-wider">Pendiente de Surtido</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal para Nueva Solicitud (Catálogo Frecuente) -->
+    <div id="modal-solicitud" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-100 space-y-5 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="font-black text-slate-800 text-lg">Solicitud de Materiales Habituales</h3>
+                    <p class="text-[11px] text-slate-500 font-medium">Marque y ajuste la cantidad de los insumos requeridos.</p>
+                </div>
+                <button onclick="document.getElementById('modal-solicitud').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
+            </div>
+            
+            <form action="/piso/materiales/guardar" method="POST" class="space-y-5 text-sm">
+                
+                <!-- Lista de Materiales Frecuentes -->
+                <div class="space-y-3 border border-slate-200 rounded-2xl p-4 bg-slate-50">
+                    
+                    <!-- Item 1 -->
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
+                        <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
+                            <input type="checkbox" name="material_1" value="Rejillas 100 orificios" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
+                            <span>Rejillas plásticas de 100 orificios</span>
+                        </label>
+                        <input type="number" name="cant_1" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
+                        <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
+                            <input type="checkbox" name="material_2" value="Botes plásticos de cría" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
+                            <span>Botes plásticos para cría</span>
+                        </label>
+                        <input type="number" name="cant_2" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
+                        <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
+                            <input type="checkbox" name="material_3" value="Papel filtro base" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
+                            <span>Papel filtro base</span>
+                        </label>
+                        <input type="number" name="cant_3" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
+                    </div>
+
+                    <!-- Item 4 -->
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
+                        <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
+                            <input type="checkbox" name="material_4" value="Sustrato / Alimento" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
+                            <span>Sustrato / Alimento (Bulto)</span>
+                        </label>
+                        <input type="number" name="cant_4" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
+                    </div>
+
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1.5">Firma de Autorización (NIP de Operador)</label>
+                    <input type="password" name="nip" placeholder="Ingrese su NIP" required class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 transition-colors">
+                </div>
+
+                <div class="pt-4 flex space-x-3 border-t border-slate-100 mt-2">
+                    <button type="button" onclick="document.getElementById('modal-solicitud').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 transition-colors shadow-md">Enviar al Almacén</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
+{% endblock %}

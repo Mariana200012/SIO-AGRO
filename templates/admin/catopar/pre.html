@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pre-Parasitismo - Koppert Biofactory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Scroll suave en contenedor de tablas */
+        html { scroll-behavior: smooth; }
+        .table-container { max-height: 400px; overflow-y: auto; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 flex flex-col h-screen font-sans overflow-hidden">
+
+    <!-- Navbar Ejecutivo (Diseño Limpio) -->
+    <nav class="bg-emerald-950 text-emerald-100 shadow-lg z-20 flex-shrink-0 border-b border-emerald-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="w-9 h-9 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center font-bold text-white mr-3 shadow-md shadow-emerald-900/50">K</div>
+                    <span class="text-white text-base font-extrabold tracking-wider">KOPPERT <span class="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded-full font-semibold uppercase ml-1">Admin</span></span>
+                </div>
+                
+                <!-- Menú de Navegación Rápida -->
+                <div class="hidden md:block flex-1 mx-6">
+                    <div class="flex space-x-1 overflow-x-auto">
+                        <a href="#" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Resumen General</a>
+                        <!-- Opción activa -->
+                        <a href="#" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">Pre-Parasitismo</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Post-Parasitismo</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Registros Chrysopa</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs font-medium text-emerald-200 bg-emerald-900/80 px-3 py-1.5 rounded-lg border border-emerald-800"> <strong class="text-white">(Admin)</strong></span>
+                   <a href="{{ url_for('auth.logout') }}" class="text-xs px-4 py-2 text-white font-bold bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-400 rounded-xl transition-all shadow-sm">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Área de Trabajo Principal -->
+    <main class="flex-1 overflow-y-auto p-8 relative">
+        <div class="max-w-7xl mx-auto space-y-8 relative z-10">
+            
+            <!-- Encabezado (Diseño Blanco/Sólido) -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">Evaluación Pre-Parasitismo <span class="text-emerald-600 font-bold text-lg bg-emerald-50 px-2 py-0.5 rounded-lg ml-1">(Gorgojo)</span></h1>
+                    <p class="text-xs text-slate-500 font-medium mt-1.5">Inspección de desarrollo de larvas y aprobación de charolas para parasitación.</p>
+                </div>
+                <!-- Opciones / Filtros -->
+                <div class="flex items-center space-x-3 w-full md:w-auto">
+                    <div class="relative">
+                        <input type="date" class="border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 font-medium transition-all">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: NUEVA REVISIÓN (Tabla Plana) -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                    <h2 class="text-sm font-extrabold text-slate-800 flex items-center gap-3">
+                        <div class="w-2 h-6 bg-emerald-500 rounded-full"></div>
+                        Revisión de Muestras y Conteo
+                    </h2>
+                    <span class="text-[10px] font-bold text-blue-800 bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-200 shadow-sm">MUESTRA: 21 GARBANZOS</span>
+                </div>
+                
+                <div class="overflow-x-auto table-container">
+                    <table class="min-w-full divide-y divide-slate-200 text-sm relative">
+                        <thead class="sticky top-0 z-10 bg-slate-50 shadow-sm">
+                            <tr>
+                                <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-200">Charola / Lote</th>
+                                <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-200">Larvas Chicas</th>
+                                <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-200 bg-emerald-50">Larvas Med.</th>
+                                <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-200 bg-emerald-50">Larvas Grandes</th>
+                                <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-200">Pupas</th>
+                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-l border-slate-200">Decisión Operativa</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white">
+                            
+                            <!-- Fila con atributos para el script JS -->
+                            <tr class="hover:bg-slate-50 transition-colors group fila-evaluacion" data-chicas="12" data-medianas="25" data-grandes="18" data-pupas="5">
+                                <td class="px-6 py-5 border-r border-slate-100">
+                                    <div class="font-bold text-slate-800 text-sm">CH-PRE-089</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5 flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        Hoy 08:00 AM
+                                    </div>
+                                </td>
+                                
+                                <td class="px-4 py-5 text-center border-r border-slate-100 transition-colors">
+                                    <span class="text-lg font-bold text-slate-500">12</span>
+                                </td>
+                                <td class="px-4 py-5 text-center bg-emerald-50/50 border-r border-slate-100 transition-colors">
+                                    <span class="text-lg font-black text-emerald-600">25</span>
+                                </td>
+                                <td class="px-4 py-5 text-center bg-emerald-50/50 border-r border-slate-100 transition-colors">
+                                    <span class="text-lg font-black text-emerald-600">18</span>
+                                </td>
+                                <td class="px-4 py-5 text-center border-r border-slate-100 transition-colors">
+                                    <span class="text-lg font-bold text-slate-500">5</span>
+                                </td>
+                                
+                                <td class="px-6 py-5 bg-slate-50 border-l border-slate-100 align-middle">
+                                    <div class="flex flex-col space-y-3 w-full max-w-[200px] mx-auto">
+                                        <!-- Indicador visual generado por JS -->
+                                        <div class="contenedor-diagnostico flex justify-center w-full">
+                                            <!-- Se llenará vía JS -->
+                                        </div>
+                                        
+                                        <!-- Botones -->
+                                        <div class="flex space-x-2">
+                                            <button class="bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-sm transition-all flex-1">
+                                                Aprobar
+                                            </button>
+                                            <button class="bg-white border border-red-200 text-red-500 px-3 py-2 rounded-xl text-xs font-bold hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all shadow-sm flex-1">
+                                                Rechazar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: HISTORIAL DE EVALUACIONES (Sólido) -->
+            <div class="mt-8 space-y-4">
+                <div class="flex items-center justify-between px-2">
+                    <h2 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Historial Reciente</h2>
+                </div>
+                
+                <div class="bg-slate-50 rounded-3xl shadow-sm border border-slate-200 border-dashed p-12 flex flex-col items-center justify-center text-center">
+                    <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 border border-slate-200 shadow-sm">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-700">Sin registros recientes</h3>
+                    <p class="text-sm text-slate-500 mt-1 max-w-md">La tabla de historial de pre-parasitismo se renderizará en esta sección conforme se realicen las evaluaciones.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Script de validación ajustado para diseño sólido -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const filasEvaluacion = document.querySelectorAll('.fila-evaluacion');
+            
+            filasEvaluacion.forEach(fila => {
+                const chicas = parseInt(fila.getAttribute('data-chicas')) || 0;
+                const medianas = parseInt(fila.getAttribute('data-medianas')) || 0;
+                const grandes = parseInt(fila.getAttribute('data-grandes')) || 0;
+                const pupas = parseInt(fila.getAttribute('data-pupas')) || 0;
+                
+                const contenedor = fila.querySelector('.contenedor-diagnostico');
+                
+                if (contenedor && contenedor.innerHTML.trim() === '') {
+                    if ((medianas + grandes) > (chicas + pupas)) {
+                        contenedor.innerHTML = '<span class="inline-flex w-full justify-center items-center px-3 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-100 text-emerald-800 uppercase tracking-wider"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Lote Óptimo</span>';
+                    } else {
+                        contenedor.innerHTML = '<span class="inline-flex w-full justify-center items-center px-3 py-1.5 rounded-lg text-[10px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wider"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Rendimiento Bajo</span>';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post-Parasitismo - Koppert Biofactory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        .table-container { max-height: 400px; overflow-y: auto; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 flex flex-col h-screen font-sans overflow-hidden">
+
+    <!-- Navbar Ejecutivo (Diseño Limpio) -->
+    <nav class="bg-emerald-950 text-emerald-100 shadow-lg z-20 flex-shrink-0 border-b border-emerald-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="w-9 h-9 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center font-bold text-white mr-3 shadow-md shadow-emerald-900/50">K</div>
+                    <span class="text-white text-base font-extrabold tracking-wider">KOPPERT <span class="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded-full font-semibold uppercase ml-1">Admin</span></span>
+                </div>
+                
+                <!-- Menú de Navegación Rápida -->
+                <div class="hidden md:block flex-1 mx-6">
+                    <div class="flex space-x-1 overflow-x-auto">
+                        <a href="#" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Resumen General</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Pre-Parasitismo</a>
+                        <!-- Opción activa -->
+                        <a href="#" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">Post-Parasitismo</a>
+                        <a href="#" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Registros Chrysopa</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs font-medium text-emerald-200 bg-emerald-900/80 px-3 py-1.5 rounded-lg border border-emerald-800"> <strong class="text-white">(Admin)</strong></span>
+                   <a href="{{ url_for('auth.logout') }}" class="text-xs px-4 py-2 text-white font-bold bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-400 rounded-xl transition-all shadow-sm">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Área de Trabajo Principal -->
+    <main class="flex-1 overflow-y-auto p-8 relative">
+        <div class="max-w-7xl mx-auto space-y-8 relative z-10">
+            
+            <!-- Encabezado (Diseño Blanco/Sólido) -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">Asignación Post-Parasitismo <span class="text-emerald-600 font-bold text-lg bg-emerald-50 px-2 py-0.5 rounded-lg ml-1">(Catopar)</span></h1>
+                    <p class="text-xs text-slate-500 font-medium mt-1.5">Módulo de evaluación de muestras e ingreso de asignación de botes.</p>
+                </div>
+                <div class="flex items-center space-x-3 w-full md:w-auto">
+                    <div class="relative">
+                        <input type="date" class="border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 font-medium transition-all">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: NUEVA REVISIÓN Y ASIGNACIÓN (Tabla Plana) -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                    <h2 class="text-sm font-extrabold text-slate-800 flex items-center gap-3">
+                        <div class="w-2 h-6 bg-emerald-500 rounded-full"></div>
+                        Revisión Post-Parasitismo y Asignación (Catopar)
+                    </h2>
+                    <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-lg border border-emerald-200 shadow-sm">MUESTRA: 10 GARBANZOS</span>
+                </div>
+                
+                <div class="overflow-x-auto table-container">
+                    <table class="min-w-full divide-y divide-slate-200 text-sm relative">
+                        <!-- Cabecera de 2 Niveles -->
+                        <thead class="sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th rowspan="2" class="bg-slate-50 px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px] text-slate-500 border-r border-slate-200 align-bottom">
+                                    Lote Parasitado
+                                </th>
+                                <th colspan="2" class="bg-amber-50 px-4 py-2 text-center font-extrabold uppercase tracking-wider text-[10px] text-amber-800 border-r border-b border-amber-200">
+                                    Gorgojos <span class="font-medium ml-1 opacity-70">(No Parasitados)</span>
+                                </th>
+                                <th colspan="3" class="bg-emerald-50 px-4 py-2 text-center font-extrabold uppercase tracking-wider text-[10px] text-emerald-800 border-r border-b border-emerald-200">
+                                    Catopar <span class="font-medium ml-1 opacity-70">(Parasitados)</span>
+                                </th>
+                                <th rowspan="2" class="bg-slate-50 px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-500 border-l border-slate-200 align-bottom">
+                                    Asignación de Botes
+                                </th>
+                            </tr>
+                            <tr>
+                                <th class="bg-amber-50/50 px-4 py-3 text-center font-bold uppercase tracking-wider text-[10px] text-amber-700 border-r border-slate-200">Nacidos</th>
+                                <th class="bg-amber-50/50 px-4 py-3 text-center font-bold uppercase tracking-wider text-[10px] text-amber-700 border-r border-slate-200">En Pupa</th>
+                                <th class="bg-emerald-50/50 px-4 py-3 text-center font-bold uppercase tracking-wider text-[10px] text-emerald-700 border-r border-slate-200">Negros</th>
+                                <th class="bg-emerald-50/50 px-4 py-3 text-center font-bold uppercase tracking-wider text-[10px] text-emerald-700 border-r border-slate-200">Combinados</th>
+                                <th class="bg-emerald-50/50 px-4 py-3 text-center font-bold uppercase tracking-wider text-[10px] text-emerald-700 border-r border-slate-200">Ámbar</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white">
+                            <tr class="hover:bg-slate-50 transition-colors group">
+                                <td class="px-6 py-5 border-r border-slate-100">
+                                    <div class="font-bold text-slate-800 text-sm">LOTE-CAT-045</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">Ciclo completado</div>
+                                    <span class="inline-flex mt-2 items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                                        Calidad: Óptima
+                                    </span>
+                                </td>
+                                
+                                <!-- Datos Gorgojos -->
+                                <td class="px-4 py-5 text-center border-r border-slate-100">
+                                    <span class="text-lg font-black text-amber-600">1</span>
+                                </td>
+                                <td class="px-4 py-5 text-center border-r border-slate-100">
+                                    <span class="text-lg font-bold text-slate-400">0</span>
+                                </td>
+                                
+                                <!-- Datos Catopar -->
+                                <td class="px-4 py-5 text-center border-r border-slate-100">
+                                    <span class="text-lg font-bold text-slate-400">0</span>
+                                </td>
+                                <td class="px-4 py-5 text-center border-r border-slate-100">
+                                    <span class="text-lg font-bold text-slate-400">0</span>
+                                </td>
+                                <td class="px-4 py-5 text-center border-r border-slate-100">
+                                    <span class="text-lg font-black text-emerald-600">1</span>
+                                </td>
+                                
+                                <!-- Controles de Asignación -->
+                                <td class="px-6 py-5 bg-slate-50 border-l border-slate-100">
+                                    <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 justify-center items-end">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Botes Cría Madre</label>
+                                            <input type="number" class="w-24 px-3 py-2 text-sm text-slate-800 font-bold border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 bg-white shadow-sm transition-all" placeholder="0">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">Botes a Parasitar</label>
+                                            <input type="number" class="w-24 px-3 py-2 text-sm text-slate-800 font-bold border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 bg-white shadow-sm transition-all" placeholder="0">
+                                        </div>
+                                        <button class="bg-emerald-800 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-900 shadow-md transition-all flex items-center gap-1.5">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                            Asignar
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: HISTORIAL DE ASIGNACIONES (Sólido) -->
+            <div class="mt-8 space-y-4">
+                <div class="flex items-center justify-between px-2">
+                    <h2 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Historial de Lotes Asignados</h2>
+                </div>
+                
+                <div class="bg-slate-50 rounded-3xl shadow-sm border border-slate-200 border-dashed p-12 flex flex-col items-center justify-center text-center">
+                    <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 border border-slate-200 shadow-sm">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-700">Sin registros recientes</h3>
+                    <p class="text-sm text-slate-500 mt-1 max-w-md">La tabla de historial de lotes post-parasitismo se renderizará en esta sección conforme se realicen las asignaciones.</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</body>
+</html>

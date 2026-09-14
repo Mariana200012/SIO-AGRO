@@ -1,0 +1,376 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Monitoreo de Ocupación - Koppert Biofactory{% endblock %}
+
+{% block navbar_menu %}
+<div class="hidden md:block flex-1 mx-6">
+    <div class="flex space-x-1 overflow-x-auto">
+        <a href="{{ url_for('admin.dashboard') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Control</a>
+        <a href="{{ url_for('admin.ocupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors"">Ocupación</a>
+        <a href="{{ url_for('admin.pupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Pupación</a>
+        <a href="{{ url_for('admin.eclosion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Eclosión</a>
+        <a href="{{ url_for('admin.mortalidad') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Mortalidad</a>
+        <a href="{{ url_for('admin.fallas') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">Fallas</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+    <!-- Área de Trabajo Principal -->
+    <main class="flex-1 overflow-y-auto p-8">
+        <div class="max-w-7xl mx-auto space-y-8">
+            
+            <!-- Encabezado y Buscador -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">Supervisión de Fallas de Pupación <span class="text-emerald-600 font-bold text-lg">(Chrysopa)</span></h1>
+                    <p class="text-xs text-slate-500 font-medium mt-1">Control diario de larvas no pupadas evaluadas del lote.</p>
+                </div>
+                <div class="flex items-center space-x-3 w-full md:w-auto">
+                    <input type="date" id="dateSearch" class="border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 font-medium">
+                    <button id="btnSearch" class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-900 transition-all shadow-md flex items-center justify-center gap-2">
+                        Buscar Registro
+                    </button>
+                    <button id="btnResetCards" class="bg-emerald-100 text-emerald-800 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-200 transition-all shadow-sm hidden">
+                        Limpiar Selección
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjetas de Identificadores y KPIs reordenadas -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Tarjeta 1: Semana de Lote (Fondo Esmeralda Original) -->
+                <div class="bg-gradient-to-br from-emerald-800 to-emerald-950 p-6 rounded-3xl shadow-lg shadow-emerald-900/20 relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                    <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl"></div>
+                    
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-emerald-200 text-xs font-bold uppercase tracking-widest">Semana de Producción</h3>
+                            <span class="text-[10px] text-emerald-400 font-medium mt-1 block">Calendario Operativo</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-2xl bg-white/10 text-emerald-100 flex items-center justify-center backdrop-blur-sm border border-white/10">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="relative z-10 mt-6">
+                        <p id="valSemana" class="text-3xl font-black text-white tracking-tight">Vista Global</p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <span id="subSemana" class="text-xs text-emerald-200 font-medium">Seleccione un registro en la tabla</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2: Identificador de Lote -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute -right-6 -top-6 w-24 h-24 bg-slate-50 rounded-full"></div>
+                    
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Identificador de Lote</h3>
+                            <span class="text-[10px] text-slate-400 font-medium mt-1 block">Trazabilidad Interna</span>
+                        </div>
+                        <div class="w-10 h-10 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="relative z-10 mt-6">
+                        <p id="valLote" class="text-3xl font-black text-slate-800 tracking-tight">--</p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <span id="subLote" class="text-xs text-slate-400 font-medium">Lote correspondiente</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 3: Porcentaje de Fallas (Cambia de color > 3.0%) -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between group">
+                    <div id="blobFalla" class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full transition-colors duration-500"></div>
+                    
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Tasa de Falla</h3>
+                            <span class="text-[10px] text-slate-400 font-medium mt-1 block">Límite operativo: 3.0%</span>
+                        </div>
+                        <div id="iconBoxFalla" class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center transition-colors duration-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="relative z-10 mt-6 flex items-end gap-1">
+                        <p id="valFalla" class="text-5xl font-black text-slate-800 tracking-tight transition-colors duration-500">2.8</p>
+                        <span id="symbolFalla" class="text-2xl font-bold text-slate-600 mb-1 transition-colors duration-500">%</span>
+                    </div>
+                    <div class="relative z-10 mt-2 flex items-center gap-2">
+                        <div id="dotFalla" class="w-2 h-2 rounded-full bg-emerald-500 transition-colors duration-500"></div>
+                        <span id="subFalla" class="text-xs text-slate-500 font-medium">Porcentaje global general</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial de Fallas de Pupación (6 Rejillas) -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                    <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        Historial de Larvas No Pupadas
+                        <span class="text-xs font-normal text-slate-400 ml-2 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">(Haz clic en un lote para ver sus datos arriba)</span>
+                    </h2>
+                    <span class="text-[10px] text-slate-500 font-mono bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">TABLA: PUPACION / FALLAS</span>
+                </div>
+                
+                <div class="overflow-x-auto table-container" id="scrollTable">
+                    <table class="min-w-full divide-y divide-slate-100 text-sm relative">
+                        <thead class="bg-white text-slate-500 sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">ID Lote / Fecha</th>
+                                <th class="px-3 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Semana</th>
+                                <th class="px-3 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">R1</th>
+                                <th class="px-3 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">R2</th>
+                                <th class="px-3 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">R3</th>
+                                <th class="px-3 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">R4</th>
+                                <th class="px-3 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">R5</th>
+                                <th class="px-3 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">R6</th>
+                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] bg-slate-50">% Falla</th>
+                                <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Operador</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white" id="lotesTableBody">
+                            
+                            <!-- Se agregó data-semana y data-porcentaje -->
+                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-104" data-semana="30" data-fecha="2026-07-23" data-porcentaje="2.0">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-104</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">23/Jul/2026 - 10:15 AM</div>
+                                </td>
+                                <td class="px-3 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 30</span></td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">2.0%</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">Juan Pérez <span class="text-slate-400 text-[10px] ml-1">(OP-04)</span></td>
+                            </tr>
+
+                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-103" data-semana="29" data-fecha="2026-07-22" data-porcentaje="2.8">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-103</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">22/Jul/2026 - 03:00 PM</div>
+                                </td>
+                                <td class="px-3 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 29</span></td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">3</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">4</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">3</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">3</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">2.8%</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">María López <span class="text-slate-400 text-[10px] ml-1">(OP-02)</span></td>
+                            </tr>
+
+                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-102" data-semana="29" data-fecha="2026-07-21" data-porcentaje="1.8">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-102</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">21/Jul/2026 - 03:20 PM</div>
+                                </td>
+                                <td class="px-3 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 29</span></td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">1</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">3</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">1</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">1.8%</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">Carlos Ruiz <span class="text-slate-400 text-[10px] ml-1">(OP-01)</span></td>
+                            </tr>
+                            
+                            <!-- Lote que excede el parámetro de 3.0% -->
+                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-095" data-semana="28" data-fecha="2026-07-15" data-porcentaje="4.3">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-095</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">15/Jul/2026 - 02:45 PM</div>
+                                </td>
+                                <td class="px-3 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 28</span></td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">4</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">5</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">4</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">4</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">5</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">4</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-800">4.3%</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">María López <span class="text-slate-400 text-[10px] ml-1">(OP-02)</span></td>
+                            </tr>
+                            
+                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-090" data-semana="28" data-fecha="2026-07-10" data-porcentaje="2.3">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-090</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">10/Jul/2026 - 01:20 PM</div>
+                                </td>
+                                <td class="px-3 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 28</span></td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">3</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">3</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">2.3%</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">Juan Pérez <span class="text-slate-400 text-[10px] ml-1">(OP-04)</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    {% endblock %}
+
+    {% block scripts %}
+    <!-- Funciones Javascript -->
+    <script>
+        const rows = document.querySelectorAll('.data-row');
+        const btnResetCards = document.getElementById('btnResetCards');
+
+        // Referencias de Elementos HTML
+        const valSemana = document.getElementById('valSemana');
+        const subSemana = document.getElementById('subSemana');
+        
+        const valLote = document.getElementById('valLote');
+        const subLote = document.getElementById('subLote');
+        
+        const valFalla = document.getElementById('valFalla');
+        const symbolFalla = document.getElementById('symbolFalla');
+        const subFalla = document.getElementById('subFalla');
+        const blobFalla = document.getElementById('blobFalla');
+        const iconBoxFalla = document.getElementById('iconBoxFalla');
+        const dotFalla = document.getElementById('dotFalla');
+
+        // Función para cambiar colores (Límite operativo > 3.0%)
+        function updateCardColors(isAlert) {
+            const allClasses = ['bg-emerald-50', 'bg-amber-50', 'text-emerald-600', 'text-amber-600', 'text-slate-800', 'text-amber-700', 'text-slate-600', 'bg-slate-300', 'bg-emerald-500', 'bg-amber-500'];
+
+            if (isAlert) {
+                blobFalla.classList.remove(...allClasses); blobFalla.classList.add('bg-amber-50');
+                iconBoxFalla.classList.remove(...allClasses); iconBoxFalla.classList.add('bg-amber-50', 'text-amber-600');
+                valFalla.classList.remove(...allClasses); valFalla.classList.add('text-amber-700');
+                symbolFalla.classList.remove(...allClasses); symbolFalla.classList.add('text-amber-700');
+                dotFalla.classList.remove(...allClasses); dotFalla.classList.add('bg-amber-500');
+            } else {
+                blobFalla.classList.remove(...allClasses); blobFalla.classList.add('bg-emerald-50');
+                iconBoxFalla.classList.remove(...allClasses); iconBoxFalla.classList.add('bg-emerald-50', 'text-emerald-600');
+                valFalla.classList.remove(...allClasses); valFalla.classList.add('text-slate-800');
+                symbolFalla.classList.remove(...allClasses); symbolFalla.classList.add('text-slate-600');
+                dotFalla.classList.remove(...allClasses); dotFalla.classList.add('bg-emerald-500');
+            }
+        }
+
+        // Lógica 1: Clic en lote actualiza las tarjetas
+        rows.forEach(row => {
+            row.addEventListener('click', () => {
+                rows.forEach(r => {
+                    r.classList.remove('bg-emerald-50', 'border-l-4', 'border-emerald-500');
+                    r.classList.remove('bg-slate-200', 'ring-2', 'ring-slate-400', 'z-10', 'relative');
+                });
+                row.classList.add('bg-emerald-50', 'border-l-4', 'border-emerald-500');
+
+                // Extraer datos
+                const semana = row.getAttribute('data-semana');
+                const lote = row.getAttribute('data-lote');
+                const porcentaje = parseFloat(row.getAttribute('data-porcentaje'));
+
+                // Actualizar Textos
+                valSemana.innerText = "Semana " + semana;
+                valSemana.classList.remove('text-3xl');
+                valSemana.classList.add('text-2xl');
+                subSemana.innerText = "Lote seleccionado para revisión";
+
+                valLote.innerText = lote;
+                valLote.classList.remove('text-3xl');
+                valLote.classList.add('text-2xl');
+                subLote.innerText = "Identificador de registro";
+
+                valFalla.innerText = porcentaje.toFixed(1);
+
+                // Lógica de porcentaje > 3.0%
+                if(porcentaje > 3.0) {
+                    updateCardColors(true);
+                    subFalla.innerText = "⚠️ Límite de fallas superado (> 3.0%)";
+                } else {
+                    updateCardColors(false);
+                    subFalla.innerText = "Dentro del parámetro aceptable (≤ 3.0%)";
+                }
+
+                btnResetCards.classList.remove('hidden');
+            });
+        });
+
+        // Lógica 2: Volver a la Vista Global / Limpiar
+        btnResetCards.addEventListener('click', () => {
+            rows.forEach(r => {
+                r.classList.remove('bg-emerald-50', 'border-l-4', 'border-emerald-500');
+                r.classList.remove('bg-slate-200', 'ring-2', 'ring-slate-400', 'z-10', 'relative');
+            });
+            
+            valSemana.innerText = "Vista Global";
+            valSemana.classList.remove('text-2xl');
+            valSemana.classList.add('text-3xl');
+            subSemana.innerText = "Seleccione un registro en la tabla";
+            
+            valLote.innerText = "--";
+            valLote.classList.remove('text-2xl');
+            valLote.classList.add('text-3xl');
+            subLote.innerText = "Lote correspondiente";
+            
+            valFalla.innerText = "2.8";
+            subFalla.innerText = "Porcentaje global general";
+            
+            updateCardColors(false);
+            btnResetCards.classList.add('hidden');
+        });
+
+        // Lógica 3: Buscador de Fechas
+        const btnSearch = document.getElementById('btnSearch');
+        const dateSearch = document.getElementById('dateSearch');
+        const scrollTable = document.getElementById('scrollTable');
+
+        btnSearch.addEventListener('click', () => {
+            const searchVal = dateSearch.value;
+            if(!searchVal) {
+                alert("Por favor selecciona una fecha primero.");
+                return;
+            }
+
+            const targetRow = Array.from(rows).find(row => row.getAttribute('data-fecha') === searchVal);
+
+            if(targetRow) {
+                const topPos = targetRow.offsetTop - scrollTable.offsetTop;
+                scrollTable.scrollTo({
+                    top: topPos - 40,
+                    behavior: 'smooth'
+                });
+
+                rows.forEach(r => {
+                    r.classList.remove('bg-slate-200', 'ring-2', 'ring-slate-400', 'z-10', 'relative');
+                });
+
+                targetRow.classList.add('bg-slate-200', 'ring-2', 'ring-slate-400', 'z-10', 'relative');
+            } else {
+                alert("No se encontró ningún lote procesado en esa fecha.");
+            }
+        });
+
+    </script>
+</body>
+</html>
+{% endblock %}

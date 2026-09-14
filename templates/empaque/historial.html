@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial - Koppert Biofactory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 flex flex-col h-screen font-sans">
+
+    <!-- NAVBAR (Copia y pega el mismo <nav> del dashboard.html aquí) -->
+
+    <main class="flex-1 overflow-y-auto p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
+            
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">Bitácora de Movimientos</h1>
+                    <p class="text-xs text-slate-500 font-medium mt-1">Registro inalterable de empaque y salidas manuales.</p>
+                </div>
+                <div class="bg-slate-100 px-4 py-2 rounded-lg border border-slate-200">
+                    <span class="text-xs font-bold text-slate-500 uppercase">Tabla:</span> 
+                    <span class="text-sm font-mono text-slate-800 ml-1">EMP_HISTORIAL_MOVIMIENTOS</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-slate-100 text-sm">
+                        <thead class="bg-slate-50 text-slate-500">
+                            <tr>
+                                <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Fecha y Hora</th>
+                                <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Código Batch</th>
+                                <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Movimiento</th>
+                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Cantidad</th>
+                                <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Operador</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white">
+                            
+                            <!-- Ejemplo: Salida Manual (Negativo) -->
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">07/Sep/2026 09:15 AM</td>
+                                <td class="px-6 py-4 whitespace-nowrap font-bold text-slate-800">34-2-2026-CTP-01</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-1 rounded uppercase">Salida Manual</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-red-600 font-black">-50.00</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-600 font-medium">OP-04 (Juan P.)</td>
+                            </tr>
+
+                            <!-- Ejemplo: Nuevo Empaque (Positivo) -->
+                            <tr class="hover:bg-slate-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-xs font-medium text-slate-500">06/Sep/2026 16:30 PM</td>
+                                <td class="px-6 py-4 whitespace-nowrap font-bold text-slate-800">34-1-2026-CLB-02</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-1 rounded uppercase">Empaque Inicial</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-emerald-600 font-black">+200.00</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-600 font-medium">OP-04 (Juan P.)</td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

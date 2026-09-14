@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Interno de Operaciones - Koppert Biofactory</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        .table-container { max-height: 400px; overflow-y: auto; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 flex flex-col h-screen font-sans overflow-hidden">
+
+    <!-- Navbar Corporativo (Diseño Limpio) -->
+    <nav class="bg-emerald-950 text-emerald-100 shadow-lg z-20 flex-shrink-0 border-b border-emerald-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="w-9 h-9 bg-emerald-500 rounded-xl flex items-center justify-center font-bold text-white mr-3 shadow-sm">K</div>
+                    <span class="text-white text-base font-extrabold tracking-wider">KOPPERT <span class="text-[10px] bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded-md font-semibold uppercase ml-1">Admin</span></span>
+                </div>
+                
+                <div class="hidden md:block flex-1 mx-6">
+                    <div class="flex space-x-1 overflow-x-auto">
+                        <a href="/admin/dashboard" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">Control</a>
+                        <a href="/admin/chrysopa/ocupacion" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Ocupación</a>
+                        <a href="/admin/chrysopa/pupacion" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Pupación</a>
+                        <a href="/admin/chrysopa/eclosion" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Eclosión</a>
+                        <a href="/admin/chrysopa/mortalidad" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Mortalidad</a>
+                        <a href="/admin/chrysopa/fallas" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Fallas</a>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs font-medium text-emerald-200 bg-emerald-900/80 px-3 py-1.5 rounded-lg border border-emerald-800">Abdón <strong class="text-white">(Admin)</strong></span>
+                    <a href="/logout" class="text-xs px-3 py-1.5 text-emerald-300 font-medium hover:text-white hover:bg-red-600/80 border border-emerald-800 hover:border-red-500 rounded-lg transition-all shadow-sm">Salir</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 overflow-y-auto p-8 relative">
+        <div class="max-w-7xl mx-auto space-y-8 relative z-10">
+            
+            <!-- Encabezado y Filtro Semanal (Diseño Sólido) -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">Panel General de Operaciones <span class="text-emerald-600 font-bold text-lg bg-emerald-50 px-2 py-0.5 rounded-lg ml-1">(Chrysopa)</span></h1>
+                    <p class="text-xs text-slate-500 font-medium mt-1.5">Monitoreo de rendimiento y estado de lotes organizados por semana de inicio.</p>
+                </div>
+                <div class="flex items-center space-x-3 w-full md:w-auto">
+                    <!-- Selector de Semana -->
+                    <select class="border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 font-bold transition-all hover:border-emerald-300 cursor-pointer">
+                        <option value="30">Semana 30 (Actual)</option>
+                        <option value="29">Semana 29</option>
+                        <option value="28">Semana 28</option>
+                        <option value="27">Semana 27</option>
+                    </select>
+                    <button class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-900 transition-all shadow-md flex items-center justify-center gap-2">
+                        Consultar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sección 1: Estatus de Lotes (2 Columnas) -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between px-2">
+                    <h2 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Flujo de Lotes - Identificador: Semana 30</h2>
+                    <span class="text-xs text-emerald-600 font-medium flex items-center gap-1"><div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div> Datos actualizados</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    
+                    <!-- Lotes en Proceso -->
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 border-t-4 border-t-blue-500 relative overflow-hidden flex flex-col justify-between group">
+                        <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-50 rounded-full transition-colors duration-500"></div>
+                        <div class="relative z-10 flex justify-between items-start">
+                            <div>
+                                <h3 class="text-slate-500 text-[11px] font-bold uppercase tracking-widest">En Proceso</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            </div>
+                        </div>
+                        <div class="relative z-10 mt-4">
+                            <p class="text-4xl font-black text-slate-800 tracking-tight">8</p>
+                            <span class="text-[11px] text-blue-700 font-semibold mt-3 flex items-center gap-1 bg-blue-50 px-2.5 py-1 rounded-lg w-fit border border-blue-200">🔵 Activos (Sem 30)</span>
+                        </div>
+                    </div>
+
+                    <!-- Lotes Finalizados -->
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 border-t-4 border-t-emerald-500 relative overflow-hidden flex flex-col justify-between group">
+                        <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full transition-colors duration-500"></div>
+                        <div class="relative z-10 flex justify-between items-start">
+                            <div>
+                                <h3 class="text-slate-500 text-[11px] font-bold uppercase tracking-widest">Finalizados</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="relative z-10 mt-4">
+                            <p class="text-4xl font-black text-slate-800 tracking-tight">14</p>
+                            <span class="text-[11px] text-emerald-700 font-semibold mt-3 flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-lg w-fit border border-emerald-200">🟢 Concluidos (Sem 30)</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Sección 2: Desglose de Lotes por Semana -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-8">
+                <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                    <h2 class="text-sm font-extrabold text-slate-800 flex items-center gap-3">
+                        <div class="w-2 h-6 bg-emerald-500 rounded-full"></div>
+                        Desglose de Lotes por Semana de Inicio
+                    </h2>
+                    <span class="text-[10px] font-bold text-slate-500 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">Vista: Semanas Recientes</span>
+                </div>
+                <div class="overflow-x-auto table-container">
+                    <table class="min-w-full divide-y divide-slate-200 text-sm relative">
+                        <thead class="bg-slate-50 text-slate-500 sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-100">ID Lote</th>
+                                <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-100">Semana</th>
+                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-100">Fase / Estado</th>
+                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-100">Progreso</th>
+                                <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px] text-slate-600">Responsable</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 bg-white">
+                            
+                            <!-- Lote En Proceso -->
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap border-r border-slate-50">
+                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-104</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">25/Jul/2026</div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-black bg-slate-100 text-slate-600 border border-slate-200">SEM 30</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                                    <span class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">En Proceso (Eclosión)</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                                    <div class="w-full bg-slate-100 rounded-full h-2.5 max-w-[120px] mx-auto overflow-hidden border border-slate-200">
+                                        <div class="bg-blue-500 h-full rounded-full" style="width: 80%"></div>
+                                    </div>
+                                    <span class="text-[10px] text-slate-500 font-bold mt-1.5 block">80% Completado</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">
+                                    Juan Pérez <span class="text-slate-400 text-[10px] ml-1 bg-slate-100 px-1.5 rounded">OP-04</span>
+                                </td>
+                            </tr>
+                            
+                            <!-- Lote En Revisión -->
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap border-r border-slate-50">
+                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-103</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">23/Jul/2026</div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-black bg-slate-100 text-slate-600 border border-slate-200">SEM 30</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                                    <span class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">En Revisión (Pupación)</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                                    <div class="w-full bg-slate-100 rounded-full h-2.5 max-w-[120px] mx-auto overflow-hidden border border-slate-200">
+                                        <div class="bg-amber-500 h-full rounded-full" style="width: 65%"></div>
+                                    </div>
+                                    <span class="text-[10px] text-slate-500 font-bold mt-1.5 block">Pausado</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">
+                                    María López <span class="text-slate-400 text-[10px] ml-1 bg-slate-100 px-1.5 rounded">OP-02</span>
+                                </td>
+                            </tr>
+
+                            <!-- Lote Finalizado -->
+                            <tr class="hover:bg-slate-50 transition-colors bg-slate-50/50">
+                                <td class="px-6 py-4 whitespace-nowrap border-r border-slate-50">
+                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-102</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">18/Jul/2026</div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-black bg-slate-200 text-slate-500 border border-slate-300">SEM 29</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                                    <span class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Finalizado</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                                    <div class="w-full bg-slate-100 rounded-full h-2.5 max-w-[120px] mx-auto overflow-hidden border border-slate-200">
+                                        <div class="bg-emerald-500 h-full rounded-full" style="width: 100%"></div>
+                                    </div>
+                                    <span class="text-[10px] text-emerald-600 font-bold mt-1.5 block">100% Entregado</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">
+                                    Carlos Ruiz <span class="text-slate-400 text-[10px] ml-1 bg-slate-100 px-1.5 rounded">OP-01</span>
+                                </td>
+                            </tr>
+
+                            <!-- Lote Finalizado -->
+                            <tr class="hover:bg-slate-50 transition-colors bg-slate-50/50">
+                                <td class="px-6 py-4 whitespace-nowrap border-r border-slate-50">
+                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-101</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">15/Jul/2026</div>
+                                </td>
+                                <td class="px-4 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                                    <span class="px-2.5 py-1 rounded-md text-[10px] font-black bg-slate-200 text-slate-500 border border-slate-300">SEM 29</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                                    <span class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Finalizado</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                                    <div class="w-full bg-slate-100 rounded-full h-2.5 max-w-[120px] mx-auto overflow-hidden border border-slate-200">
+                                        <div class="bg-emerald-500 h-full rounded-full" style="width: 100%"></div>
+                                    </div>
+                                    <span class="text-[10px] text-emerald-600 font-bold mt-1.5 block">100% Entregado</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">
+                                    María López <span class="text-slate-400 text-[10px] ml-1 bg-slate-100 px-1.5 rounded">OP-02</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sección 3: Gráficas de Análisis Visual -->
+            <div class="space-y-6 mt-8">
+                <!-- Fila 1: Eficiencia y Barras -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                            <h2 class="text-sm font-bold text-slate-800">Eficiencia Global por Módulo (%)</h2>
+                            <span class="text-[10px] text-slate-500 font-mono bg-slate-100 px-2.5 py-1 rounded-lg">Tendencia Semanal</span>
+                        </div>
+                        <div class="relative h-72 w-full">
+                            <canvas id="efficiencyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                            <h2 class="text-sm font-bold text-slate-800">Incidencias Semanales</h2>
+                            <span class="text-[10px] text-slate-500 font-mono bg-slate-100 px-2.5 py-1 rounded-lg">Fallas / Bajas</span>
+                        </div>
+                        <div class="relative h-72 w-full flex items-center justify-center">
+                            <canvas id="incidentsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fila 2: Comparativa Mortalidad -->
+                <div class="grid grid-cols-1 gap-6">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                            <h2 class="text-sm font-bold text-slate-800">Comparativa de Mortalidad: Semana 1 vs Semana 2</h2>
+                            <span class="text-[10px] text-slate-500 font-mono bg-slate-100 px-2.5 py-1 rounded-lg">Bajas por Lote</span>
+                        </div>
+                        <div class="relative h-72 w-full">
+                            <canvas id="mortalityComparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Configuración de fuentes de Chart.js
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#64748b'; 
+
+        // Gráfica 1: Eficiencia
+        const ctxEfficiency = document.getElementById('efficiencyChart').getContext('2d');
+        new Chart(ctxEfficiency, {
+            type: 'line',
+            data: {
+                labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+                datasets: [{
+                    label: 'Ocupación (%)',
+                    data: [85, 86, 88, 87, 89, 87.3],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Pupación (%)',
+                    data: [92, 93, 95, 94, 96, 94.8],
+                    borderColor: '#059669',
+                    tension: 0.4
+                }, {
+                    label: 'Eclosión (%)',
+                    data: [95, 96, 95.5, 97, 96.2],
+                    borderColor: '#064e3b',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
+                scales: { 
+                    y: { min: 80, max: 100, grid: { color: '#f1f5f9' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Gráfica 2: Barras de Incidencias
+        const ctxIncidents = document.getElementById('incidentsChart').getContext('2d');
+        new Chart(ctxIncidents, {
+            type: 'bar',
+            data: {
+                labels: ['Ocupación Baja', 'Fallas Pupación', 'No Eclosionados', 'Bajas Botes'],
+                datasets: [{
+                    label: 'Registros',
+                    data: [4, 18, 12, 12],
+                    backgroundColor: ['#3b82f6', '#f59e0b', '#10b981', '#ef4444'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { grid: { color: '#f1f5f9' } },
+                    x: { grid: { display: false } } 
+                }
+            }
+        });
+
+        // Gráfica 3: Mortalidad
+        const ctxMortality = document.getElementById('mortalityComparisonChart').getContext('2d');
+        new Chart(ctxMortality, {
+            type: 'line',
+            data: {
+                labels: ['CHR-LOTE-099', 'CHR-LOTE-100', 'CHR-LOTE-101', 'CHR-LOTE-102'],
+                datasets: [{
+                    label: 'Semana 1 (Bajas Previas)',
+                    data: [2, 1, 1, 2],
+                    borderColor: '#94a3b8',
+                    borderDash: [5, 5], 
+                    tension: 0, 
+                    fill: false,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#94a3b8',
+                    pointBorderWidth: 2
+                }, {
+                    label: 'Semana 2 (Bajas Actuales)',
+                    data: [4, 3, 2, 5],
+                    borderColor: '#ef4444',
+                    tension: 0, 
+                    fill: false,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#ef4444',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f1f5f9' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
