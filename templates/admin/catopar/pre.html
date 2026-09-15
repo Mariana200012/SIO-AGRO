@@ -1,49 +1,24 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pre-Parasitismo - Koppert Biofactory</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Scroll suave en contenedor de tablas */
-        html { scroll-behavior: smooth; }
-        .table-container { max-height: 400px; overflow-y: auto; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
-</head>
-<body class="bg-slate-50 flex flex-col h-screen font-sans overflow-hidden">
+{% extends "admin/base_admin.html" %}
 
-    <!-- Navbar Ejecutivo (Diseño Limpio) -->
-    <nav class="bg-emerald-950 text-emerald-100 shadow-lg z-20 flex-shrink-0 border-b border-emerald-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <div class="w-9 h-9 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center font-bold text-white mr-3 shadow-md shadow-emerald-900/50">K</div>
-                    <span class="text-white text-base font-extrabold tracking-wider">KOPPERT <span class="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded-full font-semibold uppercase ml-1">Admin</span></span>
-                </div>
-                
-                <!-- Menú de Navegación Rápida -->
-                <div class="hidden md:block flex-1 mx-6">
-                    <div class="flex space-x-1 overflow-x-auto">
-                        <a href="#" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Resumen General</a>
-                        <!-- Opción activa -->
-                        <a href="#" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">Pre-Parasitismo</a>
-                        <a href="#" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Post-Parasitismo</a>
-                        <a href="#" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Registros Chrysopa</a>
-                    </div>
-                </div>
+{% block title %}Monitoreo de Pre-Parasitismo - Koppert Biofactory{% endblock %}
 
-                <div class="flex items-center space-x-4">
-                    <span class="text-xs font-medium text-emerald-200 bg-emerald-900/80 px-3 py-1.5 rounded-lg border border-emerald-800"> <strong class="text-white">(Admin)</strong></span>
-                   <a href="{{ url_for('auth.logout') }}" class="text-xs px-4 py-2 text-white font-bold bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-400 rounded-xl transition-all shadow-sm">Cerrar Sesión</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+{% block navbar_menu %}
+<div class="hidden md:block flex-1 mx-6">
+    <div class="flex space-x-1 overflow-x-auto">
+        <!-- PESTAÑA ACTIVA: PRE-PARASITISMO -->
+        <a href="{{ url_for('admin.pre') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-sm flex items-center gap-1.5">
+            Pre-Parasitismo
+        </a>            
+        
+        <!-- PESTAÑA INACTIVA: POST-PARASITISMO -->
+        <a href="{{ url_for('admin.post') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-blue-900 hover:text-white transition-colors flex items-center gap-1.5">
+            Post-Parasitismo
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
 
     <!-- Área de Trabajo Principal -->
     <main class="flex-1 overflow-y-auto p-8 relative">
@@ -153,7 +128,9 @@
 
         </div>
     </main>
+    {% endblock %}
 
+    {% block scripts %}
     <!-- Script de validación ajustado para diseño sólido -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -179,3 +156,4 @@
     </script>
 </body>
 </html>
+{% endblock %}

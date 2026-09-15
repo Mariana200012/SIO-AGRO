@@ -29,7 +29,19 @@
                 {% block navbar_menu %}
                 {% endblock %}
                 
-                <div class="flex items-center space-x-6">
+                <!-- SECCIÓN DERECHA ORDENADA: Panel -> Separador -> Usuario -> Cerrar Sesión -->
+                <div class="flex items-center space-x-4">
+                    
+                    <!-- 1. Botón Panel -->
+                    <a href="{{ url_for('admin.dashboard') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-slate-800/80 text-slate-300 hover:bg-emerald-600 hover:text-white transition-all shadow-sm flex items-center gap-1.5 border border-slate-700/50 group">
+                        <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                        Panel
+                    </a>
+
+                    <!-- 2. Línea divisoria muy sutil -->
+                    <div class="w-px h-6 bg-slate-700/50 hidden sm:block"></div>
+
+                    <!-- 3. Información del Usuario -->
                     <div class="text-right hidden sm:block">
                         <p class="text-xs font-bold text-white"><span class="text-emerald-200 font-medium">{{ session.get('nombre', 'Administrador') }}</span></p>
                         <p class="text-[10px] text-emerald-400 font-mono flex items-center justify-end gap-1 mt-0.5">
@@ -37,7 +49,10 @@
                             Sesión Segura
                         </p>
                     </div>
-                   <a href="{{ url_for('auth.logout') }}" class="text-xs px-4 py-2 text-white font-bold bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-400 rounded-xl transition-all shadow-sm">Cerrar Sesión</a>
+
+                    <!-- 4. Botón Cerrar Sesión -->
+                    <a href="{{ url_for('auth.logout') }}" class="text-xs px-4 py-2 text-white font-bold bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-400 rounded-xl transition-all shadow-sm">Cerrar Sesión</a>
+                    
                 </div>
             </div>
         </div>
@@ -50,6 +65,7 @@
             {% endblock %}
         </div>
     </main>
+    
     {% block scripts %}
     {% endblock %}
 </body>

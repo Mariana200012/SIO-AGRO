@@ -1,14 +1,16 @@
 {% extends "admin/base_admin.html" %}
 
-{% block title %}Monitoreo de Ocupación - Koppert Biofactory{% endblock %}
+{% block title %}Monitoreo de Eclosión - Koppert Biofactory{% endblock %}
 
 {% block navbar_menu %}
 <div class="hidden md:block flex-1 mx-6">
     <div class="flex space-x-1 overflow-x-auto">
-        <a href="{{ url_for('admin.dashboard') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Control</a>
-        <a href="{{ url_for('admin.ocupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Ocupación</a>
+       <a href="{{ url_for('admin.ocupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Ocupación</a>
         <a href="{{ url_for('admin.pupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Pupación</a>
+        
+        <!-- PESTAÑA ACTIVA: ECLOSIÓN -->
         <a href="{{ url_for('admin.eclosion') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">Eclosión</a>
+        
         <a href="{{ url_for('admin.mortalidad') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Mortalidad</a>
         <a href="{{ url_for('admin.fallas') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Fallas</a>
     </div>
@@ -19,8 +21,8 @@
 <!-- Encabezado y Buscador -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
     <div>
-        <h1 class="text-2xl font-black text-slate-800 tracking-tight">Supervisión de Ocupación <span class="text-emerald-600 font-bold text-lg">(Chrysopa)</span></h1>
-        <p class="text-xs text-slate-500 font-medium mt-1">Control de porcentajes de ocupación por lote y estatus técnico de revisión.</p>
+        <h1 class="text-2xl font-black text-slate-800 tracking-tight">Supervisión de Eclosión <span class="text-emerald-600 font-bold text-lg">(Chrysopa)</span></h1>
+        <p class="text-xs text-slate-500 font-medium mt-1">Control del surgimiento de adultos, viabilidad del ciclo y porcentajes de eclosión por lote.</p>
     </div>
     <div class="flex items-center space-x-3 w-full md:w-auto">
         <input type="date" id="dateSearch" class="border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 font-medium">
@@ -79,21 +81,21 @@
         </div>
     </div>
 
-    <!-- Tarjeta 3: Promedio de Ocupación -->
+    <!-- Tarjeta 3: Promedio de Eclosión -->
     <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between group">
         <div id="blobPromedio" class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full transition-colors duration-500"></div>
         
         <div class="relative z-10 flex justify-between items-start">
             <div>
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Promedio Ocupación</h3>
-                <span class="text-[10px] text-slate-400 font-medium mt-1 block">Límite mínimo operativo: 80%</span>
+                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Promedio Eclosión</h3>
+                <span class="text-[10px] text-slate-400 font-medium mt-1 block">Límite mínimo viabilidad: 80%</span>
             </div>
             <div id="iconBoxPromedio" class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center transition-colors duration-500">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
             </div>
         </div>
         <div class="relative z-10 mt-6 flex items-end gap-1">
-            <p id="valPromedio" class="text-5xl font-black text-slate-800 tracking-tight transition-colors duration-500">87.3</p>
+            <p id="valPromedio" class="text-5xl font-black text-slate-800 tracking-tight transition-colors duration-500">89.1</p>
             <span id="symbolPromedio" class="text-2xl font-bold text-slate-600 mb-1 transition-colors duration-500">%</span>
         </div>
         <div class="relative z-10 mt-2 flex items-center gap-2">
@@ -103,14 +105,14 @@
     </div>
 </div>
 
-<!-- Historial de Ocupación -->
+<!-- Historial de Eclosión -->
 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-8">
     <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
         <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-            Historial de Muestreos y Estatus de Lotes
+            Historial de Muestreos y Estatus de Eclosión
             <span class="text-xs font-normal text-slate-400 ml-2 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">(Haz clic en un lote para ver sus datos arriba)</span>
         </h2>
-        <span class="text-[10px] text-slate-500 font-mono bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">TABLA: OCUPACION / DETALLE</span>
+        <span class="text-[10px] text-slate-500 font-mono bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">TABLA: ECLOSION / DETALLE</span>
     </div>
     
     <div class="overflow-x-auto table-container" id="scrollTable">
@@ -119,9 +121,9 @@
                 <tr>
                     <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">ID Lote / Fecha</th>
                     <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Semana</th>
-                    <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Rejilla 1 <span class="block text-[9px] font-normal text-slate-400 mt-0.5">(de 100)</span></th>
-                    <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Rejilla 2 <span class="block text-[9px] font-normal text-slate-400 mt-0.5">(de 100)</span></th>
-                    <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Rejilla 3 <span class="block text-[9px] font-normal text-slate-400 mt-0.5">(de 100)</span></th>
+                    <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Muestra 1 <span class="block text-[9px] font-normal text-slate-400 mt-0.5">(Adultos nacidos)</span></th>
+                    <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Muestra 2 <span class="block text-[9px] font-normal text-slate-400 mt-0.5">(Adultos nacidos)</span></th>
+                    <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Muestra 3 <span class="block text-[9px] font-normal text-slate-400 mt-0.5">(Adultos nacidos)</span></th>
                     <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] bg-slate-50">Promedio Lote</th>
                     <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Estatus</th>
                     <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Operador</th>
@@ -130,26 +132,26 @@
             <tbody class="divide-y divide-slate-100 bg-white" id="lotesTableBody">
                 
                 <!-- Lote 104 -->
-                <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-104" data-semana="30" data-fecha="2026-07-23" data-promedio="86.3" data-estado="Óptimo">
+                <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-104" data-semana="30" data-fecha="2026-07-23" data-promedio="89.5" data-estado="Óptimo">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="font-bold text-slate-800 text-sm">CHR-LOTE-104</div>
                         <div class="text-[11px] text-slate-400 font-medium mt-0.5">23/Jul/2026 - 10:00 AM</div>
                     </td>
                     <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 30</span></td>
                     <td class="px-5 py-4 whitespace-nowrap text-center">
-                        <div class="text-slate-800 font-bold text-sm">84</div>
-                        <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">84.0%</div>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center">
-                        <div class="text-slate-800 font-bold text-sm">87</div>
-                        <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">87.0%</div>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center">
                         <div class="text-slate-800 font-bold text-sm">88</div>
                         <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">88.0%</div>
                     </td>
+                    <td class="px-5 py-4 whitespace-nowrap text-center">
+                        <div class="text-slate-800 font-bold text-sm">90</div>
+                        <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">90.0%</div>
+                    </td>
+                    <td class="px-5 py-4 whitespace-nowrap text-center">
+                        <div class="text-slate-800 font-bold text-sm">91</div>
+                        <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">91.0%</div>
+                    </td>
                     <td class="px-5 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                        <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">86.3%</span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">89.5%</span>
                     </td>
                     <td class="px-5 py-4 whitespace-nowrap text-center">
                         <span class="inline-flex items-center px-3 py-1 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">🟢 Óptimo</span>
@@ -158,89 +160,32 @@
                 </tr>
 
                 <!-- Lote 103 (Alerta) -->
-                <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-103" data-semana="29" data-fecha="2026-07-22" data-promedio="70.0" data-estado="Requiere Revisión">
+                <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-103" data-semana="29" data-fecha="2026-07-22" data-promedio="73.0" data-estado="Requiere Revisión">
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="font-bold text-slate-800 text-sm">CHR-LOTE-103</div>
                         <div class="text-[11px] text-slate-400 font-medium mt-0.5">22/Jul/2026 - 11:30 AM</div>
                     </td>
                     <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 29</span></td>
                     <td class="px-5 py-4 whitespace-nowrap text-center">
-                        <div class="text-slate-800 font-bold text-sm">68</div>
-                        <div class="text-[10px] text-amber-600 font-semibold mt-0.5">68.0%</div>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center">
-                        <div class="text-slate-800 font-bold text-sm">72</div>
-                        <div class="text-[10px] text-amber-600 font-semibold mt-0.5">72.0%</div>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center">
                         <div class="text-slate-800 font-bold text-sm">70</div>
                         <div class="text-[10px] text-amber-600 font-semibold mt-0.5">70.0%</div>
                     </td>
+                    <td class="px-5 py-4 whitespace-nowrap text-center">
+                        <div class="text-slate-800 font-bold text-sm">75</div>
+                        <div class="text-[10px] text-amber-600 font-semibold mt-0.5">75.0%</div>
+                    </td>
+                    <td class="px-5 py-4 whitespace-nowrap text-center">
+                        <div class="text-slate-800 font-bold text-sm">74</div>
+                        <div class="text-[10px] text-amber-600 font-semibold mt-0.5">74.0%</div>
+                    </td>
                     <td class="px-5 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                        <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-800">70.0%</span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-800">73.0%</span>
                     </td>
                     <td class="px-5 py-4 whitespace-nowrap text-center">
                         <span class="inline-flex items-center px-3 py-1 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-200">⚠️ Revisión</span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">María López <span class="text-slate-400 text-[10px] ml-1">(OP-02)</span></td>
                 </tr>
-
-                <!-- Lote 102 -->
-                <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-102" data-semana="29" data-fecha="2026-07-21" data-promedio="87.7" data-estado="Óptimo">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="font-bold text-slate-800 text-sm">CHR-LOTE-102</div>
-                        <div class="text-[11px] text-slate-400 font-medium mt-0.5">21/Jul/2026 - 09:15 AM</div>
-                    </td>
-                    <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 29</span></td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center">
-                        <div class="text-slate-800 font-bold text-sm">85</div>
-                        <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">85.0%</div>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center">
-                        <div class="text-slate-800 font-bold text-sm">90</div>
-                        <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">90.0%</div>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center">
-                        <div class="text-slate-800 font-bold text-sm">88</div>
-                        <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">88.0%</div>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                        <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">87.7%</span>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center">
-                        <span class="inline-flex items-center px-3 py-1 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">🟢 Óptimo</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">Carlos Ruiz <span class="text-slate-400 text-[10px] ml-1">(OP-01)</span></td>
-                </tr>
-                
-                <!-- Lote 095 (Alerta) -->
-                <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-095" data-semana="28" data-fecha="2026-07-15" data-promedio="65.5" data-estado="Requiere Revisión">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="font-bold text-slate-800 text-sm">CHR-LOTE-095</div>
-                        <div class="text-[11px] text-slate-400 font-medium mt-0.5">15/Jul/2026 - 11:45 AM</div>
-                    </td>
-                    <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 28</span></td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center">
-                        <div class="text-slate-800 font-bold text-sm">64</div>
-                        <div class="text-[10px] text-amber-600 font-semibold mt-0.5">64.0%</div>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center">
-                        <div class="text-slate-800 font-bold text-sm">66</div>
-                        <div class="text-[10px] text-amber-600 font-semibold mt-0.5">66.0%</div>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center">
-                        <div class="text-slate-800 font-bold text-sm">66</div>
-                        <div class="text-[10px] text-amber-600 font-semibold mt-0.5">66.0%</div>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                        <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-800">65.5%</span>
-                    </td>
-                    <td class="px-5 py-4 whitespace-nowrap text-center">
-                        <span class="inline-flex items-center px-3 py-1 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-200">⚠️ Revisión</span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">María López <span class="text-slate-400 text-[10px] ml-1">(OP-02)</span></td>
-                </tr>
-
             </tbody>
         </table>
     </div>
@@ -248,7 +193,7 @@
 {% endblock %}
 
 {% block scripts %}
-<!-- Funciones Javascript Originales -->
+<!-- Funciones Javascript para Eclosión -->
 <script>
     const rows = document.querySelectorAll('.data-row');
     const btnResetCards = document.getElementById('btnResetCards');
@@ -267,7 +212,7 @@
     const iconBoxPromedio = document.getElementById('iconBoxPromedio');
     const dotPromedio = document.getElementById('dotPromedio');
 
-    // Función para cambiar colores
+    // Función para cambiar colores (Alertas de Eclosión)
     function updateCardColors(isAlert) {
         const allClasses = ['bg-emerald-50', 'bg-amber-50', 'text-emerald-600', 'text-amber-600', 'text-slate-800', 'text-amber-700', 'text-slate-600', 'bg-slate-300', 'bg-emerald-500', 'bg-amber-500'];
 
@@ -315,10 +260,10 @@
 
             if(promedio < 80.0) {
                 updateCardColors(true);
-                subPromedio.innerText = "⚠️ Nivel de ocupación bajo (< 80%)";
+                subPromedio.innerText = "⚠️ Nivel de eclosión bajo (< 80%)";
             } else {
                 updateCardColors(false);
-                subPromedio.innerText = "🟢 Nivel de ocupación óptimo";
+                subPromedio.innerText = "🟢 Nivel de eclosión óptimo";
             }
 
             btnResetCards.classList.remove('hidden');
@@ -342,7 +287,7 @@
         valLote.classList.add('text-3xl');
         subLote.innerText = "Lote correspondiente";
         
-        valPromedio.innerText = "87.3";
+        valPromedio.innerText = "89.1";
         subPromedio.innerText = "Promedio global general";
         
         updateCardColors(false);

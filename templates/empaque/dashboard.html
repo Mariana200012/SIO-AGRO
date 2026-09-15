@@ -32,7 +32,7 @@
 
                 <div class="flex items-center space-x-4">
                     <span class="text-xs font-medium text-emerald-200 bg-emerald-900/80 px-3 py-1.5 rounded-lg border border-emerald-800"> <strong class="text-white">Op. Empaque</strong></span>
-                    <a href="/logout" class="text-xs px-3 py-1.5 text-emerald-300 font-medium hover:text-white hover:bg-red-600/80 border border-emerald-800 hover:border-red-500 rounded-lg transition-all">Salir</a>
+                    <a href="{{ url_for('auth.logout') }}" class="text-xs px-4 py-2 text-white font-bold bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-400 rounded-xl transition-all shadow-sm">Cerrar Sesión</a>                </div>
                 </div>
             </div>
         </div>

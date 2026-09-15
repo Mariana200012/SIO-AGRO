@@ -1,0 +1,137 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Gestión de Usuarios - Koppert Biofactory{% endblock %}
+
+{% block navbar_menu %}
+<div class="hidden md:block flex-1 mx-6">
+    <div class="flex space-x-1 overflow-x-auto">
+ 
+        <a href="{{ url_for('admin.usuarios') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-purple-600 text-white shadow-sm flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+            Gestión de Usuarios
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Encabezado y Botón de Nuevo Usuario -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+    <div>
+        <h1 class="text-2xl font-black text-slate-800 tracking-tight">Directorio de Personal <span class="text-purple-600 font-bold text-lg">(Accesos)</span></h1>
+        <p class="text-xs text-slate-500 font-medium mt-1">Administración de operadores, NIPs de seguridad y asignación de áreas.</p>
+    </div>
+    <div class="flex items-center w-full md:w-auto">
+        <button onclick="document.getElementById('modal-usuario').classList.remove('hidden')" class="bg-purple-600 text-white px-5 py-3 rounded-xl text-sm font-bold hover:bg-purple-700 transition-all shadow-md flex items-center justify-center gap-2 w-full md:w-auto">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+            Registrar Nuevo Usuario
+        </button>
+    </div>
+</div>
+
+<!-- Tabla de Usuarios (DINÁMICA DESDE SQLITE) -->
+<div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-8">
+    <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+        <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+            Operadores Activos en el Sistema
+        </h2>
+        <span class="text-[10px] text-slate-500 font-mono bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">TABLA: USUARIOS</span>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-100 text-sm">
+            <thead class="bg-white text-slate-500">
+                <tr>
+                    <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">ID / Nombre Completo</th>
+                    <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Puesto y Área</th>
+                    <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">NIP de Acceso</th>
+                    <th class="px-6 py-4 text-right font-extrabold uppercase tracking-wider text-[10px]">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                
+                <!-- CICLO FOR PARA MOSTRAR LA TABLA REAL -->
+                {% for u in usuarios %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-3">
+                            <!-- Inicial del nombre -->
+                            <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs uppercase">{{ u['nombre_usuario'][0] }}</div>
+                            <div>
+                                <div class="font-bold text-slate-800 text-sm">{{ u['nombre_usuario'] }}</div>
+                                <div class="text-[10px] text-slate-400 font-mono mt-0.5">ID: USR-00{{ u['id_usuario'] }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="font-bold text-slate-700 text-xs">{{ u['puesto'] }}</div>
+                        <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md border border-slate-200 mt-1 inline-block">Área ID: {{ u['id_area'] }}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                        <span class="font-mono text-slate-800 font-bold tracking-widest bg-slate-100 px-2 py-1 rounded">{{ u['nip_firma'] }}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right space-x-2">
+                        <button class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors inline-flex items-center justify-center" title="Editar">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        </button>
+                        <button class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors inline-flex items-center justify-center" title="Eliminar">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal para Registrar Nuevo Usuario -->
+<div id="modal-usuario" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+            <div>
+                <h3 class="font-black text-slate-800 text-lg">Registrar Operador</h3>
+                <p class="text-[11px] text-slate-500 font-medium">Llene los datos para dar de alta en la BD.</p>
+            </div>
+            <button onclick="document.getElementById('modal-usuario').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
+        </div>
+        
+        <!-- Formulario CONECTADO a la ruta de Python -->
+        <form action="{{ url_for('admin.agregar_usuario') }}" method="POST" class="space-y-5 text-sm">
+            <div>
+                <label class="font-bold text-slate-700 block mb-1.5">Nombre Completo</label>
+                <input type="text" name="nombre_usuario" placeholder="Ej. Juan Pérez" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors">
+            </div>
+
+            <div>
+                <label class="font-bold text-slate-700 block mb-1.5">Puesto</label>
+                <input type="text" name="puesto" placeholder="Ej. Operador, Administrador..." required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1.5">NIP de Acceso</label>
+                    <input type="text" name="nip_firma" placeholder="4 dígitos" maxlength="4" pattern="\d{4}" required class="w-full font-mono font-bold text-center text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1.5">Área (ID)</label>
+                    <select name="id_area" class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors">
+                        <option value="1">1 - Chrysopa</option>
+                        <option value="2">2 - Catopar</option>
+                        <option value="3">3 - Empaque</option>
+                        <option value="4">4 - Analista</option>
+                        <option value="5">5 - Administrador</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="pt-4 flex space-x-3 border-t border-slate-100 mt-2">
+                <button type="button" onclick="document.getElementById('modal-usuario').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+                <button type="submit" class="flex-1 bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700 transition-colors shadow-md">Guardar Usuario</button>
+                
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
