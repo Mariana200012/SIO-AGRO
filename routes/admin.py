@@ -74,6 +74,8 @@ def agregar_usuario():
     
     conexion = sqlite3.connect('Bd_SIO-AGRO.db')
     cursor = conexion.cursor()
+    
+    # Insertamos sin enviar el id_usuario, SQLite se encarga del Autoincremento
     cursor.execute(
         "INSERT INTO USUARIOS (id_area, nombre_usuario, puesto, nip_firma) VALUES (?, ?, ?, ?)",
         (id_area, nombre, puesto, nip)
@@ -96,11 +98,21 @@ def eliminar_usuario(id_usuario):
 
 @admin_bp.route('/usuarios/editar/<int:id_usuario>', methods=['POST'])
 def editar_usuario(id_usuario):
+    # Recibimos los nuevos datos
+    nombre = request.form['nombre_usuario']
+    puesto = request.form['puesto']
+    nip = request.form['nip_firma']
+    id_area = request.form['id_area']
+    
+    # Actualizamos la base de datos
     conexion = sqlite3.connect('Bd_SIO-AGRO.db')
     cursor = conexion.cursor()
-    
-    cursor.execute("UPDATE USUARIOS SET nombre_usuario = ?, puesto = ?, nip_firma = ?, id_area = ? WHERE id_usuario = ?",
-                   (request.form['nombre_usuario'], request.form['puesto'], request.form['nip_firma'], request.form['id_area'], id_usuario))
+    cursor.execute(
+        """UPDATE USUARIOS 
+           SET id_area = ?, nombre_usuario = ?, puesto = ?, nip_firma = ? 
+           WHERE id_usuario = ?""",
+        (id_area, nombre, puesto, nip, id_usuario)
+    )
     conexion.commit()
     conexion.close()
     

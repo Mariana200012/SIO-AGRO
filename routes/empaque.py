@@ -61,6 +61,3 @@ def registrar_empaque():
         conn.close()
         
     return redirect(url_for('empaque.dashboard_empaque'))
-
-#ok si pero yo ya tengo una bd de sqlite que abri en el visual basic con una herramienta extra entoes aqui puedo ver mi bdy editar la pero
-#ese archivo que creMO SIO_AGRO.DB DEBERIA ESTRA CONECTADO A ESA bd que hice y por alguna razon no lo ets ya que en labtabla de usuarios yo no tengo esos datos guardados

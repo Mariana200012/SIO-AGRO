@@ -1,7 +1,6 @@
 import sqlite3
 import os
 
-# SUSTITUYE 'tu_base_original.db' POR EL NOMBRE EXACTO DEL ARCHIVO QUE VES EN VS CODE
 DATABASE = 'Bd_SIO-AGRO.db' 
 
 def get_db_connection():
