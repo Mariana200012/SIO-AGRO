@@ -38,6 +38,24 @@
     <main class="flex-1 overflow-y-auto p-6 lg:p-10">
         <div class="max-w-5xl mx-auto space-y-6">
             
+            <!-- ALERTA DE MENSAJES (ÉXITO O ERROR) -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="p-4 rounded-2xl font-bold text-sm shadow-sm flex items-center gap-2 
+                            {% if category == 'error' %} bg-rose-100 text-rose-700 border border-rose-200 
+                            {% else %} bg-emerald-100 text-emerald-800 border border-emerald-200 {% endif %}">
+                            {% if category == 'error' %}
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            {% else %}
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            {% endif %}
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
             <!-- Encabezado de Sección (Sólido) -->
             <div class="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
@@ -57,7 +75,7 @@
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-6">
                 <div class="bg-slate-50 px-7 py-5 border-b border-slate-100 flex justify-between items-center">
                     <h2 class="text-[15px] font-bold text-slate-800 tracking-tight">Tus Solicitudes Recientes</h2>
-                    <span class="text-[10px] text-slate-500 font-mono bg-white border border-slate-200 px-2 py-1 rounded-md shadow-sm">Tabla: SOLICITUD_MATERIALES</span>
+                    <span class="text-[10px] text-slate-500 font-mono bg-white border border-slate-200 px-2 py-1 rounded-md shadow-sm">Tabla: SOLICITUDES_MATERIAL</span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
@@ -70,20 +88,34 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white text-xs">
+                            
+                            <!-- CICLO DINÁMICO DE PYTHON -->
+                            {% for sol in mis_solicitudes %}
                             <tr class="hover:bg-slate-50 transition-colors">
                                 <td class="px-7 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-900 text-sm">SOL-2026-042</div>
-                                    <div class="text-[11px] text-slate-500 font-medium mt-0.5">22/Jul/2026 - 10:30 AM</div>
+                                    <div class="font-bold text-slate-900 text-sm">SOL-00{{ sol['id_solicitud'] }}</div>
+                                    <div class="text-[11px] text-slate-500 font-medium mt-0.5">{{ sol['fecha_solicitud'] }}</div>
                                 </td>
                                 <td class="px-7 py-4 font-medium text-slate-700 space-y-1">
-                                    <span class="block">&bull; Rejillas plásticas de 100 orificios (15 pzas)</span>
-                                    <span class="block">&bull; Papel filtro base (5 pzas)</span>
+                                    <span class="block">&bull; {{ sol['nombre_material'] }} ({{ sol['cantidad_solicitada'] }} pzas)</span>
                                 </td>
-                                <td class="px-7 py-4 text-slate-600 font-medium">Juan Pérez <span class="font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded ml-1">OP-04</span></td>
+                                <td class="px-7 py-4 text-slate-600 font-medium">
+                                    {{ sol['nombre_usuario'] }}
+                                </td>
                                 <td class="px-7 py-4 whitespace-nowrap text-center">
-                                    <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-amber-100 text-amber-800 uppercase tracking-wider">Pendiente de Surtido</span>
+                                    {% if sol['estatus'] == 'Pendiente' %}
+                                        <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-amber-100 text-amber-800 uppercase tracking-wider">{{ sol['estatus'] }}</span>
+                                    {% else %}
+                                        <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-emerald-100 text-emerald-800 uppercase tracking-wider">{{ sol['estatus'] }}</span>
+                                    {% endif %}
                                 </td>
                             </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="px-7 py-8 text-center text-slate-500 font-medium">No has realizado ninguna solicitud recientemente.</td>
+                            </tr>
+                            {% endfor %}
+
                         </tbody>
                     </table>
                 </div>
@@ -103,42 +135,52 @@
                 <button onclick="document.getElementById('modal-solicitud').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
             </div>
             
-            <form action="/piso/materiales/guardar" method="POST" class="space-y-5 text-sm">
+            <!-- FORMULARIO CONECTADO A PYTHON -->
+            <form action="{{ url_for('prod_chrysopa.guardar_materiales') }}" method="POST" class="space-y-5 text-sm">
                 
                 <!-- Lista de Materiales Frecuentes -->
                 <div class="space-y-3 border border-slate-200 rounded-2xl p-4 bg-slate-50">
                     
-                    <!-- Item 1 -->
+                    <!-- Item 1 (VALUE = 1) -->
                     <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
                         <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
-                            <input type="checkbox" name="material_1" value="Rejillas 100 orificios" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
-                            <span>Rejillas plásticas de 100 orificios</span>
+                            <input type="checkbox" name="material_1" value="1" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
+                            <span>Leche en polvo</span>
                         </label>
                         <input type="number" name="cant_1" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
                     </div>
 
-                    <!-- Item 2 -->
+                  <!-- Miel ahora usa el ID 1 -->
                     <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
                         <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
-                            <input type="checkbox" name="material_2" value="Botes plásticos de cría" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
-                            <span>Botes plásticos para cría</span>
+                            <input type="checkbox" name="material_1" value="1" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
+                            <span>Miel</span>
+                        </label>
+                        <input type="number" name="cant_1" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
+                    </div>
+
+                    <!-- Leche en Polvo ahora usa el ID 2 -->
+                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
+                        <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
+                            <input type="checkbox" name="material_2" value="2" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
+                            <span>Leche en polvo</span>
                         </label>
                         <input type="number" name="cant_2" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
                     </div>
 
-                    <!-- Item 3 -->
+                    <!-- Item 3 (VALUE = 3) -->
                     <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
                         <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
-                            <input type="checkbox" name="material_3" value="Papel filtro base" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
-                            <span>Papel filtro base</span>
+                            <input type="checkbox" name="material_3" value="3" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
+                            <span>Espirulina</span>
                         </label>
                         <input type="number" name="cant_3" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
                     </div>
 
-                    <!-- Item 4 -->
+                    <!-- Item 4 (VALUE = 4) -->
                     <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
                         <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
-                            <input type="checkbox" name="material_4" value="Sustrato / Alimento" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
+                            <input type="checkbox" name="material_4" value="4" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
                             <span>Sustrato / Alimento (Bulto)</span>
                         </label>
                         <input type="number" name="cant_4" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
@@ -159,6 +201,4 @@
         </div>
     </div>
 
-</body>
-</html>
 {% endblock %}

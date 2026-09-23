@@ -1,8 +1,8 @@
-{% extends "admin/base_admin.html" %}
+{% extends "admin/base_modulo.html" %}
 
 {% block title %}Monitoreo de Eclosión - Koppert Biofactory{% endblock %}
 
-{% block navbar_menu %}
+{% block sidebar_menu %}
 <div class="flex space-x-1 items-center">
     <a href="{{ url_for('admin.ocupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors whitespace-nowrap">Ocupación</a>
     <a href="{{ url_for('admin.pupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors whitespace-nowrap">Pupación</a>
@@ -16,176 +16,190 @@
 {% endblock %}
 
 {% block content %}
-<!-- Encabezado y Buscador (Cajas más compactas) -->
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-5 rounded-3xl shadow-sm border border-slate-200 gap-4">
-    <div>
-        <h1 class="text-xl font-black text-slate-800 tracking-tight">Supervisión de Eclosión <span class="text-emerald-600 font-bold text-base">(Chrysopa)</span></h1>
-        <!-- Texto más corto para que no haga doble línea -->
-        <p class="text-xs text-slate-500 font-medium mt-1">Control del surgimiento y porcentajes de eclosión por lote.</p> 
-    </div>
-    <div class="flex items-center space-x-3 w-full md:w-auto">
-        <input type="date" id="dateSearch" class="border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 font-medium">
-        <button id="btnSearch" class="bg-slate-800 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-slate-900 transition-all shadow-md flex items-center justify-center gap-2 whitespace-nowrap">
-            Buscar Registro
-        </button>
-        <button id="btnResetCards" class="bg-emerald-100 text-emerald-800 px-4 py-2 rounded-xl text-sm font-bold hover:bg-emerald-200 transition-all shadow-sm hidden whitespace-nowrap">
-            Limpiar Selección
-        </button>
-    </div>
-</div>
-
-<!-- Tarjetas de Identificadores y KPIs (Márgenes ajustados) -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-    
-    <!-- Tarjeta 1: Semana de Lote -->
-    <div class="bg-gradient-to-br from-emerald-800 to-emerald-950 p-5 rounded-3xl shadow-lg shadow-emerald-900/20 relative overflow-hidden flex flex-col justify-between">
-        <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
-        <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl"></div>
+<!-- Área de Trabajo Principal (Alineado con pupación) -->
+<main class="flex-1 overflow-y-auto p-8">
+    <div class="max-w-7xl mx-auto space-y-8">
         
-        <div class="relative z-10 flex justify-between items-start">
+        <!-- Encabezado y Buscador -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
             <div>
-                <h3 class="text-emerald-200 text-xs font-bold uppercase tracking-widest">Semana Producción</h3>
-                <span class="text-[10px] text-emerald-400 font-medium mt-1 block">Calendario Operativo</span>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight">Supervisión de Eclosión <span class="text-emerald-600 font-bold text-lg">(Chrysopa)</span></h1>
+                <p class="text-xs text-slate-500 font-medium mt-1">Control del surgimiento y porcentajes de eclosión por lote.</p> 
             </div>
-            <div class="w-8 h-8 rounded-xl bg-white/10 text-emerald-100 flex items-center justify-center backdrop-blur-sm border border-white/10">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <div class="flex items-center space-x-3 w-full md:w-auto">
+                <input type="date" id="dateSearch" class="border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 font-medium">
+                <button id="btnSearch" class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-900 transition-all shadow-md flex items-center justify-center gap-2 whitespace-nowrap">
+                    Buscar Registro
+                </button>
+                <button id="btnResetCards" class="bg-emerald-100 text-emerald-800 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-200 transition-all shadow-sm hidden whitespace-nowrap">
+                    Limpiar Selección
+                </button>
             </div>
         </div>
-        <div class="relative z-10 mt-4">
-            <p id="valSemana" class="text-2xl font-black text-white tracking-tight">Vista Global</p>
-            <div class="mt-2 flex items-center gap-2">
-                <span id="subSemana" class="text-[11px] text-emerald-200 font-medium">Seleccione un registro en la tabla</span>
-            </div>
-        </div>
-    </div>
 
-    <!-- Tarjeta 2: Identificador de Lote -->
-    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between">
-        <div class="absolute -right-6 -top-6 w-24 h-24 bg-slate-50 rounded-full"></div>
-        
-        <div class="relative z-10 flex justify-between items-start">
-            <div>
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Lote Interno</h3>
-                <span class="text-[10px] text-slate-400 font-medium mt-1 block">Trazabilidad</span>
-            </div>
-            <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-            </div>
-        </div>
-        <div class="relative z-10 mt-4">
-            <p id="valLote" class="text-2xl font-black text-slate-800 tracking-tight">--</p>
-            <div class="mt-2 flex items-center gap-2">
-                <span id="subLote" class="text-[11px] text-slate-400 font-medium">Lote correspondiente</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tarjeta 3: Promedio de Eclosión -->
-    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between group">
-        <div id="blobPromedio" class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full transition-colors duration-500"></div>
-        
-        <div class="relative z-10 flex justify-between items-start">
-            <div>
-                <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Promedio Eclosión</h3>
-                <span class="text-[10px] text-slate-400 font-medium mt-1 block">Límite mínimo: 80%</span>
-            </div>
-            <div id="iconBoxPromedio" class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center transition-colors duration-500">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-            </div>
-        </div>
-        <div class="relative z-10 mt-4 flex items-end gap-1">
-            <p id="valPromedio" class="text-4xl font-black text-slate-800 tracking-tight transition-colors duration-500">89.1</p>
-            <span id="symbolPromedio" class="text-xl font-bold text-slate-600 mb-1 transition-colors duration-500">%</span>
-        </div>
-        <div class="relative z-10 mt-2 flex items-center gap-2">
-            <div id="dotPromedio" class="w-2 h-2 rounded-full bg-emerald-500 transition-colors duration-500"></div>
-            <span id="subPromedio" class="text-[11px] text-slate-500 font-medium transition-colors">Promedio global general</span>
-        </div>
-    </div>
-</div>
-
-<!-- Historial de Eclosión -->
-<div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-6">
-    <div class="bg-slate-50/50 px-5 py-4 border-b border-slate-100 flex justify-between items-center">
-        <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-            Historial de Muestreos y Estatus
-            <span class="text-[11px] font-normal text-slate-400 ml-2 hidden sm:inline">(Haz clic para detalles)</span>
-        </h2>
-        <span class="text-[10px] text-slate-500 font-mono bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-sm">TABLA: ECLOSION</span>
-    </div>
-    
-    <div class="overflow-x-auto table-container" id="scrollTable">
-        <table class="min-w-full divide-y divide-slate-100 text-sm relative">
-            <thead class="bg-white text-slate-500 sticky top-0 z-10 shadow-sm">
-                <tr>
-                    <th class="px-5 py-3 text-left font-extrabold uppercase tracking-wider text-[10px]">ID Lote / Fecha</th>
-                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Semana</th>
-                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Muestra 1</th>
-                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Muestra 2</th>
-                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Muestra 3</th>
-                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px] bg-slate-50">Promedio</th>
-                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Estatus</th>
-                    <th class="px-5 py-3 text-left font-extrabold uppercase tracking-wider text-[10px]">Operador</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 bg-white" id="lotesTableBody">
+        <!-- Tarjetas de Indicadores (KPIs estandarizadas a 3 columnas) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Tarjeta 1: Semana de Producción -->
+            <div class="bg-gradient-to-br from-emerald-800 to-emerald-950 p-6 rounded-3xl shadow-lg shadow-emerald-900/20 relative overflow-hidden flex flex-col justify-between">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl"></div>
                 
-                <!-- Lote 104 -->
-                <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-104" data-semana="30" data-fecha="2026-07-23" data-promedio="89.5" data-estado="Óptimo">
-                    <td class="px-5 py-3 whitespace-nowrap">
-                        <div class="font-bold text-slate-800 text-sm">CHR-LOTE-104</div>
-                        <div class="text-[10px] text-slate-400 font-medium">23/Jul/2026</div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center"><span class="text-[11px] font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 30</span></td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center">
-                        <div class="font-bold text-sm text-slate-800">88 <span class="text-[9px] text-emerald-600 ml-0.5">88%</span></div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center">
-                        <div class="font-bold text-sm text-slate-800">90 <span class="text-[9px] text-emerald-600 ml-0.5">90%</span></div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center">
-                        <div class="font-bold text-sm text-slate-800">91 <span class="text-[9px] text-emerald-600 ml-0.5">91%</span></div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center bg-slate-50/50">
-                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">89.5%</span>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center">
-                        <span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">🟢 Óptimo</span>
-                    </td>
-                    <td class="px-5 py-3 whitespace-nowrap text-slate-600 text-xs font-medium">Juan P. <span class="text-slate-400 text-[9px] ml-1">(OP-04)</span></td>
-                </tr>
+                <div class="relative z-10 flex justify-between items-start">
+                    <div>
+                        <h3 class="text-emerald-200 text-xs font-bold uppercase tracking-widest">Semana de Producción</h3>
+                        <span class="text-[10px] text-emerald-400 font-medium mt-1 block">Calendario Operativo</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-2xl bg-white/10 text-emerald-100 flex items-center justify-center backdrop-blur-sm border border-white/10">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                </div>
+                <div class="relative z-10 mt-6">
+                    <p id="valSemana" class="text-3xl font-black text-white tracking-tight">Vista Global</p>
+                    <div class="mt-3 flex items-center gap-2">
+                        <span id="subSemana" class="text-xs text-emerald-200 font-medium">Seleccione un registro en la tabla</span>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Lote 103 (Alerta) -->
-                <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-103" data-semana="29" data-fecha="2026-07-22" data-promedio="73.0" data-estado="Requiere Revisión">
-                    <td class="px-5 py-3 whitespace-nowrap">
-                        <div class="font-bold text-slate-800 text-sm">CHR-LOTE-103</div>
-                        <div class="text-[10px] text-slate-400 font-medium">22/Jul/2026</div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center"><span class="text-[11px] font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 29</span></td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center">
-                        <div class="font-bold text-sm text-slate-800">70 <span class="text-[9px] text-amber-600 ml-0.5">70%</span></div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center">
-                        <div class="font-bold text-sm text-slate-800">75 <span class="text-[9px] text-amber-600 ml-0.5">75%</span></div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center">
-                        <div class="font-bold text-sm text-slate-800">74 <span class="text-[9px] text-amber-600 ml-0.5">74%</span></div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center bg-slate-50/50">
-                        <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-800">73.0%</span>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center">
-                        <span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-200">⚠️ Revisión</span>
-                    </td>
-                    <td class="px-5 py-3 whitespace-nowrap text-slate-600 text-xs font-medium">María L. <span class="text-slate-400 text-[9px] ml-1">(OP-02)</span></td>
-                </tr>
-            </tbody>
-        </table>
+            <!-- Tarjeta 2: Identificador de Lote -->
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between">
+                <div class="absolute -right-6 -top-6 w-24 h-24 bg-slate-50 rounded-full"></div>
+                
+                <div class="relative z-10 flex justify-between items-start">
+                    <div>
+                        <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Identificador de Lote</h3>
+                        <span class="text-[10px] text-slate-400 font-medium mt-1 block">Trazabilidad Interna</span>
+                    </div>
+                    <div class="w-10 h-10 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                    </div>
+                </div>
+                <div class="relative z-10 mt-6">
+                    <p id="valLote" class="text-3xl font-black text-slate-800 tracking-tight">--</p>
+                    <div class="mt-3 flex items-center gap-2">
+                        <span id="subLote" class="text-xs text-slate-400 font-medium">Lote correspondiente</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 3: Promedio de Eclosión -->
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between group">
+                <div id="blobPromedio" class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full transition-colors duration-500"></div>
+                
+                <div class="relative z-10 flex justify-between items-start">
+                    <div>
+                        <h3 id="labelPromedio" class="text-slate-500 text-xs font-bold uppercase tracking-widest">Promedio de Eclosión</h3>
+                        <span class="text-[10px] text-slate-400 font-medium mt-1 block">Límite mínimo operativo: 80%</span>
+                    </div>
+                    <div id="iconBoxPromedio" class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center transition-colors duration-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                    </div>
+                </div>
+                <div class="relative z-10 mt-6 flex items-end gap-1">
+                    <p id="valPromedio" class="text-5xl font-black text-slate-800 tracking-tight transition-colors duration-500">89.1</p>
+                    <span id="symbolPromedio" class="text-2xl font-bold text-slate-600 mb-1 transition-colors duration-500">%</span>
+                </div>
+                <div class="relative z-10 mt-2 flex items-center gap-2">
+                    <div id="dotPromedio" class="w-2 h-2 rounded-full bg-emerald-500 transition-colors duration-500"></div>
+                    <span id="subPromedio" class="text-xs text-slate-500 font-medium transition-colors">Promedio global general</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Historial de Eclosión -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    Historial de Muestreos y Estatus
+                    <span class="text-xs font-normal text-slate-400 ml-2 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">(Haz clic en un lote para ver sus datos arriba)</span>
+                </h2>
+                <span class="text-[10px] text-slate-500 font-mono bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">TABLA: ECLOSION</span>
+            </div>
+            
+            <div class="overflow-x-auto table-container" id="scrollTable">
+                <table class="min-w-full divide-y divide-slate-100 text-sm relative">
+                    <thead class="bg-white text-slate-500 sticky top-0 z-10 shadow-sm">
+                        <tr>
+                            <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">ID Lote / Fecha</th>
+                            <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Semana</th>
+                            <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Muestra 1</th>
+                            <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Muestra 2</th>
+                            <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Muestra 3</th>
+                            <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] bg-slate-50">Promedio Lote</th>
+                            <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Estatus</th>
+                            <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Operador</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white" id="lotesTableBody">
+                        
+                        <!-- Lote 104 -->
+                        <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-104" data-semana="30" data-fecha="2026-07-23" data-promedio="89.5" data-estado="Óptimo">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="font-bold text-slate-800 text-sm">CHR-LOTE-104</div>
+                                <div class="text-[11px] text-slate-400 font-medium mt-0.5">23/Jul/2026 - 10:00 AM</div>
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 30</span></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="text-slate-800 font-bold text-sm">88</div>
+                                <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">88.0%</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="text-slate-800 font-bold text-sm">90</div>
+                                <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">90.0%</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="text-slate-800 font-bold text-sm">91</div>
+                                <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">91.0%</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
+                                <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">89.5%</span>
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-center">
+                                <span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">🟢 Óptimo</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">Juan Pérez <span class="text-slate-400 text-[10px] ml-1">(OP-04)</span></td>
+                        </tr>
+
+                        <!-- Lote 103 (Alerta) -->
+                        <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-103" data-semana="29" data-fecha="2026-07-22" data-promedio="73.0" data-estado="Requiere Revisión">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="font-bold text-slate-800 text-sm">CHR-LOTE-103</div>
+                                <div class="text-[11px] text-slate-400 font-medium mt-0.5">22/Jul/2026 - 11:30 AM</div>
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 29</span></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="text-slate-800 font-bold text-sm">70</div>
+                                <div class="text-[10px] text-amber-600 font-semibold mt-0.5">70.0%</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="text-slate-800 font-bold text-sm">75</div>
+                                <div class="text-[10px] text-amber-600 font-semibold mt-0.5">75.0%</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="text-slate-800 font-bold text-sm">74</div>
+                                <div class="text-[10px] text-amber-600 font-semibold mt-0.5">74.0%</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
+                                <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-800">73.0%</span>
+                            </td>
+                            <td class="px-4 py-4 whitespace-nowrap text-center">
+                                <span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-200">⚠️ Revisión</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">María López <span class="text-slate-400 text-[10px] ml-1">(OP-02)</span></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
-</div>
+</main>
 {% endblock %}
 
 {% block scripts %}
+<!-- Funciones Javascript -->
 <script>
     const rows = document.querySelectorAll('.data-row');
     const btnResetCards = document.getElementById('btnResetCards');
@@ -203,6 +217,7 @@
 
     function updateCardColors(isAlert) {
         const allClasses = ['bg-emerald-50', 'bg-amber-50', 'text-emerald-600', 'text-amber-600', 'text-slate-800', 'text-amber-700', 'text-slate-600', 'bg-slate-300', 'bg-emerald-500', 'bg-amber-500'];
+
         if (isAlert) {
             blobPromedio.classList.remove(...allClasses); blobPromedio.classList.add('bg-amber-50');
             iconBoxPromedio.classList.remove(...allClasses); iconBoxPromedio.classList.add('bg-amber-50', 'text-amber-600');
@@ -231,24 +246,25 @@
             const promedio = parseFloat(row.getAttribute('data-promedio'));
 
             valSemana.innerText = "Semana " + semana;
-            valSemana.classList.remove('text-2xl');
-            valSemana.classList.add('text-xl');
-            subSemana.innerText = "Revisión seleccionada";
+            valSemana.classList.remove('text-3xl');
+            valSemana.classList.add('text-2xl');
+            subSemana.innerText = "Lote seleccionado para revisión";
 
             valLote.innerText = lote;
-            valLote.classList.remove('text-2xl');
-            valLote.classList.add('text-xl');
-            subLote.innerText = "Registro";
+            valLote.classList.remove('text-3xl');
+            valLote.classList.add('text-2xl');
+            subLote.innerText = "Identificador de registro";
 
             valPromedio.innerText = promedio.toFixed(1);
 
             if(promedio < 80.0) {
                 updateCardColors(true);
-                subPromedio.innerText = "⚠️ Nivel de eclosión bajo (< 80%)";
+                subPromedio.innerText = "⚠️ Rendimiento inferior al estándar (< 80%)";
             } else {
                 updateCardColors(false);
-                subPromedio.innerText = "🟢 Nivel de eclosión óptimo";
+                subPromedio.innerText = "Cumple con el estándar de éxito";
             }
+
             btnResetCards.classList.remove('hidden');
         });
     });
@@ -260,17 +276,17 @@
         });
         
         valSemana.innerText = "Vista Global";
-        valSemana.classList.remove('text-xl');
-        valSemana.classList.add('text-2xl');
-        subSemana.innerText = "Seleccione registro";
+        valSemana.classList.remove('text-2xl');
+        valSemana.classList.add('text-3xl');
+        subSemana.innerText = "Seleccione un registro en la tabla";
         
         valLote.innerText = "--";
-        valLote.classList.remove('text-xl');
-        valLote.classList.add('text-2xl');
+        valLote.classList.remove('text-2xl');
+        valLote.classList.add('text-3xl');
         subLote.innerText = "Lote correspondiente";
         
         valPromedio.innerText = "89.1";
-        subPromedio.innerText = "Promedio general";
+        subPromedio.innerText = "Promedio global general";
         
         updateCardColors(false);
         btnResetCards.classList.add('hidden');

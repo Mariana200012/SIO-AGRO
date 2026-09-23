@@ -1,8 +1,8 @@
-{% extends "admin/base_admin.html" %}
+{% extends "admin/base_modulo.html" %}
 
 {% block title %}Monitoreo de Ocupación - Koppert Biofactory{% endblock %}
 
-{% block navbar_menu %}
+{% block sidebar_menu %}
 <div class="hidden md:block flex-1 mx-6">
     <div class="flex space-x-1 overflow-x-auto">
         <a href="{{ url_for('admin.ocupacion') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">Ocupación</a>
@@ -326,7 +326,7 @@
                     subPromedio.innerText = "⚠️ Nivel de ocupación bajo (< 80%)";
                 } else {
                     updateCardColors(false);
-                    subPromedio.innerText = "🟢 Nivel de ocupación óptimo";
+                    subPromedio.innerText = "Nivel de ocupación óptimo";
                 }
 
                 btnResetCards.classList.remove('hidden');

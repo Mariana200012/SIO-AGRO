@@ -1,8 +1,9 @@
-{% extends "admin/base_admin.html" %}
+{% extends "admin/base_modulo.html" %}
 
 {% block title %}Monitoreo de Post-Parasitismo - Koppert Biofactory{% endblock %}
 
-{% block navbar_menu %}
+{% block sidebar_menu %}
+
 <div class="hidden md:block flex-1 mx-6">
     <div class="flex space-x-1 overflow-x-auto">
          <a href="{{ url_for('admin.pre') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors flex items-center gap-1.5">

@@ -5,7 +5,7 @@
 {% block navbar_menu %}
 <div class="hidden md:block flex-1 mx-6">
     <div class="flex space-x-1 overflow-x-auto">
-        <a href="{{ url_for('admin.usuarios') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-purple-600 text-white shadow-sm flex items-center gap-1.5">
+        <a href="{{ url_for('admin.usuarios') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-cyan-600 text-white shadow-sm flex items-center gap-1.5">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
             Gestión de Usuarios
         </a>
@@ -17,18 +17,18 @@
 <!-- Encabezado y Botón de Nuevo Usuario -->
 <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
     <div>
-        <h1 class="text-2xl font-black text-slate-800 tracking-tight">Directorio de Personal <span class="text-purple-600 font-bold text-lg">(Accesos)</span></h1>
+        <h1 class="text-2xl font-black text-slate-800 tracking-tight">Directorio de Personal <span class="text-cyan-600 font-bold text-lg">(Accesos)</span></h1>
         <p class="text-xs text-slate-500 font-medium mt-1">Administración de operadores, NIPs de seguridad y asignación de áreas.</p>
     </div>
     <div class="flex items-center w-full md:w-auto">
-        <button onclick="document.getElementById('modal-usuario').classList.remove('hidden')" class="bg-purple-600 text-white px-5 py-3 rounded-xl text-sm font-bold hover:bg-purple-700 transition-all shadow-md flex items-center justify-center gap-2 w-full md:w-auto">
+        <button onclick="document.getElementById('modal-usuario').classList.remove('hidden')" class="bg-cyan-600 text-white px-5 py-3 rounded-xl text-sm font-bold hover:bg-cyan-700 transition-all shadow-md flex items-center justify-center gap-2 w-full md:w-auto">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
             Registrar Nuevo Usuario
         </button>
     </div>
 </div>
 
-<!-- Tabla de Usuarios (DINÁMICA DESDE SQLITE) -->
+<!-- Tabla de Usuarios -->
 <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-8">
     <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
         <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
@@ -49,13 +49,13 @@
             </thead>
             <tbody class="divide-y divide-slate-100 bg-white">
                 
-                <!-- CICLO FOR PARA MOSTRAR LA TABLA REAL -->
                 {% for u in usuarios %}
-                    {% if u['id_usuario'] %} <!-- Filtro de seguridad -->
+                    {% if u['id_usuario'] %}
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs uppercase">{{ u['nombre_usuario'][0] }}</div>
+                                <!-- Avatar Color Cian -->
+                                <div class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold text-xs uppercase">{{ u['nombre_usuario'][0] }}</div>
                                 <div>
                                     <div class="font-bold text-slate-800 text-sm">{{ u['nombre_usuario'] }}</div>
                                     <div class="text-[10px] text-slate-400 font-mono mt-0.5">ID: USR-00{{ u['id_usuario'] }}</div>
@@ -64,20 +64,18 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="font-bold text-slate-700 text-xs">{{ u['puesto'] }}</div>
-                            <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md border border-slate-200 mt-1 inline-block">Área ID: {{ u['id_area'] }}</span>
+                            <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md border border-slate-200 mt-1 inline-block">Área: {{ u['nombre_area'] }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <span class="font-mono text-slate-800 font-bold tracking-widest bg-slate-100 px-2 py-1 rounded">{{ u['nip_firma'] }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right space-x-2">
                             
-                            <!-- BOTÓN EDITAR -->
                             <button onclick="abrirModalEditar('{{ u['id_usuario'] }}', '{{ u['nombre_usuario'] }}', '{{ u['puesto'] }}', '{{ u['nip_firma'] }}', '{{ u['id_area'] }}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors inline-flex items-center justify-center" title="Editar">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             </button>
                             
-                            <!-- BOTÓN ELIMINAR -->
-                            <form action="{{ url_for('admin.eliminar_usuario', id_usuario=u['id_usuario']) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Estás seguro de que deseas eliminar a {{ u['nombre_usuario'] }}? Esta acción no se puede deshacer.');">
+                            <form action="{{ url_for('admin.eliminar_usuario', id_usuario=u['id_usuario']) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Estás seguro de que deseas desactivar a {{ u['nombre_usuario'] }}?');">
                                 <button type="submit" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors inline-flex items-center justify-center" title="Eliminar">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 </button>
@@ -107,34 +105,39 @@
         <form action="{{ url_for('admin.agregar_usuario') }}" method="POST" class="space-y-5 text-sm">
             <div>
                 <label class="font-bold text-slate-700 block mb-1.5">Nombre Completo</label>
-                <input type="text" name="nombre_usuario" placeholder="Ej. Juan Pérez" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors">
+                <input type="text" name="nombre_usuario" placeholder="Ej. Juan Pérez" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors">
             </div>
 
-            <div>
-                <label class="font-bold text-slate-700 block mb-1.5">Puesto</label>
-                <input type="text" name="puesto" placeholder="Ej. Operador, Administrador..." required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors">
-            </div>
-            
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="font-bold text-slate-700 block mb-1.5">NIP de Acceso</label>
-                    <input type="text" name="nip_firma" placeholder="4 dígitos" maxlength="4" pattern="\d{4}" required class="w-full font-mono font-bold text-center text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors">
+                    <label class="font-bold text-slate-700 block mb-1.5">Puesto</label>
+                    <select id="nuevo_puesto" name="puesto" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors">
+                        <option value="Operador">Operador</option>
+                        <option value="Analista">Analista</option>
+                        <option value="Supervisor">Supervisor</option>
+                        <option value="Administrador">Administrador</option>
+                    </select>
                 </div>
                 <div>
                     <label class="font-bold text-slate-700 block mb-1.5">Área (ID)</label>
-                    <select name="id_area" class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-colors">
+                    <select id="nuevo_area" name="id_area" class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors">
                         <option value="1">1 - Chrysopa</option>
                         <option value="2">2 - Catopar</option>
                         <option value="3">3 - Empaque</option>
-                        <option value="4">4 - Analista</option>
-                        <option value="5">5 - Administrador</option>
+                        <option value="4">4 - Inventario</option>
+                        <option value="5">5 - Administración</option>
                     </select>
                 </div>
+            </div>
+            
+            <div>
+                <label class="font-bold text-slate-700 block mb-1.5">NIP de Acceso</label>
+                <input type="text" name="nip_firma" placeholder="4 dígitos" maxlength="4" pattern="\d{4}" required class="w-full font-mono font-bold text-center text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors">
             </div>
 
             <div class="pt-4 flex space-x-3 border-t border-slate-100 mt-2">
                 <button type="button" onclick="document.getElementById('modal-usuario').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
-                <button type="submit" class="flex-1 bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700 transition-colors shadow-md">Guardar Usuario</button>
+                <button type="submit" class="flex-1 bg-cyan-600 text-white font-bold py-3 rounded-xl hover:bg-cyan-700 transition-colors shadow-md">Guardar Usuario</button>
             </div>
         </form>
     </div>
@@ -157,15 +160,15 @@
                 <input type="text" id="edit_nombre" name="nombre_usuario" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
             </div>
 
-            <div>
-                <label class="font-bold text-slate-700 block mb-1.5">Puesto</label>
-                <input type="text" id="edit_puesto" name="puesto" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
-            </div>
-            
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="font-bold text-slate-700 block mb-1.5">NIP de Acceso</label>
-                    <input type="text" id="edit_nip" name="nip_firma" maxlength="4" pattern="\d{4}" required class="w-full font-mono font-bold text-center text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
+                    <label class="font-bold text-slate-700 block mb-1.5">Puesto</label>
+                    <select id="edit_puesto" name="puesto" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
+                        <option value="Operador">Operador</option>
+                        <option value="Analista">Analista</option>
+                        <option value="Supervisor">Supervisor</option>
+                        <option value="Administrador">Administrador</option>
+                    </select>
                 </div>
                 <div>
                     <label class="font-bold text-slate-700 block mb-1.5">Área (ID)</label>
@@ -173,10 +176,15 @@
                         <option value="1">1 - Chrysopa</option>
                         <option value="2">2 - Catopar</option>
                         <option value="3">3 - Empaque</option>
-                        <option value="4">4 - Analista</option>
-                        <option value="5">5 - Administrador</option>
+                        <option value="4">4 - Inventario</option>
+                        <option value="5">5 - Administración</option>
                     </select>
                 </div>
+            </div>
+            
+            <div>
+                <label class="font-bold text-slate-700 block mb-1.5">NIP de Acceso</label>
+                <input type="text" id="edit_nip" name="nip_firma" maxlength="4" pattern="\d{4}" required class="w-full font-mono font-bold text-center text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
             </div>
 
             <div class="pt-4 flex space-x-3 border-t border-slate-100 mt-2">
@@ -190,18 +198,74 @@
 
 {% block scripts %}
 <script>
-    // Esta función recibe los datos de la fila y los inyecta en el Modal
-    function abrirModalEditar(id, nombre, puesto, nip, area) {
+    function abrirModalEditar(id, nombre, puesto, nip, id_area) {
         document.getElementById('modal-editar').classList.remove('hidden');
         
         document.getElementById('edit_nombre').value = nombre;
-        document.getElementById('edit_puesto').value = puesto;
         document.getElementById('edit_nip').value = nip;
-        document.getElementById('edit_area').value = area;
         
-        // Le indicamos al formulario a qué usuario de la BD debe modificar
+        const selectPuesto = document.getElementById('edit_puesto');
+        selectPuesto.value = puesto;
+        
+        const selectArea = document.getElementById('edit_area');
+        sincronizarAreas(selectPuesto, selectArea);
+        
+        let optionExists = Array.from(selectArea.options).some(option => option.value === id_area.toString());
+        if (optionExists) {
+            selectArea.value = id_area.toString();
+        }
+
         document.getElementById('form-editar').action = "/admin/usuarios/editar/" + id;
     }
+
+    function sincronizarAreas(selectPuesto, selectArea) {
+        const opciones = selectArea.options;
+        const puestoSeleccionado = selectPuesto.value;
+
+        for (let i = 0; i < opciones.length; i++) {
+            opciones[i].style.display = 'none';
+        }
+
+        if (puestoSeleccionado === 'Administrador') {
+            for (let i = 0; i < opciones.length; i++) {
+                if (opciones[i].value === '5') {
+                    opciones[i].style.display = 'block';
+                }
+            }
+            selectArea.value = '5';
+            selectArea.classList.add('bg-slate-200', 'cursor-not-allowed', 'opacity-70');
+            selectArea.style.pointerEvents = "none"; 
+        } else {
+            let primeraAreaValida = null;
+            for (let i = 0; i < opciones.length; i++) {
+                if (opciones[i].value !== '5') {
+                    opciones[i].style.display = 'block';
+                    if (!primeraAreaValida) primeraAreaValida = opciones[i].value;
+                }
+            }
+            
+            if (selectArea.value === '5') {
+                selectArea.value = primeraAreaValida;
+            }
+            
+            selectArea.classList.remove('bg-slate-200', 'cursor-not-allowed', 'opacity-70');
+            selectArea.style.pointerEvents = "auto";
+        }
+    }
+
+    const selectPuestoNuevo = document.getElementById('nuevo_puesto');
+    const selectAreaNuevo = document.getElementById('nuevo_area');
+    
+    sincronizarAreas(selectPuestoNuevo, selectAreaNuevo);
+    selectPuestoNuevo.addEventListener('change', function() {
+        sincronizarAreas(selectPuestoNuevo, selectAreaNuevo);
+    });
+
+    const selectPuestoEdit = document.getElementById('edit_puesto');
+    const selectAreaEdit = document.getElementById('edit_area');
+    
+    selectPuestoEdit.addEventListener('change', function() {
+        sincronizarAreas(selectPuestoEdit, selectAreaEdit);
+    });
 </script>
 {% endblock %}
-

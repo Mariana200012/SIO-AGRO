@@ -16,7 +16,7 @@ def dashboard_empaque():
     
     conn.close()
     
-    # Flask buscará este archivo en templates/empaque/dashboard.html (o la ruta equivalente)
+    # Flask buscará este archivo en templates/empaque/dashboard.html
     return render_template('empaque/dashboard.html')
 
 @empaque_bp.route('/registrar', methods=['POST'])
@@ -35,18 +35,18 @@ def registrar_empaque():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Validar NIP del operador
-        cursor.execute("SELECT id_usuario FROM USUARIOS WHERE nip = ?", (nip,))
+        # CORRECCIÓN: La columna en tu BD se llama nip_firma, no nip
+        cursor.execute("SELECT id_usuario FROM USUARIOS WHERE nip_firma = ?", (nip,))
         operador = cursor.fetchone()
         
         if not operador:
-            flash('Firma NIP no válida para empaque.', 'error')
+            flash('Firma NIP no válida para empaque. Acceso denegado.', 'error')
             return redirect(url_for('empaque.dashboard_empaque'))
             
         id_operador = operador['id_usuario']
         
         # Guardar el registro de empaque en la base de datos
-        # (Asegúrate de tener o crear la tabla EMPAQUE si la necesitas en database.py)
+        # (Asegúrate de tener la tabla EMPAQUE_REGISTROS o cámbiala por EMP_LOTE según tu BD)
         cursor.execute('''
             INSERT INTO EMPAQUE_REGISTROS (id_lote, cantidad_cajas, calidad, id_operador, fecha_hora)
             VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
@@ -61,3 +61,8 @@ def registrar_empaque():
         conn.close()
         
     return redirect(url_for('empaque.dashboard_empaque'))
+
+@empaque_bp.route('/inventario', methods=['GET'])
+def inventario():
+    # Después conectaremos esto con SQLite
+    return render_template('empaque/inventario.html')

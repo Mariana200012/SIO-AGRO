@@ -19,11 +19,12 @@ def login():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Buscamos usando el nombre exacto de tu columna: 'nip_firma'
+        # CORRECCIÓN: La consulta SQL completa y cerrada correctamente. 
+        # Exige que el NIP coincida y que el estatus sea 'Activo'
         cursor.execute('''
             SELECT id_usuario, nombre_usuario, id_area, puesto 
             FROM USUARIOS 
-            WHERE nip_firma = ?
+            WHERE nip_firma = ? AND estatus = 'Activo'
         ''', (nip_ingresado,))
         
         usuario = cursor.fetchone()
@@ -42,11 +43,11 @@ def login():
             return redirigir_por_area(usuario['id_area'])
         else:
             # Chivato: Fallo total
-            print("FALLO: La base de datos dice que ese NIP no existe en la columna nip_firma.\n")
-            flash('NIP incorrecto o no registrado.', 'error')
+            print("FALLO: NIP incorrecto o usuario inactivo.\n")
+            flash('NIP incorrecto, no registrado o usuario inactivo.', 'error')
             return redirect(url_for('auth.login'))
             
-    # ¡ESTA ES LA LÍNEA QUE FALTABA! Maneja las peticiones GET (cargar la página web sin errores)
+    # Maneja las peticiones GET (cargar la página web sin errores)
     return render_template('auth/login.html')
 
 
@@ -58,19 +59,25 @@ def logout():
 
 def redirigir_por_area(id_area):
     """Redirige al usuario evaluando el id_area de tu tabla 'areas'."""
-    if id_area == 1:
+    # Convertimos a entero por seguridad
+    try:
+        area_num = int(id_area)
+    except:
+        area_num = 0
+        
+    if area_num == 1:
         # 1 = Chrysopa
         return redirect(url_for('prod_chrysopa.ocupacion'))
-    elif id_area == 2:
+    elif area_num == 2:
         # 2 = Catopar
         return redirect(url_for('prod_catopar.pre'))
-    elif id_area == 3:
+    elif area_num == 3:
         # 3 = Empaque
         return redirect(url_for('empaque.dashboard_empaque')) 
-    elif id_area == 4:
+    elif area_num == 4:
         # 4 = Inventario
         return redirect(url_for('inventario.listar_solicitudes')) 
-    elif id_area == 5:
+    elif area_num == 5:
         # 5 = Administracion
         return redirect(url_for('index'))
     else:

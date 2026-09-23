@@ -1,8 +1,8 @@
-{% extends "admin/base_admin.html" %}
+{% extends "admin/base_modulo.html" %}
 
-{% block title %}Monitoreo de Ocupación - Koppert Biofactory{% endblock %}
+{% block title %}Monitoreo de Mortalidad - Koppert Biofactory{% endblock %}
 
-{% block navbar_menu %}
+{% block sidebar_menu %}
 <div class="hidden md:block flex-1 mx-6">
     <div class="flex space-x-1 overflow-x-auto">
         <a href="{{ url_for('admin.ocupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Ocupación</a>
@@ -324,7 +324,7 @@
                     subSupervivencia.innerText = "⚠️ Límite de bajas excedido (> 9)";
                 } else {
                     updateCardColors(false);
-                    subSupervivencia.innerText = "🟢 Cumple estándar de calidad";
+                    subSupervivencia.innerText = "Cumple estándar de calidad";
                 }
 
                 btnResetCards.classList.remove('hidden');

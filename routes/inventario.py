@@ -1,78 +1,66 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
-from database import get_db_connection
+import sqlite3
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 
-# Creamos el Blueprint para el módulo de Inventario / Almacén
 inventario_bp = Blueprint('inventario', __name__, url_prefix='/inventario')
 
-@inventario_bp.route('/solicitudes', methods=['GET'])
+def get_db_connection():
+    conn = sqlite3.connect('Bd_SIO-AGRO.db', isolation_level=None)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# ==========================================
+# VISTA DE LA ANALISTA (Ver el Buzón)
+# ==========================================
+@inventario_bp.route('/solicitudes') 
 def listar_solicitudes():
-    """Renderiza el panel del encargado de almacén con las solicitudes agrupadas por área."""
+    if session.get('id_area') not in [4, 5]:
+        flash('Acceso denegado. Área exclusiva de Inventario.', 'error')
+        return redirect(url_for('auth.login'))
+
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Aquí consultarías los tickets pendientes en tu base de datos SQLite
-    # Ejemplo: cursor.execute("SELECT * FROM SOLICITUD_MATERIALES WHERE estatus = 'PENDIENTE'")
-    # solicitudes = cursor.fetchall()
+    # 1. Traemos todas las filas individuales de la base de datos
+    cursor.execute("""
+        SELECT s.id_solicitud, s.id_operador, s.cantidad_solicitada, s.fecha_solicitud, s.estatus,
+               a.nombre_area, u.nombre_usuario, m.nombre_material
+        FROM SOLICITUDES_MATERIAL s
+        LEFT JOIN CAT_AREAS a ON s.id_area_solicitante = a.id_area
+        LEFT JOIN USUARIOS u ON s.id_operador = u.id_usuario
+        LEFT JOIN MATERIALES m ON s.id_material = m.id_material
+        WHERE s.estatus = 'Pendiente'
+        ORDER BY s.fecha_solicitud DESC
+    """)
     
+    # ¡ESTA ES LA LÍNEA QUE FALTABA!
+    filas_bd = cursor.fetchall()
     conn.close()
-    
-    # Renderiza la vista que organizamos en templates/inventario/solicitudes.html
-    return render_template('inventario/solicitudes.html')
 
-@inventario_bp.route('/solicitudes/surtir/<int:folio>', methods=['POST'])
-def autorizar_surtido(folio):
-    """Procesa la autorización de un ticket, descontando los insumos del stock general."""
-    nip_almacen = request.form.get('nip')
+    # 2. REGLA DE AGRUPACIÓN (Empaquetar filas en Tickets)
+    tickets_agrupados = {}
     
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+    for fila in filas_bd:
+        # Creamos la llave cortando la fecha hasta los minutos
+        fecha_minuto = fila['fecha_solicitud'][:16]
+        llave_ticket = f"{fila['id_operador']}_{fecha_minuto}"
         
-        # 1. Validar identidad del encargado de almacén
-        cursor.execute("SELECT id_usuario FROM USUARIOS WHERE nip = ?", (nip_almacen,))
-        almacenista = cursor.fetchone()
+        if llave_ticket not in tickets_agrupados:
+            tickets_agrupados[llave_ticket] = {
+                'folio_ticket': fila['id_solicitud'],
+                'nombre_area': fila['nombre_area'],
+                'nombre_usuario': fila['nombre_usuario'],
+                'fecha_solicitud': fila['fecha_solicitud'],
+                'estatus': fila['estatus'],
+                'materiales': []
+            }
         
-        if not almacenista:
-            flash('NIP de almacén incorrecto. Autorización denegada.', 'error')
-            return redirect(url_for('inventario.listar_solicitudes'))
-            
-        # 2. Transacción de Surtido: Descontar stock y actualizar estatus del ticket
-        # (Aquí realizarías los UPDATE a tu tabla de inventario y el UPDATE de estatus a 'SURTIDO')
-        
-        conn.commit()
-        flash(f'Ticket #{folio} autorizado y surtido correctamente. Stock actualizado.', 'success')
-        
-    except Exception as e:
-        flash(f'Error al procesar el surtido: {e}', 'error')
-    finally:
-        conn.close()
-        
-    return redirect(url_for('inventario.listar_solicitudes'))
+        # Agregamos los materiales a la lista interna del ticket
+        tickets_agrupados[llave_ticket]['materiales'].append({
+            'nombre': fila['nombre_material'],
+            'cantidad': fila['cantidad_solicitada']
+        })
 
-@inventario_bp.route('/entradas', methods=['GET', 'POST'])
-def registrar_compras():
-    """Permite registrar la entrada de nuevas compras o reabastecimiento al almacén."""
-    if request.method == 'POST':
-        insumo = request.form.get('insumo')
-        cantidad = request.form.get('cantidad')
-        
-        try:
-            conn = get_db_connection()
-            cursor = conn.cursor()
-            
-            # Sumar al stock actual o registrar entrada
-            cursor.execute('''
-                INSERT INTO INV_HISTORIAL (tipo_movimiento, insumo, cantidad, fecha)
-                VALUES ('ENTRADA', ?, ?, CURRENT_TIMESTAMP)
-            ''', (insumo, cantidad))
-            
-            conn.commit()
-            flash('Entrada de inventario registrada con éxito.', 'success')
-        except Exception as e:
-            flash(f'Error al registrar entrada: {e}', 'error')
-        finally:
-            conn.close()
-            
-        return redirect(url_for('inventario.registrar_compras'))
-        
-    return render_template('inventario/entradas.html')
+    # Convertimos el diccionario a una lista para enviarla al HTML
+    lista_final_tickets = list(tickets_agrupados.values())
+
+    return render_template('inventario/solicitudes.html', tickets=lista_final_tickets)

@@ -1,382 +1,138 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventario de Empaque - Koppert Biofactory</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        html { scroll-behavior: smooth; }
-        .table-container { max-height: 400px; overflow-y: auto; }
-    </style>
-</head>
-<body class="bg-slate-50 flex flex-col h-screen font-sans overflow-hidden">
+{% extends "empaque/base_empaque.html" %}
 
-    <!-- Navbar Ejecutivo -->
-    <nav class="bg-emerald-950 text-emerald-100 shadow-lg z-20 flex-shrink-0 border-b border-emerald-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <div class="w-9 h-9 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl flex items-center justify-center font-bold text-white mr-3 shadow-md shadow-emerald-900/50">K</div>
-                    <span class="text-white text-base font-extrabold tracking-wider">KOPPERT <span class="text-xs bg-emerald-800 text-emerald-200 px-2 py-0.5 rounded-full font-semibold uppercase ml-1">Empaque</span></span>
-                </div>
-                
-                <!-- Menú de Navegación Rápida -->
-                <div class="hidden md:block flex-1 mx-6">
-                    <div class="flex space-x-1 overflow-x-auto">
-                        <a href="/empaque/dashboard" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">Inventario / Semáforo</a>
-                        <a href="/empaque/registro" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Nuevo Empaque</a>
-                        <a href="/empaque/historial" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Historial de Salidas</a>
-                    </div>
-                </div>
+{% block title %}Panel de Empaque - Koppert{% endblock %}
 
-                <div class="flex items-center space-x-4">
-                    <span class="text-xs font-medium text-emerald-200 bg-emerald-900/80 px-3 py-1.5 rounded-lg border border-emerald-800"> <strong class="text-white">Op. Empaque</strong></span>
-                    <a href="{{ url_for('auth.logout') }}" class="text-xs px-4 py-2 text-white font-bold bg-white/10 hover:bg-red-500/80 border border-white/20 hover:border-red-400 rounded-xl transition-all shadow-sm">Cerrar Sesión</a>                </div>
-                </div>
-            </div>
+{% block navbar_menu %}
+<div class="flex space-x-1 items-center">
+    <!-- PESTAÑA 1: ACTIVA -->
+    <a href="{{ url_for('empaque.dashboard_empaque') }}" class="px-4 py-2 rounded-xl text-xs font-bold bg-teal-600 text-white shadow-sm whitespace-nowrap">Registro de Lotes</a>
+    
+    <!-- Pestaña 2: Inactiva -->
+    <a href="{{ url_for('empaque.inventario') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-teal-900 text-teal-100 hover:text-white transition-colors whitespace-nowrap">Semáforo de Inventario</a>
+    
+    <!-- Pestaña 3: Inactiva -->
+    <a href="#" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-teal-900 text-teal-100 hover:text-white transition-colors whitespace-nowrap">Mermas y Daños</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Encabezado y Botón de Registro -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-5 rounded-3xl shadow-sm border border-slate-200 gap-4">
+    <div>
+        <h1 class="text-xl font-black text-slate-800 tracking-tight">Gestión de Empaque <span class="text-teal-600 font-bold text-base">(Inventario)</span></h1>
+        <p class="text-xs text-slate-500 font-medium mt-1">Control de lotes procesados y semáforo de insumos.</p> 
+    </div>
+    <div class="flex items-center w-full md:w-auto">
+        <!-- ESTE BOTÓN ABRE EL MODAL DE REGISTRO -->
+        <button onclick="document.getElementById('modal-empaque').classList.remove('hidden')" class="bg-teal-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-teal-700 transition-all shadow-md flex items-center justify-center gap-2 whitespace-nowrap w-full md:w-auto">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Registrar Nuevo Empaque
+        </button>
+    </div>
+</div>
+
+<!-- KPIs / Semáforo (Cajas compactas) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+    
+    <!-- Tarjeta 1: Producción del Día -->
+    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between">
+        <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-4">Lotes Empacados Hoy</h3>
+        <div class="flex items-end gap-2">
+            <p class="text-4xl font-black text-slate-800 tracking-tight">12</p>
+            <span class="text-[11px] text-slate-500 font-medium mb-1">lotes completados</span>
         </div>
-    </nav>
+    </div>
 
-    <!-- Área de Trabajo Principal -->
-    <main class="flex-1 overflow-y-auto p-8">
-        <div class="max-w-7xl mx-auto space-y-8">
-            
-            <!-- Encabezado y Buscador -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+    <!-- Tarjeta 2: Semáforo de Botes -->
+    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between border-l-4 border-l-emerald-500">
+        <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-4">Stock: Botes (500ml)</h3>
+        <div class="flex items-end gap-2">
+            <p class="text-4xl font-black text-slate-800 tracking-tight">4,500</p>
+            <span class="text-[11px] text-emerald-600 font-bold mb-1 bg-emerald-50 px-2 py-0.5 rounded">Óptimo</span>
+        </div>
+    </div>
+
+    <!-- Tarjeta 3: Semáforo de Tapas (Ejemplo Alerta) -->
+    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between border-l-4 border-l-amber-500">
+        <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-4">Stock: Tapas</h3>
+        <div class="flex items-end gap-2">
+            <p class="text-4xl font-black text-slate-800 tracking-tight">850</p>
+            <span class="text-[11px] text-amber-600 font-bold mb-1 bg-amber-50 px-2 py-0.5 rounded">Resurtir pronto</span>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla Historial de Empaque -->
+<div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="bg-slate-50/50 px-5 py-4 border-b border-slate-100 flex justify-between items-center">
+        <h2 class="text-sm font-bold text-slate-800">Últimos Lotes Empacados</h2>
+        <span class="text-[10px] text-slate-500 font-mono bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-sm">TABLA: EMP_LOTE</span>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-100 text-sm">
+            <thead class="bg-white text-slate-500">
+                <tr>
+                    <th class="px-5 py-3 text-left font-extrabold uppercase tracking-wider text-[10px]">Lote Empaque</th>
+                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Producto</th>
+                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Cantidad</th>
+                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Fecha</th>
+                    <th class="px-5 py-3 text-left font-extrabold uppercase tracking-wider text-[10px]">Operador</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                <!-- Fila de ejemplo estática por ahora -->
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-5 py-3 whitespace-nowrap font-bold text-slate-800">EMP-2609-001</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-center text-xs font-bold text-teal-700 bg-teal-50 rounded">Chrysopa</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-center font-bold text-slate-800">150 Botes</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-center text-[11px] text-slate-500">Hoy, 10:30 AM</td>
+                    <td class="px-5 py-3 whitespace-nowrap text-slate-600 text-xs font-medium">Dalila (OP-03)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ==========================================
+     MODAL DE REGISTRO 
+     ========================================== -->
+<div id="modal-empaque" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+            <div>
+                <h3 class="font-black text-slate-800 text-lg">Registrar Empaque</h3>
+                <p class="text-[11px] text-slate-500 font-medium">Captura los datos del lote procesado.</p>
+            </div>
+            <button onclick="document.getElementById('modal-empaque').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
+        </div>
+        
+        <!-- Fíjate cómo la ruta apunta al backend -->
+        <form action="{{ url_for('empaque.registrar_empaque') }}" method="POST" class="space-y-4 text-sm">            
+            <div>
+                <label class="font-bold text-slate-700 block mb-1.5">Lote Origen (Producción)</label>
+                <input type="text" name="lote_origen" placeholder="Ej. CHR-LOTE-104" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors uppercase">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">Gestión de Inventario <span class="text-emerald-600 font-bold text-lg">(Producto Terminado)</span></h1>
-                    <p class="text-xs text-slate-500 font-medium mt-1">Control de lotes empacados, stock disponible y semáforo de caducidad.</p>
+                    <label class="font-bold text-slate-700 block mb-1.5">Producto</label>
+                    <select name="especie" class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors">
+                        <option value="Chrysopa">Chrysopa</option>
+                        <option value="Catopar">Catopar</option>
+                    </select>
                 </div>
-                <div class="flex items-center space-x-3 w-full md:w-auto">
-                    <input type="text" id="batchSearch" placeholder="Buscar Código Batch..." class="border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 font-medium w-64">
-                    <button id="btnSearch" class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-900 transition-all shadow-md flex items-center justify-center gap-2">
-                        Filtrar
-                    </button>
-                    <button id="btnResetCards" class="bg-emerald-100 text-emerald-800 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-200 transition-all shadow-sm hidden">
-                        Limpiar Selección
-                    </button>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1.5">Unidades (Botes)</label>
+                    <input type="number" name="cantidad" min="1" required class="w-full font-bold text-center text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors">
                 </div>
             </div>
 
-            <!-- Tarjetas de Identificadores y KPIs -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                <!-- Tarjeta 1: Producto Seleccionado (Fondo Oscuro) -->
-                <div class="bg-gradient-to-br from-slate-800 to-slate-950 p-6 rounded-3xl shadow-lg shadow-slate-900/20 relative overflow-hidden flex flex-col justify-between">
-                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
-                    
-                    <div class="relative z-10 flex justify-between items-start">
-                        <div>
-                            <h3 class="text-slate-300 text-xs font-bold uppercase tracking-widest">Código Batch</h3>
-                            <span class="text-[10px] text-emerald-400 font-medium mt-1 block">Identificador Único</span>
-                        </div>
-                        <div class="w-10 h-10 rounded-2xl bg-white/10 text-emerald-300 flex items-center justify-center backdrop-blur-sm border border-white/10">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                        </div>
-                    </div>
-                    <div class="relative z-10 mt-6">
-                        <p id="valBatch" class="text-3xl font-black text-white tracking-tight">Vista Global</p>
-                        <div class="mt-3 flex items-center gap-2">
-                            <span id="subBatch" class="text-xs text-slate-400 font-medium">Seleccione un lote empacado en la tabla</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tarjeta 2: Stock Disponible -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between">
-                    <div class="absolute -right-6 -top-6 w-24 h-24 bg-slate-50 rounded-full"></div>
-                    
-                    <div class="relative z-10 flex justify-between items-start">
-                        <div>
-                            <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Stock Disponible</h3>
-                            <span class="text-[10px] text-slate-400 font-medium mt-1 block">Unidades Físicas en Almacén</span>
-                        </div>
-                        <div class="w-10 h-10 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                        </div>
-                    </div>
-                    <div class="relative z-10 mt-6 flex items-end gap-2">
-                        <p id="valStock" class="text-4xl font-black text-slate-800 tracking-tight">--</p>
-                        <span class="text-lg font-bold text-slate-500 mb-1">uds</span>
-                    </div>
-                    <div class="relative z-10 mt-2">
-                        <span id="subStock" class="text-xs text-slate-500 font-medium">Volumen total de inventario</span>
-                    </div>
-                </div>
-
-                <!-- Tarjeta 3: Semáforo de Caducidad (Cambia dinámicamente) -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between group">
-                    <div id="blobCaducidad" class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full transition-colors duration-500"></div>
-                    
-                    <div class="relative z-10 flex justify-between items-start">
-                        <div>
-                            <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Estado de Vida Útil</h3>
-                            <span class="text-[10px] text-slate-400 font-medium mt-1 block">Regla de caducidad</span>
-                        </div>
-                        <div id="iconBoxCaducidad" class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center transition-colors duration-500">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        </div>
-                    </div>
-                    <div class="relative z-10 mt-6 flex items-end gap-1">
-                        <p id="valCaducidad" class="text-4xl font-black text-slate-800 tracking-tight transition-colors duration-500">Óptimo</p>
-                    </div>
-                    <div class="relative z-10 mt-2 flex items-center gap-2">
-                        <div id="dotCaducidad" class="w-2 h-2 rounded-full bg-slate-300 transition-colors duration-500"></div>
-                        <span id="subCaducidad" class="text-xs text-slate-500 font-medium">Seleccione lote para evaluar</span>
-                    </div>
-                </div>
+            <div class="pt-4 flex space-x-3 border-t border-slate-100 mt-2">
+                <button type="button" onclick="document.getElementById('modal-empaque').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+                <button type="submit" class="flex-1 bg-teal-600 text-white font-bold py-3 rounded-xl hover:bg-teal-700 transition-colors shadow-md">Guardar Lote</button>
             </div>
-
-            <!-- Tabla de Inventario / Historial -->
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
-                    <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-                        Registro Activo de Producto Terminado
-                        <span class="text-xs font-normal text-slate-400 ml-2 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">(Clic para analizar caducidad)</span>
-                    </h2>
-                    <span class="text-[10px] text-slate-500 font-mono bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">TABLA: EMP_LOTE</span>
-                </div>
-                
-                <div class="overflow-x-auto table-container" id="scrollTable">
-                    <table class="min-w-full divide-y divide-slate-100 text-sm relative">
-                        <thead class="bg-white text-slate-500 sticky top-0 z-10 shadow-sm">
-                            <tr>
-                                <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Código Batch</th>
-                                <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Producto</th>
-                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Empacado</th>
-                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Stock Disponible</th>
-                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] bg-slate-50">Días Caducidad</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 bg-white" id="lotesTableBody">
-                            
-                            <!-- Lote Óptimo (Verde) -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-batch="34-2-2026-CTP-01" data-producto="Catopar (Tubo)" data-stock="150" data-dias="5">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">34-2-2026-CTP-01</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">25/Ago/2026</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-slate-700 font-bold text-sm">Catopar (Tubo)</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-500">150 uds</span></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-800 font-black text-sm bg-slate-100 px-3 py-1 rounded-lg inline-block">150</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <!-- Semáforo Verde estático para la tabla -->
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">Quedan 5 días</span>
-                                </td>
-                            </tr>
-
-                            <!-- Lote Próximo a vencer (Amarillo) -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-batch="34-1-2026-CLB-02" data-producto="Coleobug (Granel)" data-stock="45" data-dias="2">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">34-1-2026-CLB-02</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">24/Ago/2026</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-slate-700 font-bold text-sm">Coleobug (Granel)</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-500">200 uds</span></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-800 font-black text-sm bg-slate-100 px-3 py-1 rounded-lg inline-block">45</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <!-- Semáforo Amarillo estático para la tabla -->
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-800">Quedan 2 días</span>
-                                </td>
-                            </tr>
-                            
-                            <!-- Lote de Venta Directa (Sin Stock Físico) -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-batch="33-5-2026-CTP-05" data-producto="Catopar (Tubo)" data-stock="0" data-dias="1">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">33-5-2026-CTP-05</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">22/Ago/2026 <span class="bg-blue-100 text-blue-700 px-1 rounded ml-1 text-[9px] uppercase">Venta Directa</span></div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-slate-700 font-bold text-sm">Catopar (Tubo)</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-500">100 uds</span></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-400 font-black text-sm bg-slate-50 border border-dashed border-slate-300 px-3 py-1 rounded-lg inline-block">0</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-800">Queda 1 día</span>
-                                </td>
-                            </tr>
-
-                            <!-- Lote Vencido (Rojo) -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-batch="33-1-2026-HUE-01" data-producto="Huevo Formulación" data-stock="20" data-dias="-1">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">33-1-2026-HUE-01</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">18/Ago/2026</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-slate-700 font-bold text-sm">Huevo Formulación</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-500">50 uds</span></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-800 font-black text-sm bg-slate-100 px-3 py-1 rounded-lg inline-block">20</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <!-- Semáforo Rojo estático para la tabla -->
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-red-100 text-red-800">Vencido</span>
-                                </td>
-                            </tr>
-
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- Funciones Javascript para Semáforo y Filtro -->
-    <script>
-        const rows = document.querySelectorAll('.data-row');
-        const btnResetCards = document.getElementById('btnResetCards');
-
-        // Referencias de Elementos HTML
-        const valBatch = document.getElementById('valBatch');
-        const subBatch = document.getElementById('subBatch');
-        
-        const valStock = document.getElementById('valStock');
-        const subStock = document.getElementById('subStock');
-        
-        const valCaducidad = document.getElementById('valCaducidad');
-        const subCaducidad = document.getElementById('subCaducidad');
-        const blobCaducidad = document.getElementById('blobCaducidad');
-        const iconBoxCaducidad = document.getElementById('iconBoxCaducidad');
-        const dotCaducidad = document.getElementById('dotCaducidad');
-
-        // Función para cambiar colores del SEMÁFORO (Excel Logic)
-        function updateTrafficLightColors(diasRestantes) {
-            // Limpiar clases
-            const colorClasses = ['bg-emerald-50', 'bg-amber-50', 'bg-red-50', 'text-emerald-600', 'text-amber-600', 'text-red-600', 'text-slate-800', 'text-emerald-700', 'text-amber-700', 'text-red-700', 'bg-emerald-500', 'bg-amber-500', 'bg-red-500', 'bg-slate-300'];
-            blobCaducidad.classList.remove(...colorClasses);
-            iconBoxCaducidad.classList.remove(...colorClasses);
-            valCaducidad.classList.remove(...colorClasses);
-            dotCaducidad.classList.remove(...colorClasses);
-
-            if (diasRestantes < 0) {
-                // ROJO: Vencido
-                blobCaducidad.classList.add('bg-red-50');
-                iconBoxCaducidad.classList.add('bg-red-50', 'text-red-600');
-                valCaducidad.classList.add('text-red-700');
-                dotCaducidad.classList.add('bg-red-500');
-            } else if (diasRestantes <= 2) {
-                // AMARILLO: Próximo a vencer (1-2 días)
-                blobCaducidad.classList.add('bg-amber-50');
-                iconBoxCaducidad.classList.add('bg-amber-50', 'text-amber-600');
-                valCaducidad.classList.add('text-amber-700');
-                dotCaducidad.classList.add('bg-amber-500');
-            } else {
-                // VERDE: Óptimo (> 2 días)
-                blobCaducidad.classList.add('bg-emerald-50');
-                iconBoxCaducidad.classList.add('bg-emerald-50', 'text-emerald-600');
-                valCaducidad.classList.add('text-emerald-700');
-                dotCaducidad.classList.add('bg-emerald-500');
-            }
-        }
-
-        // Clic en fila actualiza las tarjetas
-        rows.forEach(row => {
-            row.addEventListener('click', () => {
-                rows.forEach(r => {
-                    r.classList.remove('bg-emerald-50', 'border-l-4', 'border-emerald-500');
-                    r.classList.remove('bg-slate-200', 'ring-2', 'ring-slate-400', 'z-10', 'relative');
-                });
-                row.classList.add('bg-emerald-50', 'border-l-4', 'border-emerald-500');
-
-                // Extraer datos
-                const batch = row.getAttribute('data-batch');
-                const producto = row.getAttribute('data-producto');
-                const stock = parseInt(row.getAttribute('data-stock'));
-                const dias = parseInt(row.getAttribute('data-dias'));
-
-                // Actualizar Textos
-                valBatch.innerText = batch;
-                valBatch.classList.remove('text-3xl');
-                valBatch.classList.add('text-2xl', 'break-all');
-                subBatch.innerText = "Producto: " + producto;
-
-                valStock.innerText = stock;
-                if(stock === 0) {
-                    subStock.innerText = "Sin stock (Agotado o Venta Directa)";
-                } else {
-                    subStock.innerText = "Unidades listas para envío";
-                }
-
-                // Lógica del Semáforo
-                updateTrafficLightColors(dias);
-                if(dias < 0) {
-                    valCaducidad.innerText = "Vencido";
-                    subCaducidad.innerText = `Excedió caducidad por ${Math.abs(dias)} días`;
-                } else if (dias <= 2) {
-                    valCaducidad.innerText = "Próximo";
-                    subCaducidad.innerText = `Quedan ${dias} días útiles`;
-                } else {
-                    valCaducidad.innerText = "Óptimo";
-                    subCaducidad.innerText = `Quedan ${dias} días útiles`;
-                }
-
-                btnResetCards.classList.remove('hidden');
-            });
-        });
-
-        // Volver a la Vista Global / Limpiar
-        btnResetCards.addEventListener('click', () => {
-            rows.forEach(r => {
-                r.classList.remove('bg-emerald-50', 'border-l-4', 'border-emerald-500');
-                r.classList.remove('bg-slate-200', 'ring-2', 'ring-slate-400', 'z-10', 'relative');
-            });
-            
-            valBatch.innerText = "Vista Global";
-            valBatch.classList.remove('text-2xl', 'break-all');
-            valBatch.classList.add('text-3xl');
-            subBatch.innerText = "Seleccione un lote empacado en la tabla";
-            
-            valStock.innerText = "--";
-            subStock.innerText = "Volumen total de inventario";
-            
-            valCaducidad.innerText = "Óptimo";
-            subCaducidad.innerText = "Seleccione lote para evaluar";
-            
-            updateTrafficLightColors(99); // Force Green reset
-            blobCaducidad.classList.remove('bg-emerald-50'); blobCaducidad.classList.add('bg-slate-50');
-            iconBoxCaducidad.classList.remove('bg-emerald-50', 'text-emerald-600'); iconBoxCaducidad.classList.add('bg-slate-100', 'text-slate-400');
-            valCaducidad.classList.remove('text-emerald-700'); valCaducidad.classList.add('text-slate-800');
-            dotCaducidad.classList.remove('bg-emerald-500'); dotCaducidad.classList.add('bg-slate-300');
-            
-            btnResetCards.classList.add('hidden');
-        });
-
-        // Buscador de Código Batch
-        const btnSearch = document.getElementById('btnSearch');
-        const batchSearch = document.getElementById('batchSearch');
-        const scrollTable = document.getElementById('scrollTable');
-
-        btnSearch.addEventListener('click', () => {
-            const searchVal = batchSearch.value.trim().toUpperCase();
-            if(!searchVal) return;
-
-            let found = false;
-            rows.forEach(row => {
-                if (row.getAttribute('data-batch').toUpperCase().includes(searchVal)) {
-                    found = true;
-                    const topPos = row.offsetTop - scrollTable.offsetTop;
-                    scrollTable.scrollTo({ top: topPos - 40, behavior: 'smooth' });
-                    
-                    rows.forEach(r => r.classList.remove('bg-slate-200', 'ring-2', 'ring-slate-400', 'z-10', 'relative'));
-                    row.classList.add('bg-slate-200', 'ring-2', 'ring-slate-400', 'z-10', 'relative');
-                }
-            });
-
-            if(!found) alert("No se encontró ningún Código Batch coincidente.");
-        });
-    </script>
-</body>
-</html>
+        </form>
+    </div>
+</div>
+{% endblock %}

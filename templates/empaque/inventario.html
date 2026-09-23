@@ -1,0 +1,153 @@
+{% extends "empaque/base_empaque.html" %}
+
+{% block title %}Inventario y Consumo - Koppert{% endblock %}
+
+{% block navbar_menu %}
+<div class="flex space-x-1 items-center">
+    <!-- Pestaña 1: Inactiva -->
+    <a href="{{ url_for('empaque.dashboard_empaque') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-teal-900 text-teal-100 hover:text-white transition-colors whitespace-nowrap">Registro de Lotes</a>
+    
+    <!-- PESTAÑA 2: ACTIVA -->
+    <a href="{{ url_for('empaque.inventario') }}" class="px-4 py-2 rounded-xl text-xs font-bold bg-teal-600 text-white shadow-sm whitespace-nowrap">Semáforo de Inventario</a>
+    
+    <!-- Pestaña 3: Inactiva -->
+    <a href="#" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-teal-900 text-teal-100 hover:text-white transition-colors whitespace-nowrap">Mermas y Daños</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Encabezado y Botón de Registro de Consumo -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-5 rounded-3xl shadow-sm border border-slate-200 gap-4">
+    <div>
+        <h1 class="text-xl font-black text-slate-800 tracking-tight">Control de Insumos <span class="text-teal-600 font-bold text-base">(Stock)</span></h1>
+        <p class="text-xs text-slate-500 font-medium mt-1">Niveles de almacén y registro de salida de material hacia la línea de empaque.</p> 
+    </div>
+    <div class="flex items-center w-full md:w-auto">
+        <button onclick="document.getElementById('modal-consumo').classList.remove('hidden')" class="bg-teal-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-teal-700 transition-all shadow-md flex items-center justify-center gap-2 whitespace-nowrap w-full md:w-auto">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+            Registrar Salida de Material
+        </button>
+    </div>
+</div>
+
+<!-- Tarjetas del Semáforo de Inventario (Dinámicas) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    
+    <!-- Insumo 1: Botes (Óptimo) -->
+    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between border-l-4 border-l-emerald-500">
+        <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-3">Botes 500ml</h3>
+        <div class="flex items-end justify-between">
+            <p class="text-3xl font-black text-slate-800 tracking-tight">4,500</p>
+            <span class="text-[10px] text-emerald-700 font-bold bg-emerald-100 px-2 py-1 rounded">🟢 Óptimo</span>
+        </div>
+    </div>
+
+    <!-- Insumo 2: Tapas (Alerta) -->
+    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between border-l-4 border-l-amber-500">
+        <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-3">Tapas P/Bote</h3>
+        <div class="flex items-end justify-between">
+            <p class="text-3xl font-black text-slate-800 tracking-tight">850</p>
+            <span class="text-[10px] text-amber-700 font-bold bg-amber-100 px-2 py-1 rounded">⚠️ Resurtir</span>
+        </div>
+    </div>
+
+    <!-- Insumo 3: Etiquetas (Óptimo) -->
+    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between border-l-4 border-l-emerald-500">
+        <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-3">Etiquetas Chrysopa</h3>
+        <div class="flex items-end justify-between">
+            <p class="text-3xl font-black text-slate-800 tracking-tight">12,000</p>
+            <span class="text-[10px] text-emerald-700 font-bold bg-emerald-100 px-2 py-1 rounded">🟢 Óptimo</span>
+        </div>
+    </div>
+
+    <!-- Insumo 4: Cajas de Cartón (Crítico) -->
+    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between border-l-4 border-l-rose-500">
+        <h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-3">Cajas Cartón</h3>
+        <div class="flex items-end justify-between">
+            <p class="text-3xl font-black text-rose-600 tracking-tight">45</p>
+            <span class="text-[10px] text-rose-700 font-bold bg-rose-100 px-2 py-1 rounded border border-rose-200 animate-pulse">🚨 Crítico</span>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla Historial de Consumo -->
+<div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="bg-slate-50/50 px-5 py-4 border-b border-slate-100 flex justify-between items-center">
+        <h2 class="text-sm font-bold text-slate-800">Historial de Salidas a Línea</h2>
+        <span class="text-[10px] text-slate-500 font-mono bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-sm">TABLA: EMP_CONSUMO</span>
+    </div>
+    
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-100 text-sm">
+            <thead class="bg-white text-slate-500">
+                <tr>
+                    <th class="px-5 py-3 text-left font-extrabold uppercase tracking-wider text-[10px]">Fecha / Hora</th>
+                    <th class="px-5 py-3 text-left font-extrabold uppercase tracking-wider text-[10px]">Material Utilizado</th>
+                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Cantidad</th>
+                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Lote Destino</th>
+                    <th class="px-5 py-3 text-left font-extrabold uppercase tracking-wider text-[10px]">Operador</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                <!-- Fila de ejemplo estática -->
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-5 py-3 whitespace-nowrap text-[11px] font-medium text-slate-500">Hoy, 09:15 AM</td>
+                    <td class="px-5 py-3 whitespace-nowrap font-bold text-slate-800">Bote de 500ml con Tapa</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-center font-bold text-teal-700 bg-teal-50">- 150 u.</td>
+                    <td class="px-4 py-3 whitespace-nowrap text-center font-mono text-xs text-slate-600">CHR-LOTE-104</td>
+                    <td class="px-5 py-3 whitespace-nowrap text-slate-600 text-xs font-medium">Dalila (OP-03)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ==========================================
+     MODAL DE REGISTRO DE SALIDA DE MATERIAL
+     ========================================== -->
+<div id="modal-consumo" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+            <div>
+                <h3 class="font-black text-slate-800 text-lg">Registrar Salida de Insumo</h3>
+                <p class="text-[11px] text-slate-500 font-medium">Descuenta material del almacén general.</p>
+            </div>
+            <button onclick="document.getElementById('modal-consumo').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
+        </div>
+        
+        <form action="#" method="POST" class="space-y-4 text-sm">
+            
+            <div>
+                <label class="font-bold text-slate-700 block mb-1.5">Material a descontar</label>
+                <select name="material" class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors">
+                    <option value="Botes 500ml">Botes 500ml</option>
+                    <option value="Tapas">Tapas</option>
+                    <option value="Etiquetas Chrysopa">Etiquetas Chrysopa</option>
+                    <option value="Cajas de Cartón">Cajas de Cartón</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1.5">Cantidad</label>
+                    <input type="number" name="cantidad_usada" min="1" required class="w-full font-bold text-center text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1.5">Lote Destino</label>
+                    <input type="text" name="lote_destino" placeholder="Ej. LOTE-104" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors uppercase">
+                </div>
+            </div>
+
+            <div class="border-t border-slate-100 pt-4 mt-2">
+                <label class="font-bold text-slate-700 block mb-1.5 text-center">Firma de Seguridad (NIP)</label>
+                <input type="password" name="nip" placeholder="••••" required maxlength="4" class="w-full font-mono font-bold text-center tracking-widest text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors text-lg">
+            </div>
+
+            <div class="pt-2 flex space-x-3 mt-2">
+                <button type="button" onclick="document.getElementById('modal-consumo').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
+                <button type="submit" class="flex-1 bg-teal-600 text-white font-bold py-3 rounded-xl hover:bg-teal-700 transition-colors shadow-md">Registrar Salida</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
