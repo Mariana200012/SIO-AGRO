@@ -1,271 +1,265 @@
 {% extends "admin/base_admin.html" %}
 
-{% block title %}Gestión de Usuarios - Koppert Biofactory{% endblock %}
+{% block title %}Directorio de Personal - Koppert Biofactory{% endblock %}
 
 {% block navbar_menu %}
-<div class="hidden md:block flex-1 mx-6">
-    <div class="flex space-x-1 overflow-x-auto">
-        <a href="{{ url_for('admin.usuarios') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-cyan-600 text-white shadow-sm flex items-center gap-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-            Gestión de Usuarios
-        </a>
-    </div>
+<!-- Menú superior limpio (exclusivo para la sección actual) -->
+<div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
+    <a href="#" class="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-cyan-600 shadow-md shadow-cyan-900/50 border border-cyan-500/30 transition-all cursor-default whitespace-nowrap">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+        Gestión de Usuarios
+    </a>
 </div>
 {% endblock %}
 
 {% block content %}
-<!-- Encabezado y Botón de Nuevo Usuario -->
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
-    <div>
-        <h1 class="text-2xl font-black text-slate-800 tracking-tight">Directorio de Personal <span class="text-cyan-600 font-bold text-lg">(Accesos)</span></h1>
-        <p class="text-xs text-slate-500 font-medium mt-1">Administración de operadores, NIPs de seguridad y asignación de áreas.</p>
-    </div>
-    <div class="flex items-center w-full md:w-auto">
-        <button onclick="document.getElementById('modal-usuario').classList.remove('hidden')" class="bg-cyan-600 text-white px-5 py-3 rounded-xl text-sm font-bold hover:bg-cyan-700 transition-all shadow-md flex items-center justify-center gap-2 w-full md:w-auto">
+<div class="space-y-8 w-full max-w-7xl mx-auto pb-10 relative z-0">
+    
+    <!-- Encabezado -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Directorio de Personal <span class="text-cyan-600 font-bold text-lg bg-cyan-50 px-2 py-0.5 rounded-lg ml-1">Koppert</span></h1>
+            <p class="text-xs text-slate-500 font-medium mt-1.5">Administración de operadores, NIPs de seguridad y asignación de áreas.</p>
+        </div>
+        <button onclick="openModal('modalAdd')" class="bg-cyan-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-cyan-800 transition-all shadow-md flex items-center justify-center gap-2 hover:shadow-cyan-900/20">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
             Registrar Nuevo Usuario
         </button>
     </div>
-</div>
 
-<!-- Tabla de Usuarios -->
-<div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-8">
-    <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
-        <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-            Operadores Activos en el Sistema
-        </h2>
-        <span class="text-[10px] text-slate-500 font-mono bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">TABLA: USUARIOS</span>
-    </div>
-    
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-100 text-sm">
-            <thead class="bg-white text-slate-500">
-                <tr>
-                    <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">ID / Nombre Completo</th>
-                    <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Puesto y Área</th>
-                    <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">NIP de Acceso</th>
-                    <th class="px-6 py-4 text-right font-extrabold uppercase tracking-wider text-[10px]">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 bg-white">
-                
-                {% for u in usuarios %}
-                    {% if u['id_usuario'] %}
+    <!-- Tabla de Usuarios -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-sm font-extrabold text-slate-800 flex items-center gap-3">
+                <div class="w-2 h-6 bg-cyan-500 rounded-full"></div>
+                Operadores Activos en el Sistema
+            </h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+                <thead class="bg-slate-50 text-slate-500">
+                    <tr>
+                        <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px] text-slate-600">ID / Nombre Completo</th>
+                        <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600">Puesto</th>
+                        <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600">Área Asignada</th>
+                        <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600">NIP</th>
+                        <th class="px-6 py-4 text-right font-extrabold uppercase tracking-wider text-[10px] text-slate-600">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    {% for user in usuarios %}
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center gap-3">
-                                <!-- Avatar Color Cian -->
-                                <div class="w-8 h-8 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold text-xs uppercase">{{ u['nombre_usuario'][0] }}</div>
+                                <div class="w-8 h-8 rounded-full bg-cyan-50 flex items-center justify-center text-cyan-700 font-bold text-xs border border-cyan-100">
+                                    {{ user.nombre_usuario[0]|upper }}
+                                </div>
                                 <div>
-                                    <div class="font-bold text-slate-800 text-sm">{{ u['nombre_usuario'] }}</div>
-                                    <div class="text-[10px] text-slate-400 font-mono mt-0.5">ID: USR-00{{ u['id_usuario'] }}</div>
+                                    <div class="font-bold text-slate-800 text-sm">{{ user.nombre_usuario }}</div>
+                                    <div class="text-[10px] text-slate-400 font-medium mt-0.5">ID: USR-{{ "%03d"|format(user.id_usuario) }}</div>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="font-bold text-slate-700 text-xs">{{ u['puesto'] }}</div>
-                            <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-md border border-slate-200 mt-1 inline-block">Área: {{ u['nombre_area'] }}</span>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="px-2.5 py-1 rounded-md text-[10px] font-black bg-slate-100 text-slate-600">{{ user.puesto }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="font-mono text-slate-800 font-bold tracking-widest bg-slate-100 px-2 py-1 rounded">{{ u['nip_firma'] }}</span>
+                            <span class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200">{{ user.nombre_area }}</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right space-x-2">
-                            
-                            <button onclick="abrirModalEditar('{{ u['id_usuario'] }}', '{{ u['nombre_usuario'] }}', '{{ u['puesto'] }}', '{{ u['nip_firma'] }}', '{{ u['id_area'] }}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors inline-flex items-center justify-center" title="Editar">
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span class="font-mono text-xs font-bold text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-200">****</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <button onclick="openEditModal({{ user.id_usuario }}, '{{ user.nombre_usuario }}', '{{ user.puesto }}', '{{ user.id_area }}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors inline-block mr-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             </button>
-                            
-                            <form action="{{ url_for('admin.eliminar_usuario', id_usuario=u['id_usuario']) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Estás seguro de que deseas desactivar a {{ u['nombre_usuario'] }}?');">
-                                <button type="submit" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors inline-flex items-center justify-center" title="Eliminar">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                </button>
-                            </form>
-
+                            <button onclick="openDeleteModal({{ user.id_usuario }})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors inline-block">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
                         </td>
                     </tr>
-                    {% endif %}
-                {% endfor %}
-
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Modal para Registrar Nuevo Usuario -->
-<div id="modal-usuario" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
-            <div>
-                <h3 class="font-black text-slate-800 text-lg">Registrar Operador</h3>
-                <p class="text-[11px] text-slate-500 font-medium">Llene los datos para dar de alta en la BD.</p>
-            </div>
-            <button onclick="document.getElementById('modal-usuario').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        
-        <form action="{{ url_for('admin.agregar_usuario') }}" method="POST" class="space-y-5 text-sm">
-            <div>
-                <label class="font-bold text-slate-700 block mb-1.5">Nombre Completo</label>
-                <input type="text" name="nombre_usuario" placeholder="Ej. Juan Pérez" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors">
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="font-bold text-slate-700 block mb-1.5">Puesto</label>
-                    <select id="nuevo_puesto" name="puesto" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors">
-                        <option value="Operador">Operador</option>
-                        <option value="Analista">Analista</option>
-                        <option value="Supervisor">Supervisor</option>
-                        <option value="Administrador">Administrador</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="font-bold text-slate-700 block mb-1.5">Área (ID)</label>
-                    <select id="nuevo_area" name="id_area" class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors">
-                        <option value="1">1 - Chrysopa</option>
-                        <option value="2">2 - Catopar</option>
-                        <option value="3">3 - Empaque</option>
-                        <option value="4">4 - Inventario</option>
-                        <option value="5">5 - Administración</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div>
-                <label class="font-bold text-slate-700 block mb-1.5">NIP de Acceso</label>
-                <input type="text" name="nip_firma" placeholder="4 dígitos" maxlength="4" pattern="\d{4}" required class="w-full font-mono font-bold text-center text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 transition-colors">
-            </div>
-
-            <div class="pt-4 flex space-x-3 border-t border-slate-100 mt-2">
-                <button type="button" onclick="document.getElementById('modal-usuario').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
-                <button type="submit" class="flex-1 bg-cyan-600 text-white font-bold py-3 rounded-xl hover:bg-cyan-700 transition-colors shadow-md">Guardar Usuario</button>
-            </div>
-        </form>
     </div>
 </div>
 
-<!-- Modal para Editar Usuario -->
-<div id="modal-editar" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
-            <div>
-                <h3 class="font-black text-slate-800 text-lg text-blue-600">Editar Operador</h3>
-                <p class="text-[11px] text-slate-500 font-medium">Modifica los datos del usuario seleccionado.</p>
-            </div>
-            <button onclick="document.getElementById('modal-editar').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
+<!-- ===================================== -->
+<!-- MODAL: AGREGAR USUARIO -->
+<!-- ===================================== -->
+<div id="modalAdd" class="hidden fixed inset-0 z-[9999] overflow-y-auto">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeModal('modalAdd')"></div>
+    <div class="flex items-center justify-center min-h-screen p-4 py-12 text-center sm:p-0">
+        <div class="relative bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-lg w-full border border-slate-100">
+            <form action="{{ url_for('admin.agregar_usuario') }}" method="POST">
+                <div class="bg-white px-8 pt-8 pb-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="text-xl font-black text-slate-800">Registrar Operador</h3>
+                            <p class="text-xs font-medium text-slate-500 mt-1">Llene los datos para dar de alta en la BD.</p>
+                        </div>
+                        <button type="button" onclick="closeModal('modalAdd')" class="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 p-2 rounded-full transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Nombre Completo</label>
+                            <input type="text" name="nombre_usuario" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-slate-50 hover:border-cyan-300 transition-colors" placeholder="Ej. Juan Pérez">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Puesto</label>
+                                <select name="puesto" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-slate-50 hover:border-cyan-300 transition-colors cursor-pointer">
+                                    <option value="Operador">Operador</option>
+                                    <option value="Supervisor">Supervisor</option>
+                                    <option value="Administrador">Administrador</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Área (ID)</label>
+                                <select name="id_area" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-slate-50 hover:border-cyan-300 transition-colors cursor-pointer">
+                                    <option value="1">1 - Chrysopa</option>
+                                    <option value="2">2 - Catopar</option>
+                                    <option value="3">3 - Empaque</option>
+                                    <option value="4">4 - Inventario</option>
+                                    <option value="5">5 - Administración</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">NIP de Acceso</label>
+                            <input type="password" name="nip_firma" required maxlength="4" pattern="\d{4}" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono text-center text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-slate-50 hover:border-cyan-300 transition-colors tracking-[0.5em]" placeholder="****">
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-8 py-5 flex items-center justify-end gap-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('modalAdd')" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-800 transition-all shadow-sm">Cancelar</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-cyan-700 hover:bg-cyan-800 shadow-md transition-all">Guardar Usuario</button>
+                </div>
+            </form>
         </div>
-        
-        <form id="form-editar" method="POST" class="space-y-5 text-sm">
-            <div>
-                <label class="font-bold text-slate-700 block mb-1.5">Nombre Completo</label>
-                <input type="text" id="edit_nombre" name="nombre_usuario" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="font-bold text-slate-700 block mb-1.5">Puesto</label>
-                    <select id="edit_puesto" name="puesto" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
-                        <option value="Operador">Operador</option>
-                        <option value="Analista">Analista</option>
-                        <option value="Supervisor">Supervisor</option>
-                        <option value="Administrador">Administrador</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="font-bold text-slate-700 block mb-1.5">Área (ID)</label>
-                    <select id="edit_area" name="id_area" class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
-                        <option value="1">1 - Chrysopa</option>
-                        <option value="2">2 - Catopar</option>
-                        <option value="3">3 - Empaque</option>
-                        <option value="4">4 - Inventario</option>
-                        <option value="5">5 - Administración</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div>
-                <label class="font-bold text-slate-700 block mb-1.5">NIP de Acceso</label>
-                <input type="text" id="edit_nip" name="nip_firma" maxlength="4" pattern="\d{4}" required class="w-full font-mono font-bold text-center text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors">
-            </div>
-
-            <div class="pt-4 flex space-x-3 border-t border-slate-100 mt-2">
-                <button type="button" onclick="document.getElementById('modal-editar').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
-                <button type="submit" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-md">Actualizar Datos</button>
-            </div>
-        </form>
     </div>
 </div>
-{% endblock %} 
+
+<!-- ===================================== -->
+<!-- MODAL: EDITAR USUARIO -->
+<!-- ===================================== -->
+<div id="modalEdit" class="hidden fixed inset-0 z-[9999] overflow-y-auto">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeModal('modalEdit')"></div>
+    <div class="flex items-center justify-center min-h-screen p-4 py-12 text-center sm:p-0">
+        <div class="relative bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-lg w-full border border-slate-100">
+            <form id="formEdit" method="POST">
+                <div class="bg-white px-8 pt-8 pb-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h3 class="text-xl font-black text-slate-800">Editar Operador</h3>
+                            <p class="text-xs font-medium text-slate-500 mt-1">Actualice los datos del sistema.</p>
+                        </div>
+                        <button type="button" onclick="closeModal('modalEdit')" class="text-slate-400 hover:text-slate-600 bg-slate-50 hover:bg-slate-100 p-2 rounded-full transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Nombre Completo</label>
+                            <input type="text" id="editNombre" name="nombre_usuario" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 transition-colors">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Puesto</label>
+                                <select id="editPuesto" name="puesto" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 transition-colors">
+                                    <option value="Operador">Operador</option>
+                                    <option value="Supervisor">Supervisor</option>
+                                    <option value="Administrador">Administrador</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Área (ID)</label>
+                                <select id="editArea" name="id_area" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 transition-colors">
+                                    <option value="1">1 - Chrysopa</option>
+                                    <option value="2">2 - Catopar</option>
+                                    <option value="3">3 - Empaque</option>
+                                    <option value="4">4 - Inventario</option>
+                                    <option value="5">5 - Administración</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Nuevo NIP (Opcional)</label>
+                            <input type="password" name="nip_firma" maxlength="4" pattern="\d{4}" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono text-center text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 transition-colors tracking-[0.5em]" placeholder="En blanco para mantener actual">
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-50 px-8 py-5 flex items-center justify-end gap-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('modalEdit')" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-all">Cancelar</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all">Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===================================== -->
+<!-- MODAL: ELIMINAR USUARIO -->
+<!-- ===================================== -->
+<div id="modalDelete" class="hidden fixed inset-0 z-[9999] overflow-y-auto">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeModal('modalDelete')"></div>
+    <div class="flex items-center justify-center min-h-screen p-4 py-12 text-center sm:p-0">
+        <div class="relative bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-md w-full border border-slate-100">
+            <form id="formDelete" method="POST">
+                <div class="bg-white px-8 pt-8 pb-6 text-center">
+                    <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-black text-slate-800 mb-2">¿Dar de baja operador?</h3>
+                    <p class="text-sm font-medium text-slate-500">El operador cambiará a estatus 'Inactivo' y ya no podrá acceder a los módulos de producción.</p>
+                </div>
+                <div class="bg-slate-50 px-8 py-5 flex items-center justify-center gap-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('modalDelete')" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-all">Cancelar</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition-all">Sí, dar de baja</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
 {% block scripts %}
 <script>
-    function abrirModalEditar(id, nombre, puesto, nip, id_area) {
-        document.getElementById('modal-editar').classList.remove('hidden');
-        
-        document.getElementById('edit_nombre').value = nombre;
-        document.getElementById('edit_nip').value = nip;
-        
-        const selectPuesto = document.getElementById('edit_puesto');
-        selectPuesto.value = puesto;
-        
-        const selectArea = document.getElementById('edit_area');
-        sincronizarAreas(selectPuesto, selectArea);
-        
-        let optionExists = Array.from(selectArea.options).some(option => option.value === id_area.toString());
-        if (optionExists) {
-            selectArea.value = id_area.toString();
-        }
-
-        document.getElementById('form-editar').action = "/admin/usuarios/editar/" + id;
-    }
-
-    function sincronizarAreas(selectPuesto, selectArea) {
-        const opciones = selectArea.options;
-        const puestoSeleccionado = selectPuesto.value;
-
-        for (let i = 0; i < opciones.length; i++) {
-            opciones[i].style.display = 'none';
-        }
-
-        if (puestoSeleccionado === 'Administrador') {
-            for (let i = 0; i < opciones.length; i++) {
-                if (opciones[i].value === '5') {
-                    opciones[i].style.display = 'block';
-                }
-            }
-            selectArea.value = '5';
-            selectArea.classList.add('bg-slate-200', 'cursor-not-allowed', 'opacity-70');
-            selectArea.style.pointerEvents = "none"; 
-        } else {
-            let primeraAreaValida = null;
-            for (let i = 0; i < opciones.length; i++) {
-                if (opciones[i].value !== '5') {
-                    opciones[i].style.display = 'block';
-                    if (!primeraAreaValida) primeraAreaValida = opciones[i].value;
-                }
-            }
-            
-            if (selectArea.value === '5') {
-                selectArea.value = primeraAreaValida;
-            }
-            
-            selectArea.classList.remove('bg-slate-200', 'cursor-not-allowed', 'opacity-70');
-            selectArea.style.pointerEvents = "auto";
+    function openModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.appendChild(modal);
         }
     }
 
-    const selectPuestoNuevo = document.getElementById('nuevo_puesto');
-    const selectAreaNuevo = document.getElementById('nuevo_area');
-    
-    sincronizarAreas(selectPuestoNuevo, selectAreaNuevo);
-    selectPuestoNuevo.addEventListener('change', function() {
-        sincronizarAreas(selectPuestoNuevo, selectAreaNuevo);
-    });
+    function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
 
-    const selectPuestoEdit = document.getElementById('edit_puesto');
-    const selectAreaEdit = document.getElementById('edit_area');
-    
-    selectPuestoEdit.addEventListener('change', function() {
-        sincronizarAreas(selectPuestoEdit, selectAreaEdit);
-    });
+    function openEditModal(id, nombre, puesto, id_area) {
+        document.getElementById('editNombre').value = nombre;
+        document.getElementById('editPuesto').value = puesto;
+        document.getElementById('editArea').value = id_area;
+        document.getElementById('formEdit').action = `/admin/usuarios/editar/${id}`;
+        openModal('modalEdit');
+    }
+
+    function openDeleteModal(id) {
+        document.getElementById('formDelete').action = `/admin/usuarios/eliminar/${id}`;
+        openModal('modalDelete');
+    }
 </script>
 {% endblock %}

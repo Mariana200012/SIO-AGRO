@@ -3,92 +3,90 @@
 {% block title %}Monitoreo de Eclosión - Koppert Biofactory{% endblock %}
 
 {% block navbar_menu %}
-<div class="hidden md:block flex-1 mx-6">
-    <div class="flex space-x-1 overflow-x-auto">
-        <a href="{{ url_for('prod_chrysopa.ocupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Ocupación</a>
-        <a href="{{ url_for('prod_chrysopa.pupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Pupación</a>
-        <a href="{{ url_for('prod_chrysopa.eclosion') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">Eclosión</a>
-        <a href="{{ url_for('prod_chrysopa.mortalidad') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Mortalidad</a>
-        <a href="{{ url_for('prod_chrysopa.fallas') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Fallas</a>
-        <a href="{{ url_for('prod_chrysopa.materiales') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Solicitar Material</a>
-
-    </div>
+<div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
+    <a href="{{ url_for('prod_chrysopa.ocupacion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Ocupación</a>
+    <a href="{{ url_for('prod_chrysopa.pupacion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Pupación</a>
+    <!-- BOTÓN ACTIVO (Eclosión) -->
+    <a href="{{ url_for('prod_chrysopa.eclosion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-emerald-600 shadow-md shadow-emerald-900/50 border border-emerald-500/35 transition-all cursor-default whitespace-nowrap">Eclosión</a>
+    <a href="{{ url_for('prod_chrysopa.mortalidad') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Mortalidad</a>
+    <a href="{{ url_for('prod_chrysopa.fallas') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Fallas</a>
+    <a href="{{ url_for('prod_chrysopa.materiales') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Material</a>
 </div>
 {% endblock %}
 
 {% block content %}
-
-    <!-- Dashboard Principal -->
     <main class="flex-1 overflow-y-auto p-6 lg:p-10">
         <div class="max-w-[1200px] mx-auto space-y-6">
             
-            <!-- Encabezado (Sólido) -->
             <div class="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-widest uppercase mb-2">
-                        Módulo Chrysopa &bull; Control Interno
+                        Módulo Chrysopa &bull; Control de Eclosión
                     </div>
-                    <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-1">Registro de Eclosión</h1>
-                    <p class="text-xs text-slate-500 font-medium">Ingrese los datos de conteo en la plantilla de 100 orificios. El sistema calculará el porcentaje individual y el promedio del lote.</p>
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-1">Registro de Eclosión (3 Rejillas de Muestra)</h1>
+                    <p class="text-xs text-slate-500 font-medium">Control de calidad y porcentajes de eclosión por rejilla (Meta mínima óptima: 90%).</p>
                 </div>
                 <button onclick="abrirConfiguracionLote()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 px-6 rounded-xl transition-all flex items-center gap-2 shadow-md whitespace-nowrap">
                     <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                    Nuevo Registro de Lote
+                    Nuevo Registro
                 </button>
             </div>
 
-            <!-- Sección Media (Último Lote + Desglose) -->
+            {% if ultimo %}
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Tarjeta: Último Lote Procesado (Diseño Corporativo Esmeralda) -->
                 <div class="lg:col-span-4 bg-gradient-to-br from-emerald-800 to-emerald-950 text-white p-7 rounded-3xl shadow-md flex flex-col justify-between relative overflow-hidden">
                     <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full"></div>
                     <div>
-                        <span class="inline-block text-[10px] font-bold tracking-widest uppercase text-emerald-200 bg-black/20 px-3 py-1.5 rounded-md mb-4">Último Lote Procesado</span>
-                        <h2 class="text-3xl font-black tracking-tight mb-1 relative z-10">CHR-LOTE-102</h2>
+                        <span class="inline-block text-[10px] font-bold tracking-widest uppercase text-emerald-200 bg-black/20 px-3 py-1.5 rounded-md mb-4">Último Registro Procesado</span>
+                        <h2 class="text-3xl font-black tracking-tight mb-1 relative z-10">Semana {{ ultimo.semana }}</h2>
                         <div class="flex items-center gap-3 mt-2 relative z-10">
-                            <span class="text-[11px] font-bold bg-emerald-700/50 border border-emerald-600/50 px-2 py-0.5 rounded-md text-emerald-100">Semana 30</span>
-                            <p class="text-[11px] text-emerald-200/80">Registrado hace 15 minutos</p>
+                            <p class="text-[11px] text-emerald-200/80">{{ ultimo.fecha }}</p>
                         </div>
                     </div>
                     <div class="mt-8 border-t border-emerald-700/50 pt-5 flex items-end justify-between relative z-10">
                         <div>
                             <p class="text-[11px] text-emerald-200 font-medium mb-0.5">Promedio General</p>
-                            <p class="text-4xl font-black text-white leading-none">87.7%</p>
+                            <p class="text-4xl font-black text-white leading-none">{{ ultimo.promedio }}%</p>
                         </div>
-                        <span class="px-4 py-1.5 bg-emerald-500 border border-emerald-400 rounded-lg text-xs font-bold text-white shadow-sm mb-1">Aceptado</span>
+                        <span class="px-4 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm mb-1 {% if ultimo.promedio >= 90.0 %}bg-emerald-500 border border-emerald-400{% else %}bg-amber-500 border border-amber-400{% endif %}">
+                            {{ ultimo.estatus }}
+                        </span>
                     </div>
                 </div>
 
-                <!-- Tarjeta: Desglose de 3 Rejillas (Plano y Sólido) -->
                 <div class="lg:col-span-8 bg-white border border-slate-200 p-7 rounded-3xl shadow-sm flex flex-col justify-between">
                     <div>
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-5">Desglose de Muestreo de las 3 Rejillas</h3>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-5">Porcentaje de Eclosión por Rejilla</h3>
                         <div class="grid grid-cols-3 gap-5">
                             <div class="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl text-center">
                                 <span class="text-[10px] font-black uppercase tracking-wider text-emerald-800">Rejilla 1</span>
-                                <p class="text-4xl font-black text-slate-900 leading-tight mt-1 mb-1">85</p>
-                                <span class="text-xs font-bold text-emerald-600">85.0% Eclosión</span>
+                                <p class="text-4xl font-black text-slate-900 leading-tight mt-1 mb-1">{{ ultimo.r1 }}%</p>
+                                <span class="text-xs font-bold text-emerald-600">Eclosión</span>
                             </div>
                             <div class="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl text-center">
                                 <span class="text-[10px] font-black uppercase tracking-wider text-emerald-800">Rejilla 2</span>
-                                <p class="text-4xl font-black text-slate-900 leading-tight mt-1 mb-1">90</p>
-                                <span class="text-xs font-bold text-emerald-600">90.0% Eclosión</span>
+                                <p class="text-4xl font-black text-slate-900 leading-tight mt-1 mb-1">{{ ultimo.r2 }}%</p>
+                                <span class="text-xs font-bold text-emerald-600">Eclosión</span>
                             </div>
                             <div class="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl text-center">
                                 <span class="text-[10px] font-black uppercase tracking-wider text-emerald-800">Rejilla 3</span>
-                                <p class="text-4xl font-black text-slate-900 leading-tight mt-1 mb-1">88</p>
-                                <span class="text-xs font-bold text-emerald-600">88.0% Eclosión</span>
+                                <p class="text-4xl font-black text-slate-900 leading-tight mt-1 mb-1">{{ ultimo.r3 }}%</p>
+                                <span class="text-xs font-bold text-emerald-600">Eclosión</span>
                             </div>
                         </div>
                     </div>
                     <div class="mt-6 pt-5 border-t border-slate-100 flex justify-between items-center">
-                        <span class="text-xs text-slate-500 font-medium">Operador responsable: <strong class="text-slate-700">Juan Pérez (OP-04)</strong></span>
+                        <span class="text-xs text-slate-500 font-medium">Operador responsable: <strong class="text-slate-700">{{ ultimo.operador }}</strong></span>
                         <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100">Guardado Exitoso</span>
                     </div>
                 </div>
             </div>
+            {% else %}
+            <div class="bg-white p-10 text-center rounded-3xl border border-slate-200">
+                <p class="text-slate-500 font-bold">Aún no hay registros de eclosión.</p>
+            </div>
+            {% endif %}
 
-            <!-- Tabla de Registros -->
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-6">
                 <div class="bg-slate-50 px-7 py-5 border-b border-slate-100 flex justify-between items-center">
                     <h2 class="text-[15px] font-bold text-slate-800 tracking-tight">Tus Registros de Hoy en Turno</h2>
@@ -98,25 +96,35 @@
                     <table class="min-w-full text-sm">
                         <thead class="bg-white sticky top-0 z-10 shadow-sm">
                             <tr>
-                                <th class="px-7 py-4 text-left font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">ID Lote</th>
-                                <th class="px-7 py-4 text-center font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Semana</th>
-                                <th class="px-7 py-4 text-center font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Rejilla</th>
-                                <th class="px-7 py-4 text-center font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Autorización</th>
-                                <th class="px-7 py-4 text-center font-extrabold text-slate-500 uppercase tracking-wider text-[10px] bg-emerald-50">Eclosión</th>
+                                <th class="px-7 py-4 text-left font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Semana de Prod.</th>
+                                <th class="px-7 py-4 text-center font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Rejillas</th>
+                                <th class="px-7 py-4 text-center font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Operador Responsable</th>
+                                <th class="px-7 py-4 text-center font-extrabold text-slate-500 uppercase tracking-wider text-[10px] bg-emerald-50">% Rendimiento</th>
                                 <th class="px-7 py-4 text-right font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Hora de Registro</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white">
+                            {% for reg in historial %}
                             <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-7 py-4 font-bold text-slate-800">CHR-LOTE-102</td>
-                                <td class="px-7 py-4 text-center text-slate-600 font-bold">30</td>
-                                <td class="px-7 py-4 text-center"><span class="px-3 py-1 bg-slate-100 rounded-md text-[10px] font-bold text-slate-600 border border-slate-200">Rejilla 3</span></td>
-                                <td class="px-7 py-4 text-center text-slate-500 font-medium"><span class="bg-slate-50 text-slate-500 border border-slate-200 px-2 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider">Firma NIP: OP-04</span></td>
-                                <td class="px-7 py-4 text-center bg-emerald-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">88.0%</span>
+                                <td class="px-7 py-4 font-bold text-slate-800">Semana {{ reg.semana }}</td>
+                                <td class="px-7 py-4 text-center"><span class="px-3 py-1 bg-slate-100 rounded-md text-[10px] font-bold text-slate-600 border border-slate-200">1, 2 y 3</span></td>
+                                <td class="px-7 py-4 text-center text-slate-700 font-medium">
+                                    <span class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider">
+                                        {{ reg.operador }}
+                                    </span>
                                 </td>
-                                <td class="px-7 py-4 text-right text-slate-500 font-medium text-xs">09:15 AM</td>
+                                <td class="px-7 py-4 text-center bg-emerald-50/50">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black {% if reg.porcentaje >= 90.0 %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">
+                                        {{ reg.porcentaje }}%
+                                    </span>
+                                </td>
+                                <td class="px-7 py-4 text-right text-slate-500 font-medium text-xs">{{ reg.fecha }}</td>
                             </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="px-7 py-8 text-center text-slate-500 font-medium">No se han registrado datos en este turno.</td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -124,24 +132,18 @@
         </div>
     </main>
 
-    <!-- ==========================================
-         PASO 1: MODAL DE CONFIGURACIÓN INICIAL (NIP)
-         ========================================== -->
+    <!-- MODAL CONFIGURACIÓN -->
     <div id="modal-configuracion" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl overflow-hidden flex flex-col transform transition-all">
             <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
                 <div>
-                    <h3 class="font-black text-slate-800 text-lg">Inicializar Lote</h3>
+                    <h3 class="font-black text-slate-800 text-lg">Inicializar Eclosión</h3>
                     <p class="text-[11px] text-slate-500 font-medium">Autenticación requerida</p>
                 </div>
                 <button onclick="cerrarConfiguracion()" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
             </div>
             
             <div class="space-y-5 text-sm">
-                <div>
-                    <label class="font-bold text-slate-700 block mb-1.5">ID Lote a Procesar</label>
-                    <input type="text" id="input-lote" placeholder="Ej. CHR-LOTE-103" class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 transition-colors">
-                </div>
                 <div>
                     <label class="font-bold text-slate-700 block mb-1.5">Semana de Producción</label>
                     <input type="number" id="input-semana" placeholder="Ej. 30" class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 transition-colors">
@@ -152,68 +154,46 @@
                 </div>
             </div>
 
-            <button onclick="iniciarCaptura()" class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl hover:bg-emerald-700 transition-colors shadow-md text-sm mt-8 flex justify-center items-center gap-2">
+            <button type="button" onclick="iniciarCaptura(this)" class="w-full bg-emerald-600 text-white font-bold py-3.5 rounded-xl hover:bg-emerald-700 transition-colors shadow-md text-sm mt-8 flex justify-center items-center gap-2">
                 Iniciar Muestreo <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </button>
         </div>
     </div>
 
-    <!-- ==========================================
-         PASO 2: MODAL DE CAPTURA (GRID 100 ORIFICIOS)
-         ========================================== -->
+    <!-- MODAL CAPTURA GRID -->
     <div id="modal-registro" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-5xl w-full p-2 shadow-2xl overflow-hidden flex flex-col md:flex-row h-[95vh] md:h-[600px]">
-            
-            <!-- PANEL IZQUIERDO: Cuadrícula -->
+        <div class="bg-white rounded-3xl max-w-6xl w-full p-2 shadow-2xl overflow-hidden flex flex-col md:flex-row h-[95vh] md:h-[600px]">
             <div class="p-4 sm:p-6 flex-1 bg-slate-50 rounded-3xl border-r border-slate-200 flex flex-col overflow-y-auto">
                 <div class="flex justify-between items-center mb-4">
                     <div>
                         <h3 class="font-black text-slate-800 text-lg">Muestreo en Curso</h3>
-                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Ingrese cantidades</p>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Ingrese cantidades de eclosión</p>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="llenarConBase()" class="text-xs bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl font-bold transition flex items-center gap-1 shadow-sm">
-                            Llenar Base
-                        </button>
+                        <button onclick="llenarConBase()" class="text-xs bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-xl font-bold transition flex items-center gap-1 shadow-sm">Llenar Base</button>
                         <button onclick="limpiarTodos()" class="text-xs bg-white border border-red-200 hover:bg-red-50 text-red-600 px-4 py-2 rounded-xl font-bold transition shadow-sm">Limpiar</button>
                     </div>
                 </div>
-
-                <!-- Contenedor del Grid 10x10 -->
                 <div class="flex-1 flex items-center justify-center bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-                    <div id="grid-orificios" class="grid grid-cols-10 gap-1 sm:gap-1.5 w-full max-w-lg mx-auto">
-                        <!-- Inputs JS -->
-                    </div>
+                    <div id="grid-orificios" class="grid grid-cols-10 gap-1 sm:gap-1.5 w-full max-w-lg mx-auto"></div>
                 </div>
             </div>
 
-            <!-- PANEL DERECHO: Asistente y Progreso -->
             <div class="p-4 sm:p-6 w-full md:w-80 flex flex-col justify-between bg-white overflow-y-auto rounded-r-3xl">
-                
                 <div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-4">
-                    <!-- Info Bloqueada -->
                     <div>
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lote Activo</p>
-                        <p id="display-lote" class="text-base font-black text-emerald-600">CHR-LOTE-XXX</p>
-                        <p id="display-semana" class="text-xs font-bold text-slate-500 mt-0.5">Semana --</p>
+                        <p id="display-lote" class="text-base font-black text-emerald-600">Semana --</p>
                     </div>
-                    <button onclick="cerrarCaptura()" class="text-slate-400 hover:text-red-500 font-black text-2xl leading-none" title="Cancelar Lote">&times;</button>
+                    <button onclick="cerrarCaptura()" class="text-slate-400 hover:text-red-500 font-black text-2xl leading-none" title="Cancelar">&times;</button>
                 </div>
 
-                <!-- Stepper de Progreso (Rejillas) - Estilos Actualizados -->
-                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 mb-4 flex gap-2 shadow-sm">
-                    <div id="step-1" class="flex-1 text-center py-2 rounded-xl bg-emerald-600 text-white shadow-sm border border-emerald-700 transition-all">
-                        <span class="block text-[10px] font-bold uppercase">Rejilla 1</span>
-                    </div>
-                    <div id="step-2" class="flex-1 text-center py-2 rounded-xl bg-slate-100 text-slate-400 border border-transparent transition-all">
-                        <span class="block text-[10px] font-bold uppercase">Rejilla 2</span>
-                    </div>
-                    <div id="step-3" class="flex-1 text-center py-2 rounded-xl bg-slate-100 text-slate-400 border border-transparent transition-all">
-                        <span class="block text-[10px] font-bold uppercase">Rejilla 3</span>
-                    </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-2 mb-4 flex gap-2 shadow-sm">
+                    <div id="step-1" class="flex-1 text-center py-2 rounded-xl bg-emerald-600 text-white shadow-sm border border-emerald-700 transition-all"><span class="block text-[10px] font-bold uppercase">Rejilla 1</span></div>
+                    <div id="step-2" class="flex-1 text-center py-2 rounded-xl bg-slate-100 text-slate-400 border border-transparent transition-all"><span class="block text-[10px] font-bold uppercase">Rejilla 2</span></div>
+                    <div id="step-3" class="flex-1 text-center py-2 rounded-xl bg-slate-100 text-slate-400 border border-transparent transition-all"><span class="block text-[10px] font-bold uppercase">Rejilla 3</span></div>
                 </div>
 
-                <!-- Métricas Actuales (Diseño Sólido) -->
                 <div class="bg-slate-800 rounded-3xl p-6 text-white shadow-md relative overflow-hidden mb-6 flex-shrink-0 border border-slate-700">
                     <div class="flex justify-between items-end border-b border-slate-600 pb-4 mb-4">
                         <div>
@@ -221,7 +201,7 @@
                             <p id="total-suma" class="font-black text-3xl text-white mt-1">0</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">% Ocupación</p>
+                            <p class="text-slate-400 text-[10px] uppercase font-bold tracking-wider">% Eclosión</p>
                             <p id="porcentaje-ocupacion" class="font-bold text-xl text-emerald-400 mt-1">0%</p>
                         </div>
                     </div>
@@ -231,36 +211,32 @@
                     </div>
                 </div>
 
-                <!-- Botón Continuar Dinámico -->
                 <button id="btn-siguiente" onclick="siguienteRejilla()" class="w-full bg-emerald-600 text-white font-bold py-4 rounded-xl hover:bg-emerald-700 transition-colors shadow-md text-sm flex-shrink-0">
                     Guardar y pasar a Rejilla 2 &rarr;
                 </button>
             </div>
         </div>
     </div>
+{% endblock %}
 
-    {% endblock %}
-
-    {% block scripts %}
+{% block scripts %}
     <script>
-        // Variables Globales
         const totalOrificios = 100;
         let rejillaActual = 1;
+        const totalRejillas = 3;
         const gridContainer = document.getElementById('grid-orificios');
         const txtTotalSuma = document.getElementById('total-suma');
         const txtPromedio = document.getElementById('promedio-celda');
         const txtOcupacion = document.getElementById('porcentaje-ocupacion');
         
-        // Elementos del Flujo
+        let datosCompletos = [];
+
         const modalConfig = document.getElementById('modal-configuracion');
         const modalRegistro = document.getElementById('modal-registro');
         const displayLote = document.getElementById('display-lote');
-        const displaySemana = document.getElementById('display-semana');
         const btnSiguiente = document.getElementById('btn-siguiente');
 
-        // Paso 1: Abrir Modal Inicial
         function abrirConfiguracionLote() {
-            document.getElementById('input-lote').value = '';
             document.getElementById('input-semana').value = '';
             document.getElementById('input-nip').value = '';
             modalConfig.classList.remove('hidden');
@@ -270,64 +246,115 @@
             modalConfig.classList.add('hidden');
         }
 
-        // Paso 2: Validar e iniciar la captura de rejillas
-        function iniciarCaptura() {
-            const lote = document.getElementById('input-lote').value;
+        async function iniciarCaptura(boton) {
             const semana = document.getElementById('input-semana').value;
             const nip = document.getElementById('input-nip').value;
 
-            if(!lote || !semana || !nip) {
-                alert("Por favor complete el Lote, Semana y NIP para continuar.");
+            if(!semana || !nip) {
+                alert("Por favor complete la Semana y su NIP para continuar.");
                 return;
             }
 
-            displayLote.innerText = lote;
-            displaySemana.innerText = "Semana " + semana;
-            modalConfig.classList.add('hidden');
-            
-            rejillaActual = 1;
-            actualizarUIRejilla();
-            generarGrid();
-            
-            modalRegistro.classList.remove('hidden');
+            let textoOriginal = boton.innerHTML;
+            boton.innerHTML = "Validando firma...";
+            boton.disabled = true;
+
+            try {
+                let respuesta = await fetch("{{ url_for('prod_chrysopa.validar_nip_ajax') }}", {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({nip: nip})
+                });
+                
+                let data = await respuesta.json();
+
+                if(data.status === 'error') {
+                    alert("El NIP ingresado es incorrecto o el usuario no está activo.");
+                    boton.innerHTML = textoOriginal;
+                    boton.disabled = false;
+                    return; 
+                }
+
+                datosCompletos = []; 
+                displayLote.innerText = "Semana " + semana; 
+                modalConfig.classList.add('hidden');
+                rejillaActual = 1;
+                actualizarUIRejilla();
+                generarGrid();
+                modalRegistro.classList.remove('hidden');
+            } catch (error) {
+                alert("Error de conexión al validar el NIP.");
+            }
+            boton.innerHTML = textoOriginal;
+            boton.disabled = false;
         }
 
-        // Paso 3: Flujo de Rejillas
-        function siguienteRejilla() {
-            if (rejillaActual < 3) {
+        async function siguienteRejilla() {
+            document.querySelectorAll('.celda-input').forEach(input => {
+                datosCompletos.push(parseInt(input.value) || 0);
+            });
+
+            if (rejillaActual < totalRejillas) {
                 rejillaActual++;
                 limpiarTodos(); 
                 actualizarUIRejilla();
             } else {
-                alert("¡Lote guardado exitosamente!");
-                cerrarCaptura();
+                const semana = document.getElementById('input-semana').value;
+                const nip = document.getElementById('input-nip').value;
+                const lote = semana; 
+
+                btnSiguiente.innerHTML = "Guardando 300 registros...";
+                btnSiguiente.disabled = true;
+
+                try {
+                    const respuesta = await fetch("{{ url_for('prod_chrysopa.guardar_eclosion') }}", {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            lote: lote,
+                            semana: semana,
+                            nip: nip,
+                            rejillas: datosCompletos 
+                        })
+                    });
+
+                    const data = await respuesta.json();
+
+                    if (data.status === 'success') {
+                        cerrarCaptura();
+                        location.reload(); 
+                    } else {
+                        alert("Error: " + data.message);
+                        btnSiguiente.innerHTML = "Finalizar y Guardar ✔";
+                        btnSiguiente.disabled = false;
+                        datosCompletos.splice(-100); 
+                    }
+                } catch (error) {
+                    alert('Ocurrió un error al comunicarse con el servidor.');
+                    btnSiguiente.innerHTML = "Finalizar y Guardar ✔";
+                    btnSiguiente.disabled = false;
+                    datosCompletos.splice(-100);
+                }
             }
         }
 
-        // Actualiza Steppers y Textos según la rejilla actual (Clases de Tailwind actualizadas)
         function actualizarUIRejilla() {
-            const st1 = document.getElementById('step-1');
-            const st2 = document.getElementById('step-2');
-            const st3 = document.getElementById('step-3');
-            
             const pendingStyle = 'flex-1 text-center py-2 rounded-xl bg-slate-100 text-slate-400 border border-transparent transition-all';
             const activeStyle = 'flex-1 text-center py-2 rounded-xl bg-emerald-600 text-white shadow-sm border border-emerald-700 transition-all';
             const doneStyle = 'flex-1 text-center py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 transition-all';
 
-            [st1, st2, st3].forEach(st => st.className = pendingStyle);
+            for(let i = 1; i <= totalRejillas; i++) {
+                const stepElement = document.getElementById('step-' + i);
+                if (!stepElement) continue;
+                if (i < rejillaActual) stepElement.className = doneStyle;
+                else if (i === rejillaActual) stepElement.className = activeStyle;
+                else stepElement.className = pendingStyle;
+            }
 
-            if(rejillaActual === 1) {
-                st1.className = activeStyle;
-                btnSiguiente.innerHTML = "Guardar y pasar a Rejilla 2 &rarr;";
-            } else if (rejillaActual === 2) {
-                st1.className = doneStyle;
-                st2.className = activeStyle;
-                btnSiguiente.innerHTML = "Guardar y pasar a Rejilla 3 &rarr;";
-            } else if (rejillaActual === 3) {
-                st1.className = doneStyle;
-                st2.className = doneStyle;
-                st3.className = activeStyle;
-                btnSiguiente.innerHTML = "Finalizar y Guardar Lote ✔";
+            if(rejillaActual < totalRejillas) {
+                btnSiguiente.innerHTML = "Guardar y pasar a Rejilla " + (rejillaActual + 1) + " &rarr;";
+            } else {
+                btnSiguiente.innerHTML = "Finalizar y Guardar ✔";
                 btnSiguiente.classList.replace('bg-emerald-600', 'bg-slate-800'); 
                 btnSiguiente.classList.replace('hover:bg-emerald-700', 'hover:bg-slate-900');
             }
@@ -339,7 +366,6 @@
             btnSiguiente.classList.replace('hover:bg-slate-900', 'hover:bg-emerald-700');
         }
 
-        // LOGICA DE LA CUADRÍCULA Y CÁLCULOS (Clases JS actualizadas a paleta corporativa)
         function generarGrid() {
             gridContainer.innerHTML = '';
             for (let i = 0; i < totalOrificios; i++) {
@@ -396,7 +422,4 @@
             actualizarCalculos();
         }
     </script>
-</body>
-</html>
 {% endblock %}
-

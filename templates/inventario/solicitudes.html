@@ -1,67 +1,96 @@
-{% extends "produccion/base_produc.html" %}
+{% extends "inventario/base_inventario.html" %}
 
 {% block title %}Centro de Surtido - Koppert Biofactory{% endblock %}
 
 {% block navbar_menu %}
-<div class="hidden md:block flex-1 mx-6">
-    <div class="flex space-x-1 overflow-x-auto">
-        <a href="{{ url_for('inventario.listar_solicitudes') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">Solicitudes</a>
-    </div>
+<div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
+    
+    <!-- Botón Solicitudes Activas -->
+    <a href="{{ url_for('inventario.listar_solicitudes') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-emerald-600 shadow-md shadow-emerald-900/50 border border-emerald-500/30 transition-all cursor-default whitespace-nowrap">
+        Solicitudes Activas
+    </a>
+    
+    <!-- Botón Historial (CORREGIDO PARA APUNTAR A SU RUTA REAL) -->
+    <a href="{{ url_for('inventario.historial_solicitudes') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+        Historial solicitudes
+    </a>
+    
 </div>
 {% endblock %}
 
 {% block content %}
-
-    <!-- Área de Trabajo Principal -->
-    <main class="flex-1 overflow-y-auto p-8">
+    <main class="flex-1 overflow-y-auto p-4 sm:p-8">
         <div class="max-w-7xl mx-auto space-y-6">
             
             <!-- Encabezado y Pestañas de Filtrado -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
-                <div>
-                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">Centro de Surtido a Producción</h1>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+                <div class="w-full md:w-auto">
+                    <h1 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight">Centro de Surtido a Producción</h1>
                     <p class="text-xs text-slate-500 font-medium mt-1">Gestión de tickets de materiales agrupados por área operativa.</p>
                 </div>
-                <div class="flex items-center space-x-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
-                    <button class="tab-btn active bg-white text-slate-800 shadow-sm px-4 py-2 rounded-lg text-sm font-bold transition-all" data-target="all">Todas las Áreas</button>
-                    <button class="tab-btn text-slate-500 hover:text-slate-700 px-4 py-2 rounded-lg text-sm font-bold transition-all" data-target="chrysopa">Chrysopa</button>
-                    <button class="tab-btn text-slate-500 hover:text-slate-700 px-4 py-2 rounded-lg text-sm font-bold transition-all" data-target="catopar">Catopar</button>
+                
+                <div class="w-full md:w-auto overflow-x-auto hide-scroll pb-1 md:pb-0">
+                    <div class="inline-flex items-center space-x-1.5 sm:space-x-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200 min-w-max">
+                        <button class="tab-btn active bg-white text-slate-800 shadow-sm px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap" data-target="all">Todas las Áreas</button>
+                        <button class="tab-btn text-slate-500 hover:text-slate-700 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap" data-target="chrysopa">Chrysopa</button>
+                        <button class="tab-btn text-slate-500 hover:text-slate-700 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap" data-target="catopar">Catopar</button>
+                    </div>
                 </div>
             </div>
 
             <!-- KPIs Rápidos -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-amber-50 p-6 rounded-3xl border border-amber-200 flex items-center justify-between">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                
+                <!-- KPI: Pendientes -->
+                <div class="bg-amber-50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                        <p class="text-xs font-bold text-amber-700 uppercase tracking-widest">Tickets Pendientes</p>
-                        <!-- Cuenta cuántos tickets hay en total -->
-                        <p class="text-3xl font-black text-amber-900 mt-1">{{ tickets|length }}</p>
+                        <p class="text-[10px] sm:text-xs font-bold text-amber-700 uppercase tracking-widest leading-tight">Tickets Pendientes</p>
+                        <p class="text-2xl sm:text-3xl font-black text-amber-900 mt-1">
+                            {{ tickets | selectattr('estatus', 'equalto', 'Pendiente') | list | length }}
+                        </p>
                     </div>
                 </div>
-                <div class="bg-emerald-50 p-6 rounded-3xl border border-emerald-200 flex items-center justify-between">
+
+                <!-- KPI: Autorizados -->
+                <div class="bg-sky-50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-sky-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                        <p class="text-xs font-bold text-emerald-700 uppercase tracking-widest">Tickets Surtidos Hoy</p>
-                        <p class="text-3xl font-black text-emerald-900 mt-1">0</p>
+                        <p class="text-[10px] sm:text-xs font-bold text-sky-700 uppercase tracking-widest leading-tight">Tickets Autorizados</p>
+                        <p class="text-2xl sm:text-3xl font-black text-sky-900 mt-1">
+                            {{ tickets | selectattr('estatus', 'equalto', 'Autorizado') | list | length }}
+                        </p>
                     </div>
                 </div>
+
+                <!-- KPI: Rechazados -->
+                <div class="bg-rose-50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-rose-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 transition-all hover:bg-rose-100">
+                    <div>
+                        <p class="text-[10px] sm:text-xs font-bold text-rose-700 uppercase tracking-widest leading-tight">Rechazados</p>
+                        
+                        <!-- AQUÍ AGREGAMOS EL DEFAULT(0) -->
+                        <p class="text-2xl sm:text-3xl font-black text-rose-900 mt-1">
+                            {{ total_rechazados | default(0) }}
+                        </p>
+                        
+                    </div>
+                </div>
+
             </div>
 
-            <!-- CONTENEDOR DE TICKETS (Agrupados por área) -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-10">
+            <!-- CONTENEDOR DE TICKETS -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 pb-10">
                 
-                <!-- CICLO DINÁMICO: 1 Tarjeta = 1 Ticket Agrupado -->
                 {% for ticket in tickets %}
                 <div class="req-card bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden flex flex-col" data-area="{{ 'chrysopa' if ticket['nombre_area'] == 'Chrysopa' else 'catopar' }}">
                     
-                    <!-- Cabecera del Ticket (Mantiene tus colores originales) -->
+                    <!-- Cabecera del Ticket -->
                     {% if ticket['nombre_area'] == 'Chrysopa' %}
-                    <div class="bg-blue-50/50 p-5 border-b border-blue-100 flex justify-between items-start">
+                    <div class="bg-blue-50/50 p-4 sm:p-5 border-b border-blue-100 flex justify-between items-start">
                         <div>
                             <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-blue-100 border border-blue-200 text-blue-800 text-[10px] font-black uppercase tracking-wider mb-2">
                                 Área: Chrysopa
                             </div>
                     {% else %}
-                    <div class="bg-orange-50/50 p-5 border-b border-orange-100 flex justify-between items-start">
+                    <div class="bg-orange-50/50 p-4 sm:p-5 border-b border-orange-100 flex justify-between items-start">
                         <div>
                             <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-orange-100 border border-orange-200 text-orange-800 text-[10px] font-black uppercase tracking-wider mb-2">
                                 Área: Catopar
@@ -71,15 +100,16 @@
                             <p class="text-xs text-slate-500 font-medium mt-1">Solicitado por: <span class="font-bold text-slate-700">{{ ticket['nombre_usuario'] }}</span></p>
                         </div>
                         <div class="text-right">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black bg-amber-100 text-amber-800 uppercase shadow-sm">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-black uppercase shadow-sm
+                                {% if ticket['estatus']|upper == 'AUTORIZADO' %} bg-sky-100 text-sky-800 {% else %} bg-amber-100 text-amber-800 {% endif %}">
                                 {{ ticket['estatus'] }}
                             </span>
                             <p class="text-[10px] text-slate-400 font-medium mt-2">{{ ticket['fecha_solicitud'] }}</p>
                         </div>
                     </div>
                     
-                    <!-- Lista de Materiales Solicitados dentro del Ticket -->
-                    <div class="p-5 flex-1">
+                    <!-- Lista de Materiales Solicitados -->
+                    <div class="p-4 sm:p-5 flex-1">
                         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Lista de Materiales Solicitados</h3>
                         <table class="w-full text-left text-sm">
                             <thead>
@@ -89,7 +119,6 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-50">
-                                <!-- Recorremos los materiales agrupados en Python -->
                                 {% for mat in ticket['materiales'] %}
                                 <tr>
                                     <td class="py-3 font-semibold text-slate-700">&bull; {{ mat['nombre'] }}</td>
@@ -100,24 +129,41 @@
                         </table>
                     </div>
 
-                    <!-- Botones de Acción Originales -->
-                    <div class="bg-slate-50 p-4 border-t border-slate-100 flex justify-end gap-3">
-                        <button class="bg-white border border-slate-300 text-slate-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-100 transition-colors">Rechazar / Ajustar</button>
-                        <button class="bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors shadow-md">Autorizar y Surtir Ticket</button>
+                    <!-- BOTONES DE ACCIÓN PARA EL ANALISTA -->
+                    <div class="bg-slate-50 p-4 border-t border-slate-100">
+                        <form action="{{ url_for('inventario.actualizar_ticket', folio=ticket['folio_ticket']) }}" method="POST" class="flex flex-col sm:flex-row justify-end items-center gap-3 w-full">
+                            <input type="hidden" name="area_ticket" value="{{ ticket['nombre_area'] }}">
+
+                            {% if ticket['estatus']|upper == 'PENDIENTE' %}
+                                <button type="submit" name="accion" value="rechazar" class="w-full sm:w-auto bg-white border border-slate-300 text-slate-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-100 transition-colors shadow-sm">
+                                    Rechazar
+                                </button>
+                                <button type="submit" name="accion" value="autorizar" class="w-full sm:w-auto bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors shadow-md">
+                                    Autorizar Pedido
+                                </button>
+                            
+                            {% elif ticket['estatus']|upper == 'AUTORIZADO' %}
+                                <div class="mr-auto hidden sm:block text-[10px] font-bold text-sky-600 uppercase tracking-wide">
+                                    Esperando surtido físico...
+                                </div>
+                                <button type="submit" name="accion" value="surtir" class="w-full sm:w-auto bg-emerald-600 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors shadow-md">
+                                    Completar y Surtir
+                                </button>
+                            {% endif %}
+                        </form>
                     </div>
                 </div>
                 
                 {% else %}
-                <!-- Si no hay tickets en la base de datos, mostramos este mensaje -->
-                <div class="col-span-1 lg:col-span-2 text-center text-slate-500 py-10">
-                    No hay solicitudes pendientes en este momento.
+                <div class="col-span-1 lg:col-span-2 text-center text-slate-500 py-10 bg-white rounded-3xl border border-slate-200 border-dashed">
+                    <p class="font-bold text-lg mb-1">Todo limpio ✨</p>
+                    <p class="text-sm">No hay solicitudes pendientes en este momento.</p>
                 </div>
                 {% endfor %}
 
             </div>
         </div>
     </main>
-
 {% endblock %}
 
 {% block scripts %}
@@ -128,21 +174,15 @@
 
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            // Limpiar estilos de pestañas
             tabBtns.forEach(b => {
                 b.classList.remove('bg-white', 'text-slate-800', 'shadow-sm');
                 b.classList.add('text-slate-500');
             });
-            
-            // Activar pestaña clickeada
             btn.classList.add('bg-white', 'text-slate-800', 'shadow-sm');
             btn.classList.remove('text-slate-500');
-
-            // Filtrar tarjetas
             const target = btn.getAttribute('data-target');
-
             cards.forEach(card => {
-                if (target === 'all' || card.getAttribute('data-area') === target) {
+                if (target === 'all' || card.getAttribute('data-area').toLowerCase() === target.toLowerCase()) {
                     card.style.display = 'flex';
                 } else {
                     card.style.display = 'none';

@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from datetime import datetime
 import sqlite3
 
 # Declaramos el blueprint principal del Administrador
@@ -180,3 +181,57 @@ def editar_usuario(id_usuario):
         conn.close()
 
     return redirect(url_for('admin.usuarios'))
+
+# ==========================================
+# RUTAS NUEVAS PARA EL MENÚ (DASHBOARD Y ASISTENCIA)
+# ==========================================
+
+@admin_bp.route('/metricas')
+def metricas():
+    if session.get('id_area') != 5:
+        flash('Acceso denegado. Área exclusiva de Administración.', 'error')
+        return redirect(url_for('auth.login'))
+        
+    return render_template('admin/dashboard.html')
+
+
+
+# Busca tu ruta actual y actualízala con esto:
+@admin_bp.route('/asistencia') # (Cambia @app por @admin_bp si usas blueprints)
+def asistencia():
+    fecha_hoy = datetime.now().strftime('%Y-%m-%d')
+    
+    conn = sqlite3.connect(r'C:\Users\maryt\OneDrive\Escritorio\Proyecto\SF_Koppert\Bd_SIO-AGRO.db')
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # 1. Obtenemos el total de usuarios para el contador (Ajusta si solo quieres contar operadores)
+    cursor.execute("SELECT COUNT(*) AS total FROM USUARIOS")
+    total_operadores = cursor.fetchone()['total']
+
+   # 2. Obtenemos las llegadas de HOY conectando la ASISTENCIA con el USUARIO y su ÁREA
+    cursor.execute("""
+        SELECT U.nombre_usuario, A.hora_entrada, C.nombre_area
+        FROM ASISTENCIA A
+        JOIN USUARIOS U ON A.id_usuario = U.id_usuario
+        LEFT JOIN CAT_AREAS C ON U.id_area = C.id_area
+        WHERE A.fecha = ? AND A.hora_entrada IS NOT NULL
+        ORDER BY C.nombre_area DESC, A.hora_entrada DESC 
+    """, (fecha_hoy,))
+    
+    registros = cursor.fetchall()
+    conn.close()
+
+    # 3. Calculamos las matemáticas para las tarjetas de arriba
+    total_presentes = len(registros)
+    chrysopa_count = sum(1 for r in registros if r['nombre_area'] and 'Chrysopa' in r['nombre_area'])
+    catopar_count = sum(1 for r in registros if r['nombre_area'] and 'Catopar' in r['nombre_area'])
+    otros_count = total_presentes - chrysopa_count - catopar_count
+
+    return render_template('admin/asistencia.html', 
+                           registros=registros,
+                           total_presentes=total_presentes,
+                           total_operadores=total_operadores,
+                           chrysopa_count=chrysopa_count,
+                           catopar_count=catopar_count,
+                           otros_count=otros_count)

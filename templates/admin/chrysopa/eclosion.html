@@ -1,17 +1,32 @@
-{% extends "admin/base_modulo.html" %}
+{% extends "admin/base_admin.html" %}
 
 {% block title %}Monitoreo de Eclosión - Koppert Biofactory{% endblock %}
 
-{% block sidebar_menu %}
-<div class="flex space-x-1 items-center">
-    <a href="{{ url_for('admin.ocupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors whitespace-nowrap">Ocupación</a>
-    <a href="{{ url_for('admin.pupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors whitespace-nowrap">Pupación</a>
+{% block navbar_menu %}
+<!-- Contenedor tipo cápsula -->
+<div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
     
-    <!-- PESTAÑA ACTIVA -->
-    <a href="{{ url_for('admin.eclosion') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm whitespace-nowrap">Eclosión</a>
+    <!-- Botones Inactivos -->
+    <a href="{{ url_for('admin.ocupacion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+        Ocupación
+    </a>
     
-    <a href="{{ url_for('admin.mortalidad') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors whitespace-nowrap">Mortalidad</a>
-    <a href="{{ url_for('admin.fallas') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors whitespace-nowrap">Fallas</a>
+    <a href="{{ url_for('admin.pupacion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+        Pupación
+    </a>
+    
+    <!-- BOTÓN ACTIVO (Eclosión) -->
+    <a href="{{ url_for('admin.eclosion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-emerald-600 shadow-md shadow-emerald-900/50 border border-emerald-500/30 transition-all cursor-default whitespace-nowrap">
+        Eclosión
+    </a>
+    
+    <a href="{{ url_for('admin.mortalidad') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+        Mortalidad
+    </a>
+    
+    <a href="{{ url_for('admin.fallas') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+        Fallas
+    </a>
 </div>
 {% endblock %}
 
@@ -114,7 +129,6 @@
                     Historial de Muestreos y Estatus
                     <span class="text-xs font-normal text-slate-400 ml-2 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">(Haz clic en un lote para ver sus datos arriba)</span>
                 </h2>
-                <span class="text-[10px] text-slate-500 font-mono bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">TABLA: ECLOSION</span>
             </div>
             
             <div class="overflow-x-auto table-container" id="scrollTable">

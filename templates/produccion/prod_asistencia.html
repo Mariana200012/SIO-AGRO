@@ -1,0 +1,100 @@
+{% extends "produccion/base_produc.html" %}
+
+{% block title %}Pase de Lista - Koppert Biofactory{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6 pb-10">
+    
+    <!-- Encabezado Nuevo -->
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex justify-between items-center">
+        <div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-violet-50 text-violet-800 text-[10px] font-bold tracking-widest uppercase mb-2">
+                Mi Área de Trabajo
+            </div>
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Pase de Lista de Operadores</h1>
+            <p class="text-xs text-slate-500 font-medium mt-1">Marque la entrada del personal asignado a su área.</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+        <ul class="divide-y divide-slate-100">
+            
+            {% for op in operadores %}
+            <li class="p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-slate-50 transition-colors">
+                
+                <!-- Info del Operador -->
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-black border border-slate-200">
+                        {{ op['nombre_usuario'][:2] | upper }}
+                    </div>
+                    <div>
+                        <p class="font-black text-slate-800 text-sm">{{ op['nombre_usuario'] }}</p>
+                        
+                        <div class="flex items-center gap-2 mt-1">
+                            {% if op['hora_entrada'] %}
+                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100" id="hora-ent-{{ op['id_usuario'] }}">
+                                    Entrada: {{ op['hora_entrada'] }}
+                                </span>
+                            {% else %}
+                                <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 hidden" id="hora-ent-{{ op['id_usuario'] }}"></span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón de Entrada Única -->
+                <div>
+                    {% if not op['hora_entrada'] %}
+                        <button onclick="marcarAsistencia(this, {{ op['id_usuario'] }})" class="w-full sm:w-auto px-5 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-black uppercase tracking-wider rounded-xl transition-colors shadow-sm">
+                            Marcar Entrada
+                        </button>
+                    {% else %}
+                        <button disabled class="w-full sm:w-auto px-5 py-2 bg-slate-100 text-slate-400 text-xs font-black uppercase tracking-wider rounded-xl cursor-not-allowed">
+                            Entrada Registrada
+                        </button>
+                    {% endif %}
+                </div>
+            </li>
+            {% else %}
+            <!-- Mensaje si no hay operadores en el área -->
+            <li class="p-8 text-center">
+                <div class="inline-block p-3 bg-slate-50 rounded-full mb-3">
+                    <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                </div>
+                <p class="text-slate-500 font-bold text-sm">No hay operadores registrados o activos en su área.</p>
+                <p class="text-slate-400 text-xs mt-1">Asegúrese de que el personal tenga el puesto "Operador" en el sistema.</p>
+            </li>
+            {% endfor %}
+
+        </ul>
+    </div>
+</div>
+
+<script>
+    async function marcarAsistencia(boton, idOperador) {
+        boton.disabled = true;
+        boton.innerText = "Guardando...";
+
+        try {
+            let respuesta = await fetch(`/asistencia/marcar/${idOperador}`, { method: 'POST' });
+            let data = await respuesta.json();
+
+            if (data.status === 'success') {
+                boton.className = "w-full sm:w-auto px-5 py-2 bg-slate-100 text-slate-400 text-xs font-black uppercase tracking-wider rounded-xl cursor-not-allowed";
+                boton.innerText = "Entrada Registrada";
+                
+                if(data.estado === 'entrada') {
+                    let labelEntrada = document.getElementById(`hora-ent-${idOperador}`);
+                    labelEntrada.innerText = `Entrada: ${data.hora}`;
+                    labelEntrada.classList.remove('hidden');
+                    labelEntrada.classList.add('text-emerald-600', 'bg-emerald-50');
+                }
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            boton.innerText = "Error";
+            boton.disabled = false;
+        }
+    }
+</script>
+{% endblock %}

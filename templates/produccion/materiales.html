@@ -1,35 +1,62 @@
 {% extends "produccion/base_produc.html" %}
 
 {% block title %}Monitoreo de Ocupación - Koppert Biofactory{% endblock %}
-
+        
 {% block navbar_menu %}
-<div class="hidden md:block flex-1 mx-6">
-    <div class="flex space-x-1 overflow-x-auto">
+<!-- CONTENEDOR TIPO CÁPSULA -->
+<div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
+    
+    <!-- ==============================================
+         MENÚ PARA CATOPAR (Tema Azul)
+         ============================================== -->
+    {% if origen == 'catopar' %}
         
-        <!-- Si el operador viene desde Catopar, mostramos el menú de Catopar -->
-        {% if origen == 'catopar' %}
-            <a href="{{ url_for('prod_catopar.pre') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors flex items-center gap-1.5">
-                Pre-Parasitismo
-            </a>            
-            <a href="{{ url_for('prod_catopar.post') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors flex items-center gap-1.5">
-                Post-Parasitismo
-            </a>
-            <a href="{{ url_for('prod_catopar.materiales') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm flex items-center gap-1.5">
-                Solicitar Material
-            </a>
-            
-        <!-- Si el operador viene desde Chrysopa, mostramos el menú de Chrysopa -->
-        {% elif origen == 'chrysopa' %}
-            <a href="{{ url_for('prod_chrysopa.ocupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Ocupación</a>
-            <a href="{{ url_for('prod_chrysopa.pupacion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Pupación</a>
-            <a href="{{ url_for('prod_chrysopa.eclosion') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Eclosión</a>
-             <a href="{{ url_for('prod_chrysopa.mortalidad') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Mortalidad</a>
-            <a href="{{ url_for('prod_chrysopa.fallas') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-emerald-900 hover:text-white transition-colors">Fallas</a>
-            <a href="{{ url_for('prod_chrysopa.materiales') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm flex items-center gap-1.5">Solicitar Material</a>
-        {% endif %}
+        <a href="{{ url_for('prod_catopar.pre') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+            Pre-Parasitismo
+        </a>            
         
-    </div>
-</div>
+        <a href="{{ url_for('prod_catopar.post') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+            Post-Parasitismo
+        </a>
+        
+        <!-- BOTÓN ACTIVO CATOPAR -->
+        <a href="{{ url_for('prod_catopar.materiales') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-blue-600 shadow-md shadow-blue-900/50 border border-blue-500/30 transition-all cursor-default whitespace-nowrap">
+            Solicitar Material
+        </a>
+        
+    <!-- ==============================================
+         MENÚ PARA CHRYSOPA (Tema Esmeralda)
+         ============================================== -->
+    {% elif origen == 'chrysopa' %}
+        
+        <a href="{{ url_for('prod_chrysopa.ocupacion') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+            Ocupación
+        </a>
+        
+        <a href="{{ url_for('prod_chrysopa.pupacion') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+            Pupación
+        </a>
+        
+        <a href="{{ url_for('prod_chrysopa.eclosion') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+            Eclosión
+        </a>
+        
+        <a href="{{ url_for('prod_chrysopa.mortalidad') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+            Mortalidad
+        </a>
+        
+        <a href="{{ url_for('prod_chrysopa.fallas') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+            Fallas
+        </a>
+        
+        <!-- BOTÓN ACTIVO CHRYSOPA -->
+        <a href="{{ url_for('prod_chrysopa.materiales') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-emerald-600 shadow-md shadow-emerald-900/50 border border-emerald-500/30 transition-all cursor-default whitespace-nowrap">
+            Material
+        </a>
+        
+    {% endif %}
+
+</div> 
 {% endblock %}
 
 {% block content %}
@@ -38,21 +65,39 @@
     <main class="flex-1 overflow-y-auto p-6 lg:p-10">
         <div class="max-w-5xl mx-auto space-y-6">
             
-            <!-- ALERTA DE MENSAJES (ÉXITO O ERROR) -->
+            <!-- ALERTA DE MENSAJES (ÉXITO O ERROR) CON AUTOCIERRE -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
+                    <div id="contenedor-alertas" class="space-y-3">
                     {% for category, message in messages %}
-                        <div class="p-4 rounded-2xl font-bold text-sm shadow-sm flex items-center gap-2 
+                        <div class="alerta-flash p-4 rounded-2xl font-bold text-sm shadow-sm flex items-center justify-between transition-all duration-500 
                             {% if category == 'error' %} bg-rose-100 text-rose-700 border border-rose-200 
                             {% else %} bg-emerald-100 text-emerald-800 border border-emerald-200 {% endif %}">
-                            {% if category == 'error' %}
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            {% else %}
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            {% endif %}
-                            {{ message }}
+                            <div class="flex items-center gap-2">
+                                {% if category == 'error' %}
+                                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                {% else %}
+                                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                {% endif %}
+                                {{ message }}
+                            </div>
+                            <button type="button" onclick="this.parentElement.remove()" class="ml-4 font-black opacity-50 hover:opacity-100 text-lg leading-none transition-opacity">&times;</button>
                         </div>
                     {% endfor %}
+                    </div>
+
+                    <!-- SCRIPT PARA DESAPARECER EL MENSAJE COMO FANTASMA -->
+                    <script>
+                        setTimeout(() => {
+                            const alertas = document.querySelectorAll('.alerta-flash');
+                            alertas.forEach(alerta => {
+                                // 1. Le bajamos la opacidad a 0 (fade-out suave)
+                                alerta.style.opacity = '0';
+                                // 2. Esperamos medio segundo a que termine la animación y lo borramos del HTML
+                                setTimeout(() => alerta.remove(), 500); 
+                            });
+                        }, 4000); // 4000 = 4 segundos en pantalla
+                    </script>
                 {% endif %}
             {% endwith %}
 
@@ -65,13 +110,14 @@
                     <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-1">Solicitud de Materiales de Línea</h1>
                     <p class="text-xs text-slate-500 font-medium">Seleccione los insumos habituales de producción e indique las cantidades requeridas.</p>
                 </div>
-                <button onclick="document.getElementById('modal-solicitud').classList.remove('hidden')" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center gap-2 whitespace-nowrap">
+                <!-- AQUÍ CAMBIAMOS EL ONCLICK PARA ABRIR COMO "NUEVO" -->
+                <button type="button" onclick="abrirModalNuevo()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center gap-2 whitespace-nowrap">
                     <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                     Nuevo Pedido de Material
                 </button>
             </div>
 
-            <!-- Historial de Solicitudes Propias -->
+            <!-- Historial de Solicitudes Propias (CON LA LÓGICA DEL LÁPIZ) -->
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-6">
                 <div class="bg-slate-50 px-7 py-5 border-b border-slate-100 flex justify-between items-center">
                     <h2 class="text-[15px] font-bold text-slate-800 tracking-tight">Tus Solicitudes Recientes</h2>
@@ -85,6 +131,7 @@
                                 <th class="px-7 py-4 text-left font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Materiales Solicitados</th>
                                 <th class="px-7 py-4 text-left font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Operador Solicitante</th>
                                 <th class="px-7 py-4 text-center font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Estatus</th>
+                                <th class="px-7 py-4 text-center font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Acciones</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white text-xs">
@@ -103,16 +150,30 @@
                                     {{ sol['nombre_usuario'] }}
                                 </td>
                                 <td class="px-7 py-4 whitespace-nowrap text-center">
-                                    {% if sol['estatus'] == 'Pendiente' %}
+                                    {% if sol['estatus']|upper == 'PENDIENTE' %}
                                         <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-amber-100 text-amber-800 uppercase tracking-wider">{{ sol['estatus'] }}</span>
+                                    {% elif sol['estatus']|upper == 'AUTORIZADO' %}
+                                        <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-sky-100 text-sky-800 uppercase tracking-wider">{{ sol['estatus'] }}</span>
+                                    {% elif sol['estatus']|upper == 'RECHAZADO' %}
+                                        <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-red-100 text-red-800 uppercase tracking-wider">{{ sol['estatus'] }}</span>
                                     {% else %}
                                         <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-emerald-100 text-emerald-800 uppercase tracking-wider">{{ sol['estatus'] }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-7 py-4 whitespace-nowrap text-center">
+                                    <!-- AQUÍ CAMBIAMOS EL LAPICITO PARA QUE ABRA EL MODAL DE EDICIÓN -->
+                                    {% if sol['estatus']|upper == 'RECHAZADO' %}
+                                    <button type="button" onclick="abrirModalEdicion({{ sol['id_solicitud'] }})" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors inline-block" title="Editar Solicitud">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    </button>
+                                    {% else %}
+                                        <span class="text-slate-300">-</span>
                                     {% endif %}
                                 </td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="4" class="px-7 py-8 text-center text-slate-500 font-medium">No has realizado ninguna solicitud recientemente.</td>
+                                <td colspan="5" class="px-7 py-8 text-center text-slate-500 font-medium">No has realizado ninguna solicitud recientemente.</td>
                             </tr>
                             {% endfor %}
 
@@ -124,33 +185,29 @@
         </div>
     </main>
 
-    <!-- Modal para Nueva Solicitud (Catálogo Frecuente) -->
-    <div id="modal-solicitud" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+    <!-- Modal para Solicitud / Edición -->
+    <div id="modal-solicitud" class="hidden fixed inset-0 bg-slate-900/60 z-[9999] flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-100 space-y-5 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-4">
                 <div>
-                    <h3 class="font-black text-slate-800 text-lg">Solicitud de Materiales Habituales</h3>
+                    <!-- LE PUSIMOS UN ID AL TÍTULO PARA CAMBIARLO CON JS -->
+                    <h3 id="modal-titulo" class="font-black text-slate-800 text-lg">Solicitud de Materiales Habituales</h3>
                     <p class="text-[11px] text-slate-500 font-medium">Marque y ajuste la cantidad de los insumos requeridos.</p>
                 </div>
-                <button onclick="document.getElementById('modal-solicitud').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
+                <button type="button" onclick="document.getElementById('modal-solicitud').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
             </div>
             
             <!-- FORMULARIO CONECTADO A PYTHON -->
+            <!-- Nota: ajusta la ruta url_for si usas Blueprint diferente para catopar -->
             <form action="{{ url_for('prod_chrysopa.guardar_materiales') }}" method="POST" class="space-y-5 text-sm">
+                
+                <!-- ESTE INPUT OCULTO GUARDA EL ID CUANDO ES EDICIÓN -->
+                <input type="hidden" name="id_solicitud_editar" id="id_solicitud_editar" value="">
                 
                 <!-- Lista de Materiales Frecuentes -->
                 <div class="space-y-3 border border-slate-200 rounded-2xl p-4 bg-slate-50">
                     
-                    <!-- Item 1 (VALUE = 1) -->
-                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
-                        <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
-                            <input type="checkbox" name="material_1" value="1" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
-                            <span>Leche en polvo</span>
-                        </label>
-                        <input type="number" name="cant_1" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
-                    </div>
-
-                  <!-- Miel ahora usa el ID 1 -->
+                    <!-- Miel -->
                     <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
                         <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
                             <input type="checkbox" name="material_1" value="1" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
@@ -159,7 +216,7 @@
                         <input type="number" name="cant_1" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
                     </div>
 
-                    <!-- Leche en Polvo ahora usa el ID 2 -->
+                    <!-- Leche en Polvo -->
                     <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
                         <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
                             <input type="checkbox" name="material_2" value="2" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
@@ -168,7 +225,7 @@
                         <input type="number" name="cant_2" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
                     </div>
 
-                    <!-- Item 3 (VALUE = 3) -->
+                    <!-- Espirulina -->
                     <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
                         <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
                             <input type="checkbox" name="material_3" value="3" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
@@ -177,7 +234,7 @@
                         <input type="number" name="cant_3" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
                     </div>
 
-                    <!-- Item 4 (VALUE = 4) -->
+                    <!-- Sustrato -->
                     <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
                         <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
                             <input type="checkbox" name="material_4" value="4" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
@@ -185,7 +242,6 @@
                         </label>
                         <input type="number" name="cant_4" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
                     </div>
-
                 </div>
 
                 <div>
@@ -201,4 +257,80 @@
         </div>
     </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function abrirModalNuevo() {
+        // Modo Nuevo Pedido: Vaciamos el ID y limpiamos casillas
+        document.getElementById('id_solicitud_editar').value = "";
+        document.getElementById('modal-titulo').innerText = "Solicitud de Materiales Habituales";
+        
+        document.querySelectorAll('input[type="number"]').forEach(input => input.value = "");
+        document.querySelectorAll('input[type="checkbox"]').forEach(check => check.checked = false);
+        
+        document.getElementById('modal-solicitud').classList.remove('hidden');
+    }
+
+    async function abrirModalEdicion(idSolicitud) {
+        // Modo Edición: Ponemos el ID oculto y cambiamos título
+        document.getElementById('id_solicitud_editar').value = idSolicitud;
+        document.getElementById('modal-titulo').innerText = "Corregir Solicitud #SOL-00" + idSolicitud;
+        
+        // Limpiamos las casillas por si había algo escrito antes
+        document.querySelectorAll('input[type="number"]').forEach(input => input.value = "");
+        document.querySelectorAll('input[type="checkbox"]').forEach(check => check.checked = false);
+
+        try {
+            // 🌟 MAGIA AJAX: Vamos a Python a pedir los detalles del ticket
+            let respuesta = await fetch(`/piso/chrysopa/materiales/detalle/${idSolicitud}`);
+            let materiales = await respuesta.json();
+
+            // Python nos devolverá algo como: [{"id_material": 1, "cantidad": 5}, ...]
+            // Recorremos los datos y llenamos los checkboxes y los inputs
+            materiales.forEach(mat => {
+                let checkbox = document.querySelector(`input[name="material_${mat.id_material}"]`);
+                let inputCant = document.querySelector(`input[name="cant_${mat.id_material}"]`);
+                
+                if (checkbox && inputCant) {
+                    checkbox.checked = true;       // Marcamos la palomita
+                    inputCant.value = mat.cantidad; // Escribimos el número que había pedido
+                }
+            });
+        } catch (error) {
+            console.error("Error al cargar los detalles:", error);
+        }
+        
+        // Finalmente, mostramos el modal ya rellenado
+        document.getElementById('modal-solicitud').classList.remove('hidden');
+    }
+
+    // =======================================================================
+    // NUEVO SCRIPT: Auto-rellenar cantidad en "1" al marcar el checkbox
+    // =======================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        // Vigila todos los checkboxes que su name empiece con "material_"
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][name^="material_"]');
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // Obtenemos el número del material (ej. extrae el "1" de "material_1")
+                const matId = this.name.split('_')[1]; 
+                const inputCantidad = document.querySelector(`input[name="cant_${matId}"]`);
+
+                if (inputCantidad) {
+                    if (this.checked) {
+                        // Si se marca y está vacío o en 0, ponemos 1 por defecto
+                        if (!inputCantidad.value || inputCantidad.value == 0) {
+                            inputCantidad.value = 1;
+                        }
+                    } else {
+                        // Si se desmarca, limpiamos la cantidad
+                        inputCantidad.value = "";
+                    }
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

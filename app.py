@@ -1,4 +1,5 @@
 from flask import Flask, redirect, url_for, render_template, session
+from routes.asistencia import asistencia_bp
 #from database import init_db
 
 # Importamos todos los blueprints desde la carpeta routes
@@ -8,6 +9,7 @@ from routes.empaque import empaque_bp
 from routes.inventario import inventario_bp
 from routes.prod_chrysopa import prod_chrysopa_bp
 from routes.prod_catopar import prod_catopar_bp
+
 
 app = Flask(__name__)
 app.secret_key = 'clave_secreta_koppert'
@@ -22,6 +24,7 @@ app.register_blueprint(empaque_bp)
 app.register_blueprint(inventario_bp)
 app.register_blueprint(prod_chrysopa_bp)
 app.register_blueprint(prod_catopar_bp)
+app.register_blueprint(asistencia_bp)
 
 @app.route('/')
 def base_route():

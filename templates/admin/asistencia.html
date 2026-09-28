@@ -1,0 +1,148 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Personal en Piso - Koppert Biofactory{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-container { max-height: 550px; overflow-y: auto; }
+</style>
+{% endblock %}
+
+{% block navbar_menu %}
+<!-- Menú superior limpio -->
+<div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
+    <a href="#" class="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-violet-600 shadow-md shadow-violet-900/50 border border-violet-500/30 transition-all cursor-default whitespace-nowrap">
+        Personal en Piso
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-8 w-full max-w-7xl mx-auto pb-10">
+    
+    <!-- Encabezado Principal -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Personal en Turno <span class="text-violet-600 font-bold text-lg bg-violet-50 px-2 py-0.5 rounded-lg ml-1">Hoy</span></h1>
+            <p class="text-xs text-slate-500 font-medium mt-1.5">Visualización de los operadores que ya registraron su entrada y están en su área de trabajo.</p>
+        </div>
+        <div class="flex items-center space-x-3 w-full md:w-auto">
+            <span class="px-4 py-2.5 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-2 shadow-sm">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                Monitoreo Activo
+            </span>
+        </div>
+    </div>
+
+    <!-- CONTADORES DINÁMICOS (Ahora son 3 columnas) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Total Presentes -->
+        <div class="bg-slate-800 p-5 rounded-3xl shadow-md border border-slate-700 flex flex-col justify-center relative overflow-hidden group">
+            <div class="absolute -right-4 -top-4 w-16 h-16 bg-slate-700 rounded-full blur-xl"></div>
+            <p class="text-[11px] text-slate-400 font-bold uppercase tracking-widest relative z-10">Total Presentes</p>
+            <p class="text-4xl font-black text-white relative z-10 mt-1">
+                {{ total_presentes }}
+            </p>
+        </div>
+
+        <!-- Chrysopa -->
+        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-4 hover:border-emerald-300 transition-colors">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            </div>
+            <div>
+                <p class="text-[11px] text-slate-500 font-bold uppercase tracking-widest">Chrysopa</p>
+                <p class="text-3xl font-black text-slate-800">{{ chrysopa_count }}</p>
+            </div>
+        </div>
+
+        <!-- Catopar -->
+        <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex items-center gap-4 hover:border-blue-300 transition-colors">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+            </div>
+            <div>
+                <p class="text-[11px] text-slate-500 font-bold uppercase tracking-widest">Catopar</p>
+                <p class="text-3xl font-black text-slate-800">{{ catopar_count }}</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- LISTA DE LLEGADAS DINÁMICA -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-8">
+        <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-sm font-extrabold text-slate-800 flex items-center gap-3">
+                <div class="w-2 h-6 bg-violet-500 rounded-full"></div>
+                Registro de Entradas de Hoy
+            </h2>
+        </div>
+        
+        <div class="overflow-x-auto table-container">
+            <table class="min-w-full divide-y divide-slate-200 text-sm relative">
+                <thead class="bg-slate-50 text-slate-500 sticky top-0 z-10 shadow-sm">
+                    <tr>
+                        <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-100">Operador</th>
+                        <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-100">Área de Trabajo</th>
+                        <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-100">Hora de Ingreso</th>
+                        <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px] text-slate-600">Estatus</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    
+                    <!-- BUCLE JINJA PARA MOSTRAR LA LISTA REAL -->
+                    {% for reg in registros %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        
+                        <!-- Operador Info -->
+                        <td class="px-6 py-4 whitespace-nowrap border-r border-slate-50">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xs border border-slate-200">
+                                    {{ reg['nombre_usuario'][:2]|upper }}
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-800 text-sm">{{ reg['nombre_usuario'] }}</div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Área de Trabajo (Color dinámico) -->
+                        <td class="px-6 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                            {% if reg['nombre_area'] and 'Chrysopa' in reg['nombre_area'] %}
+                                <span class="px-3 py-1.5 rounded-lg text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">{{ reg['nombre_area'] }}</span>
+                            {% elif reg['nombre_area'] and 'Catopar' in reg['nombre_area'] %}
+                                <span class="px-3 py-1.5 rounded-lg text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200">{{ reg['nombre_area'] }}</span>
+                            {% else %}
+                                <span class="px-3 py-1.5 rounded-lg text-[10px] font-black bg-violet-50 text-violet-700 border border-violet-200">{{ reg['nombre_area'] or 'General' }}</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Hora de Ingreso -->
+                        <td class="px-6 py-4 whitespace-nowrap text-center border-r border-slate-50">
+                            <span class="font-mono text-xs font-bold text-slate-700">{{ reg['hora_entrada'] }}</span>
+                        </td>
+
+                        <!-- Condición de Llegada (Simplificada) -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-[11px] font-bold text-slate-500 flex items-center w-fit gap-1.5">
+                                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                Presente
+                            </span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-12 text-center text-slate-500 font-medium text-sm border-dashed border-2 border-slate-200 rounded-lg m-4">
+                            Aún no hay registros de asistencia para el día de hoy.
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

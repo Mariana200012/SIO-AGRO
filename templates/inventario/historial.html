@@ -1,0 +1,143 @@
+{% extends "inventario/base_inventario.html" %}
+
+{% block title %}Historial de Surtido - Koppert Biofactory{% endblock %}
+
+{% block navbar_menu %}
+<div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
+    <!-- Botón Solicitudes Activas -->
+    <a href="{{ url_for('inventario.listar_solicitudes') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+        Solicitudes Activas
+    </a>
+    
+    <!-- Botón Historial -->
+    <a href="{{ url_for('inventario.historial_solicitudes') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-emerald-600 shadow-md shadow-emerald-900/50 border border-emerald-500/30 transition-all cursor-default whitespace-nowrap">
+        Historial solicitudes
+    </a>
+</div>
+{% endblock %}
+
+{% block content %}
+    <main class="flex-1 overflow-y-auto p-4 sm:p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
+            
+            <!-- Encabezado y Pestañas de Filtrado -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+                <div class="w-full md:w-auto">
+                    <h1 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight">Historial de Surtido</h1>
+                    <p class="text-xs text-slate-500 font-medium mt-1">Registro en lista de tickets completados (surtidos) y rechazados.</p>
+                </div>
+                
+                <div class="w-full md:w-auto overflow-x-auto hide-scroll pb-1 md:pb-0">
+                    <div class="inline-flex items-center space-x-1.5 sm:space-x-3 bg-slate-100 p-1.5 rounded-xl border border-slate-200 min-w-max">
+                        <button class="tab-btn active bg-white text-slate-800 shadow-sm px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap" data-target="all">Todas las Áreas</button>
+                        <button class="tab-btn text-slate-500 hover:text-slate-700 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap" data-target="chrysopa">Chrysopa</button>
+                        <button class="tab-btn text-slate-500 hover:text-slate-700 px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all whitespace-nowrap" data-target="catopar">Catopar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR TIPO LISTA / TABLA -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mb-10">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm text-left">
+                        <thead class="bg-slate-50 border-b border-slate-200">
+                            <tr>
+                                <th class="px-6 py-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Folio / Fecha</th>
+                                <th class="px-6 py-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Área / Operador</th>
+                                <th class="px-6 py-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Materiales Entregados</th>
+                                <th class="px-6 py-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-wider text-center">Estatus Final</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-xs bg-white">
+                            
+                            {% for ticket in tickets_historial %}
+                            <!-- Ajustamos la clase a 'req-row' para el filtro de JS -->
+                            <tr class="req-row hover:bg-slate-50 transition-colors" data-area="{{ 'chrysopa' if ticket['nombre_area'] == 'Chrysopa' else 'catopar' }}">
+                                
+                                <!-- Folio y Fecha -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-black text-slate-800 text-sm">#REQ-00{{ ticket['folio_ticket'] }}</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-1">{{ ticket['fecha_solicitud'] }}</div>
+                                </td>
+
+                                <!-- Área y Usuario -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider mb-1
+                                        {% if ticket['nombre_area'] == 'Chrysopa' %} bg-blue-100 text-blue-800 {% else %} bg-orange-100 text-orange-800 {% endif %}">
+                                        {{ ticket['nombre_area'] }}
+                                    </div>
+                                    <div class="text-slate-600 font-bold">{{ ticket['nombre_usuario'] }}</div>
+                                </td>
+
+                                <!-- Materiales (En lista) -->
+                                <td class="px-6 py-4">
+                                    <ul class="space-y-1">
+                                        {% for mat in ticket['materiales'] %}
+                                        <li class="font-medium text-slate-600">
+                                            &bull; {{ mat['nombre'] }} 
+                                            <span class="font-black text-slate-900 ml-1">({{ mat['cantidad'] }} pzas)</span>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+
+                                <!-- Estatus -->
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-md text-[10px] font-black uppercase shadow-sm
+                                        {% if ticket['estatus']|upper == 'SURTIDO' or ticket['estatus']|upper == 'COMPLETADO' %} 
+                                            bg-emerald-100 text-emerald-800 
+                                        {% elif ticket['estatus']|upper == 'RECHAZADO' %} 
+                                            bg-red-100 text-red-800 
+                                        {% else %} 
+                                            bg-slate-100 text-slate-800 
+                                        {% endif %}">
+                                        {{ ticket['estatus'] }}
+                                    </span>
+                                </td>
+
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="px-6 py-12 text-center text-slate-500 font-medium text-sm border-dashed border-2 border-slate-200 rounded-lg m-4">
+                                    No hay registro de tickets históricos.
+                                </td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const rows = document.querySelectorAll('.req-row');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Estilos de los botones
+            tabBtns.forEach(b => {
+                b.classList.remove('bg-white', 'text-slate-800', 'shadow-sm');
+                b.classList.add('text-slate-500');
+            });
+            btn.classList.add('bg-white', 'text-slate-800', 'shadow-sm');
+            btn.classList.remove('text-slate-500');
+            
+            // Filtrado de las filas de la tabla
+            const target = btn.getAttribute('data-target').toLowerCase();
+            rows.forEach(row => {
+                if (target === 'all' || row.getAttribute('data-area').toLowerCase() === target) {
+                    row.style.display = ''; // Lo regresa al comportamiento normal de tabla
+                } else {
+                    row.style.display = 'none'; // Lo oculta
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

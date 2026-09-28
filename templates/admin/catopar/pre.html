@@ -1,20 +1,21 @@
-{% extends "admin/base_modulo.html" %}
+{% extends "admin/base_admin.html" %}
 
 {% block title %}Monitoreo de Pre-Parasitismo - Koppert Biofactory{% endblock %}
 
-{% block sidebar_menu %}
-<div class="hidden md:block flex-1 mx-6">
-    <div class="flex space-x-1 overflow-x-auto">
-        <!-- PESTAÑA ACTIVA: PRE-PARASITISMO -->
-        <a href="{{ url_for('admin.pre') }}" class="px-3 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow-sm flex items-center gap-1.5">
-            Pre-Parasitismo
-        </a>            
-        
-        <!-- PESTAÑA INACTIVA: POST-PARASITISMO -->
-        <a href="{{ url_for('admin.post') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-blue-900 hover:text-white transition-colors flex items-center gap-1.5">
-            Post-Parasitismo
-        </a>
-    </div>
+{% block navbar_menu %}
+<!-- Contenedor tipo cápsula -->
+<div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
+    
+    <!-- BOTÓN ACTIVO (Pre-Parasitismo - Tema Azul) -->
+    <a href="{{ url_for('admin.pre') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-blue-600 shadow-md shadow-blue-900/50 border border-blue-500/30 transition-all cursor-default whitespace-nowrap">
+        Pre-Parasitismo
+    </a>
+    
+    <!-- PESTAÑA INACTIVA (Post-Parasitismo) -->
+    <a href="{{ url_for('admin.post') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+        Post-Parasitismo
+    </a>
+    
 </div>
 {% endblock %}
 
