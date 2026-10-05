@@ -1,160 +1,336 @@
 {% extends "admin/base_admin.html" %}
 
-{% block title %}Monitoreo de Pre-Parasitismo - Koppert Biofactory{% endblock %}
+{% block title %}Admin Pre-Parasitismo - Koppert Biofactory{% endblock %}
 
 {% block navbar_menu %}
-<!-- Contenedor tipo cápsula -->
+<!-- Menú tipo cápsula exclusivo para Catopar Admin -->
 <div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
     
-    <!-- BOTÓN ACTIVO (Pre-Parasitismo - Tema Azul) -->
-    <a href="{{ url_for('admin.pre') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-blue-600 shadow-md shadow-blue-900/50 border border-blue-500/30 transition-all cursor-default whitespace-nowrap">
+    <!-- BOTÓN ACTIVO (Pre-Parasitismo) -->
+    <a href="{{ url_for('admin.catopar_pre') }}" class="px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-blue-600 shadow-md shadow-blue-900/50 border border-blue-500/30 transition-all cursor-default whitespace-nowrap">
         Pre-Parasitismo
     </a>
     
-    <!-- PESTAÑA INACTIVA (Post-Parasitismo) -->
-    <a href="{{ url_for('admin.post') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+    <!-- BOTÓN INACTIVO (Post-Parasitismo) -->
+    <a href="{{ url_for('admin.catopar_post') }}" class="px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
         Post-Parasitismo
     </a>
-    
 </div>
 {% endblock %}
 
 {% block content %}
-
-    <!-- Área de Trabajo Principal -->
-    <main class="flex-1 overflow-y-auto p-8 relative">
-        <div class="max-w-7xl mx-auto space-y-8 relative z-10">
+    <!-- Fondo ligeramente gris para contrastar las tarjetas -->
+    <main class="flex-1 overflow-y-auto p-6 md:p-10 bg-slate-50/40">
+        <div class="max-w-7xl mx-auto space-y-8">
             
-            <!-- Encabezado (Diseño Blanco/Sólido) -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+            <!-- Encabezado Principal y Buscador -->
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white p-6 md:p-8 rounded-[2rem] shadow-sm border border-slate-200/60 gap-6">
                 <div>
-                    <h1 class="text-2xl font-black text-slate-800 tracking-tight">Evaluación Pre-Parasitismo <span class="text-emerald-600 font-bold text-lg bg-emerald-50 px-2 py-0.5 rounded-lg ml-1">(Gorgojo)</span></h1>
-                    <p class="text-xs text-slate-500 font-medium mt-1.5">Inspección de desarrollo de larvas y aprobación de charolas para parasitación.</p>
+                    <!-- Insignia moderna -->
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 border border-blue-100 mb-3">
+                        <div class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></div>
+                        <span class="text-[10px] font-bold tracking-widest uppercase text-blue-800">Control de Calidad &bull; Catopar</span>
+                    </div>
+                    <h1 class="text-3xl font-black text-slate-900 tracking-tight">Supervisión Pre-Parasitismo</h1>
+                    <p class="text-sm text-slate-500 font-medium mt-1.5">Análisis de viabilidad en muestras estándar de 21 garbanzos.</p>
                 </div>
-                <!-- Opciones / Filtros -->
-                <div class="flex items-center space-x-3 w-full md:w-auto">
-                    <div class="relative">
-                        <input type="date" class="border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 font-medium transition-all">
-                        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                
+                <div class="flex items-center w-full lg:w-auto bg-slate-50 p-2 rounded-2xl border border-slate-200/60 transition-all focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-300">
+                    <input type="date" id="dateSearch" class="border-none bg-transparent px-4 py-2 text-sm text-slate-700 font-bold focus:outline-none focus:ring-0 w-full lg:w-auto">
+                    <div class="h-6 w-px bg-slate-200 mx-2 hidden sm:block"></div>
+                    <button id="btnSearch" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-md shadow-blue-600/20 whitespace-nowrap">
+                        Buscar
+                    </button>
+                    <button id="btnResetCards" class="ml-2 bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-300 transition-all hidden whitespace-nowrap">
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard KPIs -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Tarjeta 1: Lote Activo (Premium Gradient) -->
+                <div class="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 p-8 rounded-[2rem] shadow-xl shadow-blue-900/10 relative overflow-hidden flex flex-col justify-between group">
+                    <!-- Efectos de luz en el fondo -->
+                    <div class="absolute -right-16 -top-16 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors duration-700"></div>
+                    <div class="absolute -left-16 -bottom-16 w-48 h-48 bg-blue-400/20 rounded-full blur-3xl"></div>
+                    
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-blue-200/80 text-xs font-black uppercase tracking-widest mb-1">Identificador de Lote</h3>
+                            <span class="text-[10px] text-blue-300/70 font-bold block">Trazabilidad Catopar</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-white/10 text-white flex items-center justify-center backdrop-blur-md border border-white/20 shadow-inner">
+                            <svg class="w-6 h-6 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="relative z-10 mt-8">
+                        <p id="valLote" class="text-4xl font-black text-white tracking-tight drop-shadow-sm">Global</p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <span id="subLote" class="text-xs text-blue-200 font-medium">Seleccione un registro abajo</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 2: Muestra Analizada (Clean UI) -->
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md border border-slate-200/60 relative overflow-hidden flex flex-col justify-between transition-all duration-300">
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Garbanzos Viables</h3>
+                            <span class="text-[10px] text-slate-400/80 font-bold block">Muestra base: 21 unidades</span>
+                        </div>
+                        <div class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-500 flex items-center justify-center border border-slate-100">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </div>
+                    </div>
+                    <div class="relative z-10 mt-8">
+                        <p id="valViables" class="text-4xl font-black text-slate-800 tracking-tight">--</p>
+                        <div class="mt-3 flex items-center gap-2">
+                            <span id="subViables" class="text-xs text-slate-500 font-medium">Conteo físico reportado</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta 3: Porcentaje (Interactivo & Dynamic) -->
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm hover:shadow-md border border-slate-200/60 relative overflow-hidden flex flex-col justify-between group transition-all duration-300">
+                    <div id="blobPromedio" class="absolute -right-8 -top-8 w-32 h-32 bg-blue-50/50 rounded-full transition-colors duration-500 blur-2xl"></div>
+                    
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <h3 class="text-slate-400 text-xs font-black uppercase tracking-widest mb-1">Tasa de Viabilidad</h3>
+                            <span class="text-[10px] text-slate-400/80 font-bold block">Límite mínimo: 90.0%</span>
+                        </div>
+                        <div id="iconBoxPromedio" class="w-12 h-12 rounded-2xl bg-blue-50/80 text-blue-600 flex items-center justify-center border border-blue-100/50 transition-colors duration-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                    </div>
+                    <div class="relative z-10 mt-8 flex items-baseline gap-1">
+                        <p id="valPromedio" class="text-5xl font-black text-slate-800 tracking-tight transition-colors duration-500" data-global="{{ promedio_global }}">{{ promedio_global }}</p>
+                        <span id="symbolPromedio" class="text-2xl font-black text-slate-400 transition-colors duration-500">%</span>
+                    </div>
+                    <div class="relative z-10 mt-2 flex items-center gap-2">
+                        <div id="dotPromedio" class="w-2 h-2 rounded-full bg-blue-500 transition-colors duration-500 shadow-sm"></div>
+                        <span id="subPromedio" class="text-xs text-slate-500 font-medium transition-colors">Promedio global histórico</span>
                     </div>
                 </div>
             </div>
 
-            <!-- SECCIÓN: NUEVA REVISIÓN (Tabla Plana) -->
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-                <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
-                    <h2 class="text-sm font-extrabold text-slate-800 flex items-center gap-3">
-                        <div class="w-2 h-6 bg-emerald-500 rounded-full"></div>
-                        Revisión de Muestras y Conteo
+            <!-- Tabla Dinámica -->
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200/60 overflow-hidden">
+                <div class="bg-white px-8 py-6 border-b border-slate-100 flex justify-between items-center">
+                    <h2 class="text-base font-black text-slate-800 flex items-center gap-3">
+                        Registro de Viabilidad por Lote
+                        <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-lg border border-slate-200 hidden sm:inline-block tracking-wide">Haz clic en una fila para inspeccionar</span>
                     </h2>
-                    <span class="text-[10px] font-bold text-blue-800 bg-blue-100 px-3 py-1.5 rounded-lg border border-blue-200 shadow-sm">MUESTRA: 21 GARBANZOS</span>
                 </div>
                 
-                <div class="overflow-x-auto table-container">
-                    <table class="min-w-full divide-y divide-slate-200 text-sm relative">
-                        <thead class="sticky top-0 z-10 bg-slate-50 shadow-sm">
+                <div class="overflow-x-auto table-container" id="scrollTable">
+                    <table class="min-w-full text-sm relative">
+                        <thead class="bg-slate-50/80 backdrop-blur-sm text-slate-500 sticky top-0 z-10 border-b border-slate-200">
                             <tr>
-                                <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-200">Charola / Lote</th>
-                                <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-200">Larvas Chicas</th>
-                                <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-200 bg-emerald-50">Larvas Med.</th>
-                                <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-200 bg-emerald-50">Larvas Grandes</th>
-                                <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-r border-slate-200">Pupas</th>
-                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600 border-l border-slate-200">Decisión Operativa</th>
+                                <th class="px-8 py-5 text-left font-black uppercase tracking-widest text-[10px]">ID Lote Catopar</th>
+                                <th class="px-6 py-5 text-center font-black uppercase tracking-widest text-[10px]">Muestra</th>
+                                <th class="px-6 py-5 text-center font-black uppercase tracking-widest text-[10px]">Viables</th>
+                                <th class="px-6 py-5 text-center font-black uppercase tracking-widest text-[10px]">Viabilidad</th>
+                                <th class="px-6 py-5 text-center font-black uppercase tracking-widest text-[10px]">Estatus</th>
+                                <th class="px-8 py-5 text-left font-black uppercase tracking-widest text-[10px]">Operador / Fecha</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100 bg-white">
+                        <tbody class="divide-y divide-slate-100/80 bg-white">
                             
-                            <!-- Fila con atributos para el script JS -->
-                            <tr class="hover:bg-slate-50 transition-colors group fila-evaluacion" data-chicas="12" data-medianas="25" data-grandes="18" data-pupas="5">
-                                <td class="px-6 py-5 border-r border-slate-100">
-                                    <div class="font-bold text-slate-800 text-sm">CH-PRE-089</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5 flex items-center gap-1">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        Hoy 08:00 AM
-                                    </div>
+                            {% for reg in historial %}
+                            <tr class="data-row hover:bg-blue-50/50 cursor-pointer transition-all duration-200 group" 
+                                data-lote="{{ reg.id_lote }}" data-viables="{{ reg.viables }}" data-fecha="{{ reg.fecha_iso }}" data-porcentaje="{{ reg.porcentaje }}">
+                                
+                                <td class="px-8 py-5 whitespace-nowrap">
+                                    <div class="font-black text-slate-800 group-hover:text-blue-700 transition-colors text-sm">{{ reg.id_lote }}</div>
                                 </td>
                                 
-                                <td class="px-4 py-5 text-center border-r border-slate-100 transition-colors">
-                                    <span class="text-lg font-bold text-slate-500">12</span>
-                                </td>
-                                <td class="px-4 py-5 text-center bg-emerald-50/50 border-r border-slate-100 transition-colors">
-                                    <span class="text-lg font-black text-emerald-600">25</span>
-                                </td>
-                                <td class="px-4 py-5 text-center bg-emerald-50/50 border-r border-slate-100 transition-colors">
-                                    <span class="text-lg font-black text-emerald-600">18</span>
-                                </td>
-                                <td class="px-4 py-5 text-center border-r border-slate-100 transition-colors">
-                                    <span class="text-lg font-bold text-slate-500">5</span>
+                                <td class="px-6 py-5 whitespace-nowrap text-center">
+                                    <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200/60">21 pzas</span>
                                 </td>
                                 
-                                <td class="px-6 py-5 bg-slate-50 border-l border-slate-100 align-middle">
-                                    <div class="flex flex-col space-y-3 w-full max-w-[200px] mx-auto">
-                                        <!-- Indicador visual generado por JS -->
-                                        <div class="contenedor-diagnostico flex justify-center w-full">
-                                            <!-- Se llenará vía JS -->
+                                <td class="px-6 py-5 whitespace-nowrap text-center">
+                                    <div class="text-slate-700 font-black text-base">{{ reg.viables }}</div>
+                                </td>
+                                
+                                <td class="px-6 py-5 whitespace-nowrap text-center">
+                                    <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-black {% if reg.porcentaje >= 90.0 %}bg-blue-50 text-blue-700{% else %}bg-amber-50 text-amber-700{% endif %}">
+                                        {{ reg.porcentaje }}%
+                                    </span>
+                                </td>
+                                
+                                <td class="px-6 py-5 whitespace-nowrap text-center">
+                                    {% if reg.porcentaje >= 90.0 %}
+                                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200/60 uppercase tracking-widest">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Óptimo
                                         </div>
-                                        
-                                        <!-- Botones -->
-                                        <div class="flex space-x-2">
-                                            <button class="bg-emerald-600 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-sm transition-all flex-1">
-                                                Aprobar
-                                            </button>
-                                            <button class="bg-white border border-red-200 text-red-500 px-3 py-2 rounded-xl text-xs font-bold hover:bg-red-50 hover:border-red-300 hover:text-red-600 transition-all shadow-sm flex-1">
-                                                Rechazar
-                                            </button>
+                                    {% else %}
+                                        <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-black bg-amber-50 text-amber-700 border border-amber-200/60 uppercase tracking-widest">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div> Descarte
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                
+                                <td class="px-8 py-5 whitespace-nowrap">
+                                    <div class="flex items-center gap-3">
+                                        <!-- Avatar de iniciales para el operador -->
+                                        <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-[10px] font-black text-slate-600">
+                                            {{ reg.operador[:2]|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="text-slate-700 text-xs font-bold">{{ reg.operador }}</div>
+                                            <div class="text-[10px] text-slate-400 mt-0.5">{{ reg.fecha_str }}</div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
-                            
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="px-8 py-16 text-center">
+                                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 mb-4">
+                                        <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                                    </div>
+                                    <p class="text-slate-500 font-bold text-sm">No hay registros de Pre-Parasitismo aún.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- SECCIÓN: HISTORIAL DE EVALUACIONES (Sólido) -->
-            <div class="mt-8 space-y-4">
-                <div class="flex items-center justify-between px-2">
-                    <h2 class="text-sm font-extrabold text-slate-800 uppercase tracking-wider">Historial Reciente</h2>
-                </div>
-                
-                <div class="bg-slate-50 rounded-3xl shadow-sm border border-slate-200 border-dashed p-12 flex flex-col items-center justify-center text-center">
-                    <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-4 border border-slate-200 shadow-sm">
-                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                    </div>
-                    <h3 class="text-base font-bold text-slate-700">Sin registros recientes</h3>
-                    <p class="text-sm text-slate-500 mt-1 max-w-md">La tabla de historial de pre-parasitismo se renderizará en esta sección conforme se realicen las evaluaciones.</p>
-                </div>
-            </div>
-
         </div>
     </main>
-    {% endblock %}
+{% endblock %}
 
-    {% block scripts %}
-    <!-- Script de validación ajustado para diseño sólido -->
+{% block scripts %}
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const filasEvaluacion = document.querySelectorAll('.fila-evaluacion');
-            
-            filasEvaluacion.forEach(fila => {
-                const chicas = parseInt(fila.getAttribute('data-chicas')) || 0;
-                const medianas = parseInt(fila.getAttribute('data-medianas')) || 0;
-                const grandes = parseInt(fila.getAttribute('data-grandes')) || 0;
-                const pupas = parseInt(fila.getAttribute('data-pupas')) || 0;
-                
-                const contenedor = fila.querySelector('.contenedor-diagnostico');
-                
-                if (contenedor && contenedor.innerHTML.trim() === '') {
-                    if ((medianas + grandes) > (chicas + pupas)) {
-                        contenedor.innerHTML = '<span class="inline-flex w-full justify-center items-center px-3 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-100 text-emerald-800 uppercase tracking-wider"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Lote Óptimo</span>';
-                    } else {
-                        contenedor.innerHTML = '<span class="inline-flex w-full justify-center items-center px-3 py-1.5 rounded-lg text-[10px] font-bold bg-amber-100 text-amber-800 uppercase tracking-wider"><svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Rendimiento Bajo</span>';
-                    }
+        const rows = document.querySelectorAll('.data-row');
+        const btnResetCards = document.getElementById('btnResetCards');
+
+        const valLote = document.getElementById('valLote');
+        const subLote = document.getElementById('subLote');
+        const valViables = document.getElementById('valViables');
+        const subViables = document.getElementById('subViables');
+        
+        const valPromedio = document.getElementById('valPromedio');
+        const symbolPromedio = document.getElementById('symbolPromedio');
+        const subPromedio = document.getElementById('subPromedio');
+        const blobPromedio = document.getElementById('blobPromedio');
+        const iconBoxPromedio = document.getElementById('iconBoxPromedio');
+        const dotPromedio = document.getElementById('dotPromedio');
+        
+        const promedioGlobalOriginal = valPromedio.getAttribute('data-global');
+
+        function updateCardColors(isAlert) {
+            const allClasses = ['bg-blue-50/50', 'bg-amber-50/50', 'bg-blue-50/80', 'bg-amber-50/80', 'text-blue-600', 'text-amber-600', 'text-slate-800', 'text-amber-700', 'text-slate-400', 'bg-blue-500', 'bg-amber-500', 'border-blue-100/50', 'border-amber-200/50'];
+
+            if (isAlert) {
+                blobPromedio.classList.remove(...allClasses); blobPromedio.classList.add('bg-amber-50/50');
+                iconBoxPromedio.classList.remove(...allClasses); iconBoxPromedio.classList.add('bg-amber-50/80', 'text-amber-600', 'border-amber-200/50');
+                valPromedio.classList.remove(...allClasses); valPromedio.classList.add('text-amber-700');
+                symbolPromedio.classList.remove(...allClasses); symbolPromedio.classList.add('text-amber-600');
+                dotPromedio.classList.remove(...allClasses); dotPromedio.classList.add('bg-amber-500');
+            } else {
+                blobPromedio.classList.remove(...allClasses); blobPromedio.classList.add('bg-blue-50/50');
+                iconBoxPromedio.classList.remove(...allClasses); iconBoxPromedio.classList.add('bg-blue-50/80', 'text-blue-600', 'border-blue-100/50');
+                valPromedio.classList.remove(...allClasses); valPromedio.classList.add('text-slate-800');
+                symbolPromedio.classList.remove(...allClasses); symbolPromedio.classList.add('text-slate-400');
+                dotPromedio.classList.remove(...allClasses); dotPromedio.classList.add('bg-blue-500');
+            }
+        }
+
+        rows.forEach(row => {
+            row.addEventListener('click', () => {
+                // Efecto de selección elegante
+                rows.forEach(r => {
+                    r.classList.remove('bg-blue-50/80', 'border-l-4', 'border-blue-500');
+                    r.classList.remove('bg-slate-100', 'ring-2', 'ring-slate-300', 'z-10', 'relative');
+                });
+                row.classList.add('bg-blue-50/80', 'border-l-4', 'border-blue-500');
+
+                const lote = row.getAttribute('data-lote');
+                const viables = row.getAttribute('data-viables');
+                const porcentaje = parseFloat(row.getAttribute('data-porcentaje'));
+
+                valLote.innerText = lote;
+                valLote.classList.remove('text-4xl');
+                valLote.classList.add('text-3xl');
+                subLote.innerText = "Lote seleccionado para revisión";
+
+                valViables.innerText = viables + " / 21";
+                valViables.classList.remove('text-4xl');
+                valViables.classList.add('text-3xl');
+                subViables.innerText = "Garbanzos viables reportados";
+
+                valPromedio.innerText = porcentaje.toFixed(1);
+
+                if(porcentaje < 90.0) {
+                    updateCardColors(true);
+                    subPromedio.innerText = "⚠️ Lote en riesgo de descarte (< 90%)";
+                } else {
+                    updateCardColors(false);
+                    subPromedio.innerText = "Viabilidad óptima aceptada";
                 }
+
+                btnResetCards.classList.remove('hidden');
             });
         });
+
+        btnResetCards.addEventListener('click', () => {
+            rows.forEach(r => {
+                r.classList.remove('bg-blue-50/80', 'border-l-4', 'border-blue-500');
+                r.classList.remove('bg-slate-100', 'ring-2', 'ring-slate-300', 'z-10', 'relative');
+            });
+            
+            valLote.innerText = "Global";
+            valLote.classList.remove('text-3xl');
+            valLote.classList.add('text-4xl');
+            subLote.innerText = "Seleccione un registro en la tabla";
+            
+            valViables.innerText = "--";
+            valViables.classList.remove('text-3xl');
+            valViables.classList.add('text-4xl');
+            subViables.innerText = "Conteo físico reportado";
+            
+            valPromedio.innerText = promedioGlobalOriginal;
+            subPromedio.innerText = "Promedio global histórico";
+            
+            if(parseFloat(promedioGlobalOriginal) < 90.0 && parseFloat(promedioGlobalOriginal) > 0) {
+                updateCardColors(true);
+            } else {
+                updateCardColors(false);
+            }
+            
+            btnResetCards.classList.add('hidden');
+        });
+
+        // Buscador de fechas
+        const btnSearch = document.getElementById('btnSearch');
+        const dateSearch = document.getElementById('dateSearch');
+        const scrollTable = document.getElementById('scrollTable');
+
+        btnSearch.addEventListener('click', () => {
+            const searchVal = dateSearch.value;
+            if(!searchVal) {
+                alert("Por favor selecciona una fecha primero.");
+                return;
+            }
+
+            const targetRow = Array.from(rows).find(row => row.getAttribute('data-fecha') === searchVal);
+
+            if(targetRow) {
+                const topPos = targetRow.offsetTop - scrollTable.offsetTop;
+                scrollTable.scrollTo({ top: topPos - 40, behavior: 'smooth' });
+
+                rows.forEach(r => r.classList.remove('bg-slate-100', 'ring-2', 'ring-slate-300', 'z-10', 'relative'));
+                targetRow.classList.add('bg-slate-100', 'ring-2', 'ring-slate-300', 'z-10', 'relative');
+            } else {
+                alert("No se encontró ningún registro en esa fecha.");
+            }
+        });
     </script>
-</body>
-</html>
 {% endblock %}

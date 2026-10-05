@@ -3,38 +3,16 @@
 {% block title %}Monitoreo de Pupación - Koppert Biofactory{% endblock %}
 
 {% block navbar_menu %}
-<!-- Contenedor tipo cápsula -->
 <div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
-    
-    <!-- Botón Inactivo -->
-    <a href="{{ url_for('admin.ocupacion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
-        Ocupación
-    </a>
-    
-    <!-- BOTÓN ACTIVO (Pupación) -->
-    <a href="{{ url_for('admin.pupacion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-emerald-600 shadow-md shadow-emerald-900/50 border border-emerald-500/30 transition-all cursor-default whitespace-nowrap">
-        Pupación
-    </a>
-    
-    <!-- Botones Inactivos -->
-    <a href="{{ url_for('admin.eclosion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
-        Eclosión
-    </a>
-    
-    <a href="{{ url_for('admin.mortalidad') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
-        Mortalidad
-    </a>
-    
-    <a href="{{ url_for('admin.fallas') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
-        Fallas
-    </a>
-    
+    <a href="{{ url_for('admin.ocupacion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Ocupación</a>
+    <a href="{{ url_for('admin.pupacion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-emerald-600 shadow-md shadow-emerald-900/50 border border-emerald-500/30 transition-all cursor-default whitespace-nowrap">Pupación</a>
+    <a href="{{ url_for('admin.eclosion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Eclosión</a>
+    <a href="{{ url_for('admin.mortalidad') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Mortalidad</a>
+    <a href="{{ url_for('admin.fallas') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Fallas</a>
 </div>
 {% endblock %}
 
 {% block content %}
-
-    <!-- Área de Trabajo Principal -->
     <main class="flex-1 overflow-y-auto p-8">
         <div class="max-w-7xl mx-auto space-y-8">
             
@@ -42,27 +20,21 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
                 <div>
                     <h1 class="text-2xl font-black text-slate-800 tracking-tight">Supervisión de Pupación <span class="text-emerald-600 font-bold text-lg">(Chrysopa)</span></h1>
-                    <p class="text-xs text-slate-500 font-medium mt-1">Control de pupación y rendimiento del lote diario.</p>
+                    <p class="text-xs text-slate-500 font-medium mt-1">Control de tasas de pupación por lote en rejillas de 100 orificios.</p>
                 </div>
                 <div class="flex items-center space-x-3 w-full md:w-auto">
                     <input type="date" id="dateSearch" class="border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-slate-50 font-medium">
-                    <button id="btnSearch" class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-900 transition-all shadow-md flex items-center justify-center gap-2">
-                        Buscar Registro
-                    </button>
-                    <button id="btnResetCards" class="bg-emerald-100 text-emerald-800 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-200 transition-all shadow-sm hidden">
-                        Limpiar Selección
-                    </button>
+                    <button id="btnSearch" class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-900 transition-all shadow-md flex items-center justify-center gap-2">Buscar Registro</button>
+                    <button id="btnResetCards" class="bg-emerald-100 text-emerald-800 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-200 transition-all shadow-sm hidden">Limpiar Selección</button>
                 </div>
             </div>
 
-            <!-- Tarjetas de Indicadores (KPIs estandarizadas a 3 columnas) -->
+            <!-- Tarjetas de Identificadores y KPIs -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                <!-- Tarjeta 1: Semana de Producción (Fondo Esmeralda Original) -->
+                <!-- Tarjeta 1: Semana -->
                 <div class="bg-gradient-to-br from-emerald-800 to-emerald-950 p-6 rounded-3xl shadow-lg shadow-emerald-900/20 relative overflow-hidden flex flex-col justify-between">
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                     <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl"></div>
-                    
                     <div class="relative z-10 flex justify-between items-start">
                         <div>
                             <h3 class="text-emerald-200 text-xs font-bold uppercase tracking-widest">Semana de Producción</h3>
@@ -80,10 +52,9 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta 2: Identificador de Lote -->
+                <!-- Tarjeta 2: Lote -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between">
                     <div class="absolute -right-6 -top-6 w-24 h-24 bg-slate-50 rounded-full"></div>
-                    
                     <div class="relative z-10 flex justify-between items-start">
                         <div>
                             <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Identificador de Lote</h3>
@@ -101,21 +72,20 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta 3: Promedio de Pupación (Cambia de color < 90%) -->
+                <!-- Tarjeta 3: Promedio -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between group">
                     <div id="blobPromedio" class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full transition-colors duration-500"></div>
-                    
                     <div class="relative z-10 flex justify-between items-start">
                         <div>
-                            <h3 id="labelPromedio" class="text-slate-500 text-xs font-bold uppercase tracking-widest">Promedio de Pupación</h3>
-                            <span class="text-[10px] text-slate-400 font-medium mt-1 block">Límite mínimo operativo: 90%</span>
+                            <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Promedio Pupación</h3>
+                            <span class="text-[10px] text-slate-400 font-medium mt-1 block">Límite mínimo operativo: 80%</span>
                         </div>
                         <div id="iconBoxPromedio" class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center transition-colors duration-500">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                         </div>
                     </div>
                     <div class="relative z-10 mt-6 flex items-end gap-1">
-                        <p id="valPromedio" class="text-5xl font-black text-slate-800 tracking-tight transition-colors duration-500">95.0</p>
+                        <p id="valPromedio" class="text-5xl font-black text-slate-800 tracking-tight transition-colors duration-500" data-global="{{ promedio_global }}">{{ promedio_global }}</p>
                         <span id="symbolPromedio" class="text-2xl font-bold text-slate-600 mb-1 transition-colors duration-500">%</span>
                     </div>
                     <div class="relative z-10 mt-2 flex items-center gap-2">
@@ -125,7 +95,7 @@
                 </div>
             </div>
 
-            <!-- Historial de Pupación -->
+            <!-- Tabla Dinámica -->
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
                     <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
@@ -140,89 +110,53 @@
                             <tr>
                                 <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">ID Lote / Fecha</th>
                                 <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Semana</th>
-                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Rejilla 1 <span class="block text-[9px] font-normal text-slate-400 mt-0.5">(de 100 hoyos)</span></th>
-                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Rejilla 2 <span class="block text-[9px] font-normal text-slate-400 mt-0.5">(de 100 hoyos)</span></th>
-                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Rejilla 3 <span class="block text-[9px] font-normal text-slate-400 mt-0.5">(de 100 hoyos)</span></th>
-                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] bg-slate-50">Promedio Lote</th>
+                                <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Rejilla 1 <span class="block text-[9px] font-normal text-slate-400 mt-0.5">(de 100)</span></th>
+                                <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Rejilla 2 <span class="block text-[9px] font-normal text-slate-400 mt-0.5">(de 100)</span></th>
+                                <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Rejilla 3 <span class="block text-[9px] font-normal text-slate-400 mt-0.5">(de 100)</span></th>
+                                <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] bg-slate-50">Promedio Lote</th>
+                                <th class="px-5 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Estatus</th>
                                 <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Operador</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white" id="lotesTableBody">
                             
-                            <!-- Lote 102 -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-102" data-semana="29" data-fecha="2026-07-22" data-promedio="95.0">
+                            <!-- BUCLE JINJA2 PARA IMPRIMIR LA BD DE PUPACIÓN -->
+                            {% for reg in historial %}
+                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="{{ reg.lote }}" data-semana="{{ reg.semana }}" data-fecha="{{ reg.fecha_iso }}" data-promedio="{{ reg.promedio }}" data-estado="{{ reg.estatus }}">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-102</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">22/Jul/2026 - 10:00 AM</div>
+                                    <div class="font-bold text-slate-800 text-sm">{{ reg.lote }}</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">{{ reg.fecha_str }}</div>
                                 </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 29</span></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-800 font-bold text-sm">96</div>
-                                    <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">96.0% pupadas</div>
+                                <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem {{ reg.semana }}</span></td>
+                                <td class="px-5 py-4 whitespace-nowrap text-center">
+                                    <div class="text-slate-800 font-bold text-sm">{{ reg.r1 }}</div>
+                                    <div class="text-[10px] {% if reg.r1 >= 80 %}text-emerald-600{% else %}text-amber-600{% endif %} font-semibold mt-0.5">{{ reg.r1 }}.0%</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-800 font-bold text-sm">95</div>
-                                    <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">95.0% pupadas</div>
+                                <td class="px-5 py-4 whitespace-nowrap text-center">
+                                    <div class="text-slate-800 font-bold text-sm">{{ reg.r2 }}</div>
+                                    <div class="text-[10px] {% if reg.r2 >= 80 %}text-emerald-600{% else %}text-amber-600{% endif %} font-semibold mt-0.5">{{ reg.r2 }}.0%</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-800 font-bold text-sm">94</div>
-                                    <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">94.0% pupadas</div>
+                                <td class="px-5 py-4 whitespace-nowrap text-center">
+                                    <div class="text-slate-800 font-bold text-sm">{{ reg.r3 }}</div>
+                                    <div class="text-[10px] {% if reg.r3 >= 80 %}text-emerald-600{% else %}text-amber-600{% endif %} font-semibold mt-0.5">{{ reg.r3 }}.0%</div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">95.0%</span>
+                                <td class="px-5 py-4 whitespace-nowrap text-center bg-slate-50/50">
+                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black {% if reg.promedio >= 80.0 %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">{{ reg.promedio }}%</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">Juan Pérez <span class="text-slate-400 text-[10px] ml-1">(OP-04)</span></td>
+                                <td class="px-5 py-4 whitespace-nowrap text-center">
+                                    {% if reg.promedio >= 80.0 %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">🟢 Óptimo</span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-3 py-1 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-200">⚠️ Revisión</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">{{ reg.operador }}</td>
                             </tr>
-
-                            <!-- Lote 101 -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-101" data-semana="29" data-fecha="2026-07-21" data-promedio="93.3">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-101</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">21/Jul/2026 - 11:15 AM</div>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 29</span></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-800 font-bold text-sm">92</div>
-                                    <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">92.0% pupadas</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-800 font-bold text-sm">93</div>
-                                    <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">93.0% pupadas</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-800 font-bold text-sm">95</div>
-                                    <div class="text-[10px] text-emerald-600 font-semibold mt-0.5">95.0% pupadas</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">93.3%</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">María López <span class="text-slate-400 text-[10px] ml-1">(OP-02)</span></td>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="px-6 py-8 text-center text-slate-500 font-medium">Aún no hay registros de pupación en la base de datos.</td>
                             </tr>
-
-                            <!-- Lote 100 (Alerta) -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-100" data-semana="29" data-fecha="2026-07-20" data-promedio="85.0">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-100</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">20/Jul/2026 - 09:30 AM</div>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 29</span></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-800 font-bold text-sm">88</div>
-                                    <div class="text-[10px] text-amber-600 font-semibold mt-0.5">88.0% pupadas</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-800 font-bold text-sm">85</div>
-                                    <div class="text-[10px] text-amber-600 font-semibold mt-0.5">85.0% pupadas</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="text-slate-800 font-bold text-sm">82</div>
-                                    <div class="text-[10px] text-amber-600 font-semibold mt-0.5">82.0% pupadas</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-800">85.0%</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">Carlos Ruiz <span class="text-slate-400 text-[10px] ml-1">(OP-01)</span></td>
-                            </tr>
+                            {% endfor %}
 
                         </tbody>
                     </table>
@@ -231,19 +165,15 @@
 
         </div>
     </main>
+{% endblock %}
 
-    {% endblock %}
-
-    {% block scripts %}
-    <!-- Funciones Javascript -->
+{% block scripts %}
     <script>
         const rows = document.querySelectorAll('.data-row');
         const btnResetCards = document.getElementById('btnResetCards');
 
-        // Referencias de Elementos HTML
         const valSemana = document.getElementById('valSemana');
         const subSemana = document.getElementById('subSemana');
-        
         const valLote = document.getElementById('valLote');
         const subLote = document.getElementById('subLote');
         
@@ -253,8 +183,9 @@
         const blobPromedio = document.getElementById('blobPromedio');
         const iconBoxPromedio = document.getElementById('iconBoxPromedio');
         const dotPromedio = document.getElementById('dotPromedio');
+        
+        const promedioGlobalOriginal = valPromedio.getAttribute('data-global');
 
-        // Función para cambiar colores (Alerta si Pupación es menor a 90%)
         function updateCardColors(isAlert) {
             const allClasses = ['bg-emerald-50', 'bg-amber-50', 'text-emerald-600', 'text-amber-600', 'text-slate-800', 'text-amber-700', 'text-slate-600', 'bg-slate-300', 'bg-emerald-500', 'bg-amber-500'];
 
@@ -273,7 +204,6 @@
             }
         }
 
-        // Lógica 1: Clic en lote actualiza las tarjetas
         rows.forEach(row => {
             row.addEventListener('click', () => {
                 rows.forEach(r => {
@@ -282,12 +212,10 @@
                 });
                 row.classList.add('bg-emerald-50', 'border-l-4', 'border-emerald-500');
 
-                // Extraer datos
                 const semana = row.getAttribute('data-semana');
                 const lote = row.getAttribute('data-lote');
                 const promedio = parseFloat(row.getAttribute('data-promedio'));
 
-                // Actualizar Textos
                 valSemana.innerText = "Semana " + semana;
                 valSemana.classList.remove('text-3xl');
                 valSemana.classList.add('text-2xl');
@@ -300,20 +228,18 @@
 
                 valPromedio.innerText = promedio.toFixed(1);
 
-                // Lógica de alerta (En pupación, menos de 90% es malo)
-                if(promedio < 90.0) {
+                if(promedio < 80.0) {
                     updateCardColors(true);
-                    subPromedio.innerText = "⚠️ Rendimiento inferior al estándar (< 90%)";
+                    subPromedio.innerText = "⚠️ Nivel de pupación bajo (< 80%)";
                 } else {
                     updateCardColors(false);
-                    subPromedio.innerText = "Cumple con el estándar de éxito";
+                    subPromedio.innerText = "Nivel de pupación óptimo";
                 }
 
                 btnResetCards.classList.remove('hidden');
             });
         });
 
-        // Lógica 2: Volver a la Vista Global / Limpiar
         btnResetCards.addEventListener('click', () => {
             rows.forEach(r => {
                 r.classList.remove('bg-emerald-50', 'border-l-4', 'border-emerald-500');
@@ -330,14 +256,18 @@
             valLote.classList.add('text-3xl');
             subLote.innerText = "Lote correspondiente";
             
-            valPromedio.innerText = "95.0";
+            valPromedio.innerText = promedioGlobalOriginal;
             subPromedio.innerText = "Promedio global general";
             
-            updateCardColors(false);
+            if(parseFloat(promedioGlobalOriginal) < 80.0 && parseFloat(promedioGlobalOriginal) > 0) {
+                updateCardColors(true);
+            } else {
+                updateCardColors(false);
+            }
+            
             btnResetCards.classList.add('hidden');
         });
 
-        // Lógica 3: Buscador de Fechas
         const btnSearch = document.getElementById('btnSearch');
         const dateSearch = document.getElementById('dateSearch');
         const scrollTable = document.getElementById('scrollTable');
@@ -367,8 +297,5 @@
                 alert("No se encontró ningún registro en esa fecha.");
             }
         });
-
     </script>
-</body>
-</html>
 {% endblock %}

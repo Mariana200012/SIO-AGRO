@@ -65,4 +65,15 @@ def registrar_empaque():
 @empaque_bp.route('/inventario', methods=['GET'])
 def inventario():
     # Después conectaremos esto con SQLite
+
     return render_template('empaque/inventario.html')
+
+@empaque_bp.route('/inventario')
+def inventario_empaque():
+    # Esta ruta cargará la pantalla de Entradas / Salidas
+    return render_template('empaque/inventario.html')
+
+@empaque_bp.route('/historial')
+def historial_empaque():
+    # Esta ruta cargará la bitácora de movimientos
+    return render_template('empaque/historial.html')

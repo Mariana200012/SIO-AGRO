@@ -1,9 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="Bd_SIO-AGRO.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser query pragmas" current="2"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="4250"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="CAT_AREAS" custom_title="0" dock_id="1" table="4,9:mainCAT_AREAS"/><dock_state state="000000ff00000000fd00000001000000020000054a0000024ffc0100000001fb000000160064006f0063006b00420072006f007700730065003101000000000000054a0000011e00ffffff000002940000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="CAT_AREAS" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="51"/><column index="2" value="119"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">CREATE TABLE &quot;ASISTENCIA&quot; (
-    &quot;id_asistencia&quot; INTEGER PRIMARY KEY AUTOINCREMENT,
-    &quot;id_usuario&quot; INTEGER NOT NULL,
-    &quot;fecha&quot; DATE NOT NULL,
-    &quot;hora_entrada&quot; TIME,
-    &quot;hora_salida&quot; TIME,
-    &quot;estatus&quot; TEXT DEFAULT 'En turno',
-    FOREIGN KEY(&quot;id_usuario&quot;) REFERENCES &quot;USUARIOS&quot;(&quot;id_usuario&quot;)
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="Bd_SIO-AGRO.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser query pragmas" current="1"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="4250"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="MATERIALES" custom_title="0" dock_id="1" table="4,10:mainMATERIALES"/><dock_state state="000000ff00000000fd00000001000000020000054a0000024ffc0100000001fb000000160064006f0063006b00420072006f007700730065003101000000000000054a0000011e00ffffff000002940000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="ASISTENCIA" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="82"/><column index="2" value="67"/><column index="3" value="87"/><column index="4" value="86"/><column index="5" value="74"/><column index="6" value="71"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="MATERIALES" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="73"/><column index="2" value="51"/><column index="3" value="119"/><column index="4" value="82"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="PROD_DETALLE_CATOPAR" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="70"/><column index="2" value="80"/><column index="3" value="82"/><column index="4" value="93"/><column index="5" value="57"/><column index="6" value="55"/><column index="7" value="51"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="PROD_DETALLE_CHRYSOPA" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="82"/><column index="2" value="63"/><column index="3" value="53"/><column index="4" value="77"/><column index="5" value="159"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">-- 1. Tabla para PRE-Parasitismo (Formulario simple)
+CREATE TABLE PRE_PARASITISMO (
+    id_pre INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_lote TEXT NOT NULL,
+    viables INTEGER NOT NULL,
+    id_operador INTEGER NOT NULL,
+    fecha_registro TEXT NOT NULL
+);
+
+-- 2. Tabla CABECERA para POST-Parasitismo (El ticket general)
+CREATE TABLE POST_PARASITISMO_CABECERA (
+    id_cabecera INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_lote TEXT NOT NULL,
+    id_operador INTEGER NOT NULL,
+    fecha_registro TEXT NOT NULL
+);
+
+-- 3. Tabla DETALLE para POST-Parasitismo (Los 10 garbanzos por ticket)
+CREATE TABLE POST_PARASITISMO_DETALLE (
+    id_detalle INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_cabecera INTEGER,
+    numero_garbanzo INTEGER,
+    gorg_nacidos INTEGER,
+    gorg_pupas INTEGER,
+    cat_negros INTEGER,
+    cat_combinados INTEGER,
+    cat_ambar INTEGER,
+    FOREIGN KEY(id_cabecera) REFERENCES POST_PARASITISMO_CABECERA(id_cabecera)
 );</sql><current_tab id="0"/></tab_sql></sqlb_project>

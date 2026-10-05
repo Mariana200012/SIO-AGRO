@@ -3,172 +3,287 @@
 {% block title %}Registro Post-Parasitismo - Koppert Biofactory{% endblock %}
 
 {% block navbar_menu %}
-<!-- Contenedor tipo cápsula -->
-<div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
-    
-    <!-- PESTAÑA INACTIVA (Pre-Parasitismo) -->
-    <a href="{{ url_for('prod_catopar.pre') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+<div class="flex items-center gap-1.5 p-1.5 bg-slate-900/60 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
+    <a href="{{ url_for('prod_catopar.pre') }}" class="flex items-center px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
         Pre-Parasitismo
     </a>
     
     <!-- BOTÓN ACTIVO (Post-Parasitismo - Tema Azul) -->
-    <a href="{{ url_for('prod_catopar.post') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-blue-600 shadow-md shadow-blue-900/50 border border-blue-500/30 transition-all cursor-default whitespace-nowrap">
+    <a href="{{ url_for('prod_catopar.post') }}" class="flex items-center px-4 py-1.5 rounded-full text-xs font-bold text-white bg-blue-600 shadow-md border border-blue-500/30 cursor-default whitespace-nowrap">
         Post-Parasitismo
     </a>
     
     <!-- PESTAÑA INACTIVA (Solicitar Material) -->
-    <a href="{{ url_for('prod_catopar.materiales') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
+    <a href="{{ url_for('prod_catopar.materiales') }}" class="flex items-center px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
         Solicitar Material
     </a>
-    
 </div>
 {% endblock %}
 
 {% block content %}
-    <!-- CONTENIDO PRINCIPAL (Estandarizado a max-w-5xl) -->
-    <main class="flex-1 overflow-y-auto p-6 lg:p-10 relative">
-        <div class="max-w-5xl mx-auto space-y-6 relative z-10">
+    <main class="flex-1 overflow-y-auto px-6 pt-4 pb-10 lg:px-10 bg-slate-50/50">
+        <div class="max-w-6xl mx-auto space-y-5 relative z-10">
             
-            <!-- Cabecera del Panel y Control de Voz (Diseño Compacto) -->
-            <div class="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <!-- Cabecera del Panel y Control de Voz -->
+            <div class="bg-white border border-slate-200/70 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-5 backdrop-blur-xl">
                 <div>
-                    <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-1">Registro Post Parasitación <span class="text-emerald-600 font-bold text-lg bg-emerald-50 px-2 py-0.5 rounded-lg ml-1">(Voz)</span></h1>
-                    <p class="text-xs text-slate-500 font-medium">Lote Activo: <span class="font-bold text-slate-700">LOTE-045</span> | Ingreso de muestra de 10 garbanzos</p>
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-blue-50 border border-blue-100 text-blue-700 text-[10px] font-bold tracking-widest uppercase mb-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        Dictado de Matriz &bull; Línea Catopar
+                    </div>
+                    <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-3">Registro Post-Parasitación</h1>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <label class="text-xs text-slate-500 font-extrabold uppercase tracking-wider bg-slate-100 px-3.5 py-2 rounded-xl border border-slate-200/70 shadow-sm flex items-center gap-2">
+                            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            ID Lote Activo:
+                        </label>
+                        <input type="text" id="input-lote" placeholder="Ej. LOTE-045" class="border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-black text-blue-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 bg-slate-50 transition-all w-48 placeholder-slate-400">
+                    </div>
                 </div>
                 
-                <!-- Módulo de Estado de Voz -->
-                <div class="flex items-center w-full sm:w-auto">
-                    <div class="flex items-center gap-4 bg-slate-50 border border-slate-200 px-5 py-3 rounded-2xl shadow-sm w-full sm:w-auto">
-                        <div class="bg-white p-2 rounded-xl text-emerald-600 shadow-sm border border-slate-100">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-                        </div>
-                        <div>
-                            <p class="text-xs text-slate-500 mb-0.5 font-bold uppercase tracking-wider">Estado de Voz</p>
+                <!-- Módulo de Voz (Sin icono flotante) -->
+                <div class="w-full md:w-auto">
+                    <button id="btn-voz" onclick="toggleVoz()" class="flex items-center gap-3.5 bg-slate-50/80 hover:bg-blue-50/50 transition-all border border-slate-200/80 px-5 py-3 rounded-2xl shadow-sm w-full md:w-auto cursor-pointer group">
+                        <div class="text-left">
+                            <p class="text-[9px] text-slate-400 mb-0.5 font-extrabold uppercase tracking-widest">Asistente de Dictado</p>
                             <div class="flex items-center gap-2">
-                                <span class="font-black text-slate-800 text-sm">Escuchando...</span>
-                                <div class="flex items-end gap-[3px] h-4 ml-1">
-                                    <!-- Barras simulando onda de voz activa -->
-                                    <div class="bar bar-active bg-emerald-500 w-1 h-2 rounded-full animate-pulse"></div>
-                                    <div class="bar bar-active bg-emerald-500 w-1 h-4 rounded-full animate-pulse delay-75"></div>
-                                    <div class="bar bar-active bg-emerald-500 w-1 h-3 rounded-full animate-pulse delay-150"></div>
-                                    <div class="bar bar-active bg-emerald-500 w-1 h-1 rounded-full animate-pulse delay-200"></div>
-                                    <div class="bar bar-active bg-emerald-500 w-1 h-3 rounded-full animate-pulse delay-75"></div>
+                                <span id="texto-voz" class="font-black text-slate-800 text-xs tracking-tight">Micrófono Apagado</span>
+                                <div id="ondas-voz" class="hidden items-end gap-[3px] h-3.5 ml-1">
+                                    <div class="bg-blue-600 w-1 h-2 rounded-full"></div>
+                                    <div class="bg-blue-600 w-1 h-3.5 rounded-full"></div>
+                                    <div class="bg-blue-600 w-1 h-2.5 rounded-full"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </button>
                 </div>
             </div>
 
-            <!-- Tabla Formulario -->
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-6">
-                <div class="bg-slate-50 px-7 py-5 border-b border-slate-100 flex justify-between items-center">
-                    <h2 class="text-[15px] font-bold text-slate-800 tracking-tight flex items-center gap-3">
-                        <div class="w-2 h-6 bg-emerald-500 rounded-full"></div>
-                        Dictado de Garbanzos (Matriz 10x5)
+            <!-- Tabla Formulario Matriz 10x5 -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200/70 overflow-hidden">
+                <div class="bg-white px-7 py-4 border-b border-slate-100 flex justify-between items-center">
+                    <h2 class="text-[15px] font-black text-slate-800 tracking-tight flex items-center gap-3">
+                        <div class="w-2 h-5 bg-blue-600 rounded-full shadow-sm"></div>
+                        Dictado de Garbanzos <span class="text-slate-400 font-medium ml-1 text-xs">| Matriz 10x5</span>
                     </h2>
-                    <span class="text-[10px] font-bold text-amber-800 bg-amber-100 px-3 py-1.5 rounded-lg border border-amber-200 shadow-sm uppercase">Micrófono Activo</span>
+                    <span class="text-[10px] text-slate-400 font-mono font-semibold uppercase tracking-widest bg-slate-50 border border-slate-100 px-2.5 py-1.5 rounded-lg hidden sm:block">Estructura Dinámica</span>
                 </div>
 
                 <div class="overflow-x-auto p-6">
-                    <!-- Nota para Flask: Aquí el tag <form method="POST"> envolvería a la tabla -->
                     <table class="min-w-full text-center border-collapse text-sm">
                         <thead class="sticky top-0 z-10 shadow-sm">
                             <tr>
-                                <th rowspan="2" class="border border-slate-200 bg-slate-50 text-slate-600 font-extrabold py-3 px-4 w-32 uppercase tracking-wide text-[10px]">Muestra</th>
-                                <th colspan="2" class="border border-amber-200 bg-amber-50 text-amber-800 font-extrabold py-2 w-1/3 uppercase tracking-wider text-[10px]">Gorgojos (No Parasitados)</th>
-                                <th colspan="3" class="border border-emerald-200 bg-emerald-50 text-emerald-800 font-extrabold py-2 w-1/2 uppercase tracking-wider text-[10px]">Catopar (Parasitados)</th>
+                                <th rowspan="2" class="border border-slate-200/80 bg-slate-100/80 text-slate-600 font-black py-3 px-3 w-32 uppercase tracking-wider text-[10px] rounded-tl-xl">Muestra</th>
+                                <th colspan="2" class="border border-amber-200/80 bg-amber-50/90 text-amber-900 font-black py-2 w-1/3 uppercase tracking-wider text-[10px]">
+                                    Gorgojos
+                                    <span class="font-bold block text-[9px] text-amber-700/80 normal-case mt-0.5">No Parasitados</span>
+                                </th>
+                                <th colspan="3" class="border border-blue-200/80 bg-blue-50/90 text-blue-900 font-black py-2 w-1/2 uppercase tracking-wider text-[10px] rounded-tr-xl">
+                                    Catopar
+                                    <span class="font-bold block text-[9px] text-blue-700/80 normal-case mt-0.5">Parasitados</span>
+                                </th>
                             </tr>
                             <tr>
-                                <th class="border border-amber-200 bg-amber-50/50 text-amber-700 py-3 font-bold uppercase tracking-wider text-[10px]">Nacidos</th>
-                                <th class="border border-amber-200 bg-amber-50/50 text-amber-700 py-3 font-bold uppercase tracking-wider text-[10px]">En Pupa</th>
-                                <th class="border border-emerald-200 bg-emerald-50/50 text-emerald-700 py-3 font-bold uppercase tracking-wider text-[10px]">Negros</th>
-                                <th class="border border-emerald-200 bg-emerald-50/50 text-emerald-700 py-3 font-bold uppercase tracking-wider text-[10px]">Combinados</th>
-                                <th class="border border-emerald-200 bg-emerald-50/50 text-emerald-700 py-3 font-bold uppercase tracking-wider text-[10px]">Ámbar</th>
+                                <th class="border border-amber-200/80 bg-amber-100/60 text-amber-800 py-2.5 font-extrabold uppercase tracking-wider text-[10px]">Nacidos</th>
+                                <th class="border border-amber-200/80 bg-amber-100/60 text-amber-800 py-2.5 font-extrabold uppercase tracking-wider text-[10px]">En Pupa</th>
+                                <th class="border border-blue-200/80 bg-blue-100/60 text-blue-800 py-2.5 font-extrabold uppercase tracking-wider text-[10px]">Negros</th>
+                                <th class="border border-blue-200/80 bg-blue-100/60 text-blue-800 py-2.5 font-extrabold uppercase tracking-wider text-[10px]">Combinados</th>
+                                <th class="border border-blue-200/80 bg-blue-100/60 text-blue-800 py-2.5 font-extrabold uppercase tracking-wider text-[10px]">Ámbar</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100">
+                        <tbody id="tabla-garbanzos" class="divide-y divide-slate-100 bg-white">
                             
-                            <!-- FILA DE TOTALES DEL LOTE -->
-                            <tr class="bg-slate-50/80 font-bold text-lg">
-                                <td class="border border-slate-200 py-3 text-slate-800 tracking-wider">LOTE-045</td>
-                                <td class="border border-slate-200 text-amber-600">1</td>
-                                <td class="border border-slate-200 text-amber-600">0</td>
-                                <td class="border border-slate-200 text-red-500">0</td>
-                                <td class="border border-slate-200 text-red-500">0</td>
-                                <td class="border border-slate-200 text-emerald-600">1</td>
-                            </tr>
-
-                            <!-- GARBANZOS COMPLETADOS (Ejemplo 1 y 2) -->
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="border border-slate-200 py-2 text-slate-600 font-semibold">Garbanzo 1</td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="1" readonly class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-center bg-white shadow-sm focus:outline-none text-slate-700 font-bold"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="0" readonly class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-center bg-white shadow-sm focus:outline-none text-slate-700 font-bold"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="0" readonly class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-center bg-white shadow-sm focus:outline-none text-slate-700 font-bold"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="0" readonly class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-center bg-white shadow-sm focus:outline-none text-slate-700 font-bold"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="1" readonly class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-center bg-white shadow-sm focus:outline-none text-slate-700 font-bold"></td>
-                            </tr>
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="border border-slate-200 py-2 text-slate-600 font-semibold">Garbanzo 2</td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="0" readonly class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-center bg-white shadow-sm focus:outline-none text-slate-700 font-bold"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="0" readonly class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-center bg-white shadow-sm focus:outline-none text-slate-700 font-bold"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="1" readonly class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-center bg-white shadow-sm focus:outline-none text-slate-700 font-bold"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="0" readonly class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-center bg-white shadow-sm focus:outline-none text-slate-700 font-bold"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="0" readonly class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-center bg-white shadow-sm focus:outline-none text-slate-700 font-bold"></td>
-                            </tr>
-
-                            <!-- GARBANZO ACTIVO (ESCUCHANDO VOZ) -->
-                            <tr class="bg-emerald-50/50 relative border-y-2 border-emerald-400">
-                                <td class="border border-slate-200 py-2 text-slate-800 font-bold border-l-4 border-l-emerald-500 relative flex items-center justify-center gap-2">
-                                    <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                                    Garbanzo 3
+                            <!-- Bucle Jinja2 para generar las 10 filas de captura limpiamente -->
+                            {% for i in range(1, 11) %}
+                            <tr class="hover:bg-slate-50/80 transition-colors group">
+                                <td class="border border-slate-200/80 py-2.5 px-3 text-slate-600 font-extrabold text-xs group-hover:text-blue-700 transition-colors bg-slate-50/30">
+                                    Garbanzo {{ i }}
                                 </td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="2" class="w-full border-2 border-emerald-400 ring-2 ring-emerald-100 rounded-lg px-2 py-1.5 text-center bg-white shadow-sm focus:outline-none text-slate-900 font-black"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" placeholder="0" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-center bg-slate-50 text-slate-400 focus:outline-none font-medium"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="1" readonly class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-center bg-slate-50 text-slate-400 focus:outline-none font-medium"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="1" readonly class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-center bg-slate-50 text-slate-400 focus:outline-none font-medium"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" value="1" readonly class="w-full border border-slate-300 rounded-lg px-2 py-1.5 text-center bg-slate-50 text-slate-400 focus:outline-none font-medium"></td>
-                            </tr>
-
-                            <!-- GARBANZO PENDIENTE -->
-                            {# Regla de backend: Esto deberá renderizarse con Jinja2 {% for i in range(4, 11) %} #}
-                            <tr>
-                                <td class="border border-slate-200 py-2 text-slate-400 font-medium">Garbanzo 4</td>
-                                <td class="border border-slate-200 p-2"><input type="text" class="w-full border border-slate-200 rounded-lg px-2 py-1.5 bg-slate-50/50"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" class="w-full border border-slate-200 rounded-lg px-2 py-1.5 bg-slate-50/50"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" class="w-full border border-slate-200 rounded-lg px-2 py-1.5 bg-slate-50/50"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" class="w-full border border-slate-200 rounded-lg px-2 py-1.5 bg-slate-50/50"></td>
-                                <td class="border border-slate-200 p-2"><input type="text" class="w-full border border-slate-200 rounded-lg px-2 py-1.5 bg-slate-50/50"></td>
-                            </tr>
-
-                            <!-- Relleno de pendientes -->
-                            <tr>
-                                <td colspan="6" class="border border-slate-200 py-4 text-slate-400 italic text-sm text-left px-6 bg-slate-50/30">
-                                    ... (Filas 5 al 10 pendientes de lectura) ...
+                                <td class="border border-slate-200/80 p-2">
+                                    <input type="number" min="0" class="input-celda w-full border border-slate-200 rounded-xl px-2 py-1.5 text-center bg-white focus:bg-amber-50/50 focus:border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-400/10 text-slate-800 font-black transition-all">
+                                </td>
+                                <td class="border border-slate-200/80 p-2">
+                                    <input type="number" min="0" class="input-celda w-full border border-slate-200 rounded-xl px-2 py-1.5 text-center bg-white focus:bg-amber-50/50 focus:border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-400/10 text-slate-800 font-black transition-all">
+                                </td>
+                                <td class="border border-slate-200/80 p-2">
+                                    <input type="number" min="0" class="input-celda w-full border border-slate-200 rounded-xl px-2 py-1.5 text-center bg-white focus:bg-blue-50/50 focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-400/10 text-slate-800 font-black transition-all">
+                                </td>
+                                <td class="border border-slate-200/80 p-2">
+                                    <input type="number" min="0" class="input-celda w-full border border-slate-200 rounded-xl px-2 py-1.5 text-center bg-white focus:bg-blue-50/50 focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-400/10 text-slate-800 font-black transition-all">
+                                </td>
+                                <td class="border border-slate-200/80 p-2">
+                                    <input type="number" min="0" class="input-celda w-full border border-slate-200 rounded-xl px-2 py-1.5 text-center bg-white focus:bg-blue-50/50 focus:border-blue-400 focus:outline-none focus:ring-4 focus:ring-blue-400/10 text-slate-800 font-black transition-all">
                                 </td>
                             </tr>
+                            {% endfor %}
 
                         </tbody>
                     </table>
                 </div>
 
-                <!-- Footer con Botones -->
-                <div class="px-6 py-5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="flex gap-3 w-full sm:w-auto">
-                        <button type="button" class="flex-1 sm:flex-none bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm transition-colors border border-amber-700/50 whitespace-nowrap">
-                            Pausar / Limpiar
-                        </button>
-                        <button type="submit" class="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-md shadow-emerald-600/20 transition-colors border border-emerald-700/50 flex items-center justify-center gap-2 whitespace-nowrap">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                            Guardar Muestra de 10
-                        </button>
+                <!-- Footer con Botones y NIP -->
+                <div class="px-7 py-4 bg-slate-50 border-t border-slate-200/70 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="w-full sm:w-1/3 relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <input type="password" id="input-nip" placeholder="••••" required class="w-full pl-10 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs font-mono font-black text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 bg-white tracking-[0.3em] transition-all placeholder:tracking-normal placeholder:font-sans placeholder:font-medium">
                     </div>
-                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm w-full sm:w-auto text-center">
-                        Estado BD: Esperando Registro...
+                    
+                    <div class="flex gap-2.5 w-full sm:w-auto">
+                        <button onclick="limpiarTabla()" class="flex-1 sm:flex-none bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 px-5 py-2.5 rounded-xl text-xs font-bold shadow-sm transition-colors whitespace-nowrap">
+                            Limpiar Todo
+                        </button>
+                        <button id="btn-guardar" onclick="guardarDatos()" class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-md transition-colors flex items-center justify-center gap-2 whitespace-nowrap">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                            Guardar Muestra
+                        </button>
                     </div>
                 </div>
-
             </div>
+
         </div>
     </main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // SISTEMA DE RECONOCIMIENTO DE VOZ (Lógica intacta)
+    let reconocimientoActivado = false;
+    let recognition;
+    const inputs = document.querySelectorAll('.input-celda');
+    let currentFocusIndex = 0;
+
+    const numerosVoz = {
+        'cero': 0, 'uno': 1, 'dos': 2, 'tres': 3, 'cuatro': 4, 
+        'cinco': 5, 'seis': 6, 'siete': 7, 'ocho': 8, 'nueve': 9, 'diez': 10
+    };
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = false;
+        recognition.lang = 'es-MX';
+
+        recognition.onresult = function(event) {
+            const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+            
+            let numeroDetectado = numerosVoz[transcript] !== undefined ? numerosVoz[transcript] : parseInt(transcript);
+
+            if (!isNaN(numeroDetectado) && currentFocusIndex < inputs.length) {
+                inputs[currentFocusIndex].value = numeroDetectado;
+                currentFocusIndex++;
+                if(currentFocusIndex < inputs.length) {
+                    inputs[currentFocusIndex].focus();
+                } else {
+                    toggleVoz(); 
+                    alert("Dictado completado. Revisa la tabla y haz clic en Guardar.");
+                }
+            }
+        };
+
+        recognition.onend = function() {
+            if(reconocimientoActivado) { recognition.start(); } 
+        };
+    }
+
+    function toggleVoz() {
+        if (!recognition) {
+            alert("Tu navegador no soporta el dictado por voz. Intenta con Google Chrome.");
+            return;
+        }
+
+        reconocimientoActivado = !reconocimientoActivado;
+        const textoVoz = document.getElementById('texto-voz');
+        const ondasVoz = document.getElementById('ondas-voz');
+
+        if (reconocimientoActivado) {
+            textoVoz.innerText = "Micrófono Activo";
+            textoVoz.classList.add('text-blue-600');
+            ondasVoz.classList.remove('hidden');
+            ondasVoz.classList.add('flex');
+            
+            for(let i=0; i<inputs.length; i++) {
+                if(inputs[i].value === "") {
+                    currentFocusIndex = i;
+                    inputs[i].focus();
+                    break;
+                }
+            }
+            recognition.start();
+        } else {
+            textoVoz.innerText = "Micrófono Apagado";
+            textoVoz.classList.remove('text-blue-600');
+            ondasVoz.classList.add('hidden');
+            ondasVoz.classList.remove('flex');
+            recognition.stop();
+        }
+    }
+
+    function limpiarTabla() {
+        inputs.forEach(input => input.value = "");
+        currentFocusIndex = 0;
+        if(inputs.length > 0) inputs[0].focus();
+    }
+
+    async function guardarDatos() {
+        const lote = document.getElementById('input-lote').value;
+        const nip = document.getElementById('input-nip').value;
+        const boton = document.getElementById('btn-guardar');
+
+        if (!lote || !nip) {
+            alert("⚠️ El ID del Lote y el NIP son obligatorios para guardar la matriz.");
+            return;
+        }
+
+        let garbanzos = [];
+        let index = 0;
+        
+        for (let i = 1; i <= 10; i++) {
+            garbanzos.push({
+                numero: i,
+                g_nac: parseInt(inputs[index++].value) || 0,
+                g_pup: parseInt(inputs[index++].value) || 0,
+                c_neg: parseInt(inputs[index++].value) || 0,
+                c_com: parseInt(inputs[index++].value) || 0,
+                c_amb: parseInt(inputs[index++].value) || 0
+            });
+        }
+
+        boton.disabled = true;
+        boton.innerHTML = `<svg class="animate-spin w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Procesando...`;
+
+        try {
+            let resp = await fetch("{{ url_for('prod_catopar.guardar_post') }}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lote: lote, nip: nip, garbanzos: garbanzos })
+            });
+
+            let data = await resp.json();
+
+            if (data.status === 'success') {
+                alert("✅ Muestra de 10 garbanzos registrada y enlazada al lote correctamente.");
+                location.reload();
+            } else {
+                alert("❌ Error: " + data.message);
+                boton.disabled = false;
+                boton.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Guardar Muestra`;
+            }
+        } catch (error) {
+            alert("❌ Error de conexión al servidor.");
+            boton.disabled = false;
+            boton.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Guardar Muestra`;
+        }
+    }
+
+    inputs.forEach((input, index) => {
+        input.addEventListener('focus', () => {
+            currentFocusIndex = index;
+            document.querySelectorAll('tbody tr').forEach(tr => tr.classList.remove('bg-blue-50/40'));
+            input.closest('tr').classList.add('bg-blue-50/40');
+        });
+    });
+</script>
 {% endblock %}

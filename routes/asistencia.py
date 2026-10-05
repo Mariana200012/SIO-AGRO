@@ -34,8 +34,26 @@ def pase_lista():
         ORDER BY U.nombre_usuario
     """, (fecha_hoy, id_area_encargado))
     
-    operadores = cursor.fetchall()
+    filas_operadores = cursor.fetchall()
     conn.close()
+    
+    # Formatear la hora de entrada a 12 horas (AM/PM) para que se vea bien en el HTML
+    operadores = []
+    for op in filas_operadores:
+        op_dict = dict(op)
+        if op_dict['hora_entrada']:
+            try:
+                # Intenta parsear la hora (soporta formato HH:MM:SS o HH:MM)
+                for fmt in ('%H:%M:%S', '%H:%M'):
+                    try:
+                        dt = datetime.strptime(op_dict['hora_entrada'], fmt)
+                        op_dict['hora_entrada'] = dt.strftime('%I:%M %p')
+                        break
+                    except ValueError:
+                        continue
+            except Exception:
+                pass
+        operadores.append(op_dict)
     
     return render_template('produccion/prod_asistencia.html', operadores=operadores)
 
@@ -43,7 +61,7 @@ def pase_lista():
 @asistencia_bp.route('/marcar/<int:id_operador>', methods=['POST'])
 def marcar_asistencia(id_operador):
     fecha_hoy = datetime.now().strftime('%Y-%m-%d')
-    hora_actual = datetime.now().strftime('%H:%M:%S')
+    hora_actual_bd = datetime.now().strftime('%H:%M:%S') # Formato 24h para almacenar en BD
     
     try:
         conn = get_db_connection()
@@ -55,7 +73,7 @@ def marcar_asistencia(id_operador):
         
         if not registro:
             # Solo si no existe, insertamos la Entrada
-            cursor.execute("INSERT INTO ASISTENCIA (id_usuario, fecha, hora_entrada, estatus) VALUES (?, ?, ?, 'En turno')", (id_operador, fecha_hoy, hora_actual))
+            cursor.execute("INSERT INTO ASISTENCIA (id_usuario, fecha, hora_entrada, estatus) VALUES (?, ?, ?, 'En turno')", (id_operador, fecha_hoy, hora_actual_bd))
             estado = 'entrada'
         else:
             estado = 'completado' # Ya se había marcado antes
@@ -63,7 +81,10 @@ def marcar_asistencia(id_operador):
         conn.commit()
         conn.close()
         
-        return jsonify({'status': 'success', 'estado': estado, 'hora': hora_actual})
+        # Convertir la hora actual a formato de 12 horas con AM/PM para la respuesta JSON
+        hora_bonita = datetime.now().strftime('%I:%M %p')
+        
+        return jsonify({'status': 'success', 'estado': estado, 'hora': hora_bonita})
     except Exception as e:
         print(f"Error al marcar asistencia: {e}")
         return jsonify({'status': 'error'})

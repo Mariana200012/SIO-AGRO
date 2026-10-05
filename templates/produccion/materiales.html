@@ -1,7 +1,28 @@
 {% extends "produccion/base_produc.html" %}
 
-{% block title %}Monitoreo de Ocupación - Koppert Biofactory{% endblock %}
+{% block title %}Solicitud de Materiales - Koppert Biofactory{% endblock %}
         
+{% block extra_css %}
+<style>
+    .table-container { 
+        max-height: 500px; 
+        overflow-y: auto; 
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+    .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
+    .table-container::-webkit-scrollbar-track { background: transparent; }
+    .table-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+    
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+    }
+    input[type=number] { -moz-appearance: textfield; }
+</style>
+{% endblock %}
+
 {% block navbar_menu %}
 <!-- CONTENEDOR TIPO CÁPSULA -->
 <div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
@@ -14,12 +35,9 @@
         <a href="{{ url_for('prod_catopar.pre') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
             Pre-Parasitismo
         </a>            
-        
         <a href="{{ url_for('prod_catopar.post') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
             Post-Parasitismo
         </a>
-        
-        <!-- BOTÓN ACTIVO CATOPAR -->
         <a href="{{ url_for('prod_catopar.materiales') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-blue-600 shadow-md shadow-blue-900/50 border border-blue-500/30 transition-all cursor-default whitespace-nowrap">
             Solicitar Material
         </a>
@@ -32,24 +50,18 @@
         <a href="{{ url_for('prod_chrysopa.ocupacion') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
             Ocupación
         </a>
-        
         <a href="{{ url_for('prod_chrysopa.pupacion') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
             Pupación
         </a>
-        
         <a href="{{ url_for('prod_chrysopa.eclosion') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
             Eclosión
         </a>
-        
         <a href="{{ url_for('prod_chrysopa.mortalidad') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
             Mortalidad
         </a>
-        
         <a href="{{ url_for('prod_chrysopa.fallas') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
             Fallas
         </a>
-        
-        <!-- BOTÓN ACTIVO CHRYSOPA -->
         <a href="{{ url_for('prod_chrysopa.materiales') }}" class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-emerald-600 shadow-md shadow-emerald-900/50 border border-emerald-500/30 transition-all cursor-default whitespace-nowrap">
             Material
         </a>
@@ -61,17 +73,18 @@
 
 {% block content %}
 
-    <!-- Área de Trabajo Principal -->
-    <main class="flex-1 overflow-y-auto p-6 lg:p-10">
-        <div class="max-w-5xl mx-auto space-y-6">
+    <!-- Área de Trabajo Principal pegada arriba -->
+    <main class="flex-1 overflow-y-auto px-6 pt-4 pb-10 lg:px-10 bg-slate-50">
+        <div class="max-w-[1200px] mx-auto space-y-5">
             
-            <!-- ALERTA DE MENSAJES (ÉXITO O ERROR) CON AUTOCIERRE -->
+            <!-- ALERTA DE MENSAJES CON AUTOCIERRE DINÁMICO -->
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     <div id="contenedor-alertas" class="space-y-3">
                     {% for category, message in messages %}
                         <div class="alerta-flash p-4 rounded-2xl font-bold text-sm shadow-sm flex items-center justify-between transition-all duration-500 
                             {% if category == 'error' %} bg-rose-100 text-rose-700 border border-rose-200 
+                            {% elif origen == 'catopar' %} bg-blue-100 text-blue-800 border border-blue-200 
                             {% else %} bg-emerald-100 text-emerald-800 border border-emerald-200 {% endif %}">
                             <div class="flex items-center gap-2">
                                 {% if category == 'error' %}
@@ -86,94 +99,95 @@
                     {% endfor %}
                     </div>
 
-                    <!-- SCRIPT PARA DESAPARECER EL MENSAJE COMO FANTASMA -->
                     <script>
                         setTimeout(() => {
                             const alertas = document.querySelectorAll('.alerta-flash');
                             alertas.forEach(alerta => {
-                                // 1. Le bajamos la opacidad a 0 (fade-out suave)
                                 alerta.style.opacity = '0';
-                                // 2. Esperamos medio segundo a que termine la animación y lo borramos del HTML
                                 setTimeout(() => alerta.remove(), 500); 
                             });
-                        }, 4000); // 4000 = 4 segundos en pantalla
+                        }, 4000);
                     </script>
                 {% endif %}
             {% endwith %}
 
-            <!-- Encabezado de Sección (Sólido) -->
-            <div class="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <!-- Encabezado de Sección Sólido y Limpio -->
+            <div class="bg-white border border-slate-200 p-5 md:p-6 rounded-3xl shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-widest uppercase mb-2">
-                        Estación de Piso &bull; Catálogo Frecuente
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md {% if origen == 'catopar' %}bg-blue-50 text-blue-800 border-blue-100/50{% else %}bg-emerald-50 text-emerald-800 border-emerald-100/50{% endif %} border text-[10px] font-bold tracking-widest uppercase mb-1">
+                        <div class="w-1.5 h-1.5 rounded-full {% if origen == 'catopar' %}bg-blue-500{% else %}bg-emerald-500{% endif %}"></div>
+                        Estación de Producción 
                     </div>
                     <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-1">Solicitud de Materiales de Línea</h1>
                     <p class="text-xs text-slate-500 font-medium">Seleccione los insumos habituales de producción e indique las cantidades requeridas.</p>
                 </div>
-                <!-- AQUÍ CAMBIAMOS EL ONCLICK PARA ABRIR COMO "NUEVO" -->
-                <button type="button" onclick="abrirModalNuevo()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-3 px-6 rounded-xl shadow-md transition-all flex items-center gap-2 whitespace-nowrap">
-                    <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                    Nuevo Pedido de Material
+                <button type="button" onclick="abrirModalNuevo()" class="{% if origen == 'catopar' %}bg-[#2563eb] hover:bg-[#1d4ed8]{% else %}bg-[#059669] hover:bg-[#047857]{% endif %} text-white text-xs font-bold py-3 px-6 rounded-xl shadow-sm transition-colors flex items-center gap-2 whitespace-nowrap">
+                    <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                    Nuevo Pedido
                 </button>
             </div>
 
-            <!-- Historial de Solicitudes Propias (CON LA LÓGICA DEL LÁPIZ) -->
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mt-6">
-                <div class="bg-slate-50 px-7 py-5 border-b border-slate-100 flex justify-between items-center">
+            <!-- Historial de Solicitudes Propias -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden mt-6">
+                <div class="bg-white px-7 py-5 border-b border-slate-100 flex justify-between items-center">
                     <h2 class="text-[15px] font-bold text-slate-800 tracking-tight">Tus Solicitudes Recientes</h2>
-                    <span class="text-[10px] text-slate-500 font-mono bg-white border border-slate-200 px-2 py-1 rounded-md shadow-sm">Tabla: SOLICITUDES_MATERIAL</span>
+                    <span class="text-[10px] text-slate-400 font-mono bg-slate-50 border border-slate-100 px-2 py-1 rounded-md shadow-sm"></span>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto table-container px-2 pb-2">
                     <table class="min-w-full text-sm">
-                        <thead class="bg-white sticky top-0 z-10 shadow-sm border-b border-slate-200">
+                        <thead class="bg-white sticky top-0 z-10 shadow-sm">
                             <tr>
-                                <th class="px-7 py-4 text-left font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Folio / Fecha</th>
-                                <th class="px-7 py-4 text-left font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Materiales Solicitados</th>
-                                <th class="px-7 py-4 text-left font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Operador Solicitante</th>
-                                <th class="px-7 py-4 text-center font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Estatus</th>
-                                <th class="px-7 py-4 text-center font-extrabold text-slate-500 uppercase tracking-wider text-[10px]">Acciones</th>
+                                <th class="px-7 py-4 text-left font-extrabold text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">Folio / Fecha</th>
+                                <th class="px-7 py-4 text-left font-extrabold text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">Materiales Solicitados</th>
+                                <th class="px-7 py-4 text-left font-extrabold text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">Operador Solicitante</th>
+                                <th class="px-7 py-4 text-center font-extrabold text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">Estatus</th>
+                                <th class="px-7 py-4 text-center font-extrabold text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100 bg-white text-xs">
+                        <tbody class="divide-y divide-slate-50 bg-white">
                             
-                            <!-- CICLO DINÁMICO DE PYTHON -->
                             {% for sol in mis_solicitudes %}
                             <tr class="hover:bg-slate-50 transition-colors">
                                 <td class="px-7 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-900 text-sm">SOL-00{{ sol['id_solicitud'] }}</div>
-                                    <div class="text-[11px] text-slate-500 font-medium mt-0.5">{{ sol['fecha_solicitud'] }}</div>
+                                    <div class="font-bold text-slate-900 text-sm">SOL-00{{ sol.id_solicitud }}</div>
+                                    <div class="text-[11px] text-slate-500 font-medium mt-0.5">{{ sol.fecha_solicitud }}</div>
                                 </td>
+                                
                                 <td class="px-7 py-4 font-medium text-slate-700 space-y-1">
-                                    <span class="block">&bull; {{ sol['nombre_material'] }} ({{ sol['cantidad_solicitada'] }} pzas)</span>
+                                    {% for mat in sol.materiales %}
+                                        <span class="block text-xs">&bull; {{ mat.nombre_material }} <span class="text-slate-400 font-bold">({{ mat.cantidad }} pzas)</span></span>
+                                    {% else %}
+                                        <span class="text-slate-400 italic text-xs">Sin detalles</span>
+                                    {% endfor %}
                                 </td>
-                                <td class="px-7 py-4 text-slate-600 font-medium">
-                                    {{ sol['nombre_usuario'] }}
+
+                                <td class="px-7 py-4 text-slate-600 font-semibold text-sm">
+                                    {{ sol.nombre_usuario }}
                                 </td>
                                 <td class="px-7 py-4 whitespace-nowrap text-center">
-                                    {% if sol['estatus']|upper == 'PENDIENTE' %}
-                                        <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-amber-100 text-amber-800 uppercase tracking-wider">{{ sol['estatus'] }}</span>
-                                    {% elif sol['estatus']|upper == 'AUTORIZADO' %}
-                                        <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-sky-100 text-sky-800 uppercase tracking-wider">{{ sol['estatus'] }}</span>
-                                    {% elif sol['estatus']|upper == 'RECHAZADO' %}
-                                        <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-red-100 text-red-800 uppercase tracking-wider">{{ sol['estatus'] }}</span>
+                                    {% if sol.estatus|upper == 'PENDIENTE' %}
+                                        <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-[#fef3c7] text-[#92400e] uppercase tracking-wider border border-[#fde68a]">{{ sol.estatus }}</span>
+                                    {% elif sol.estatus|upper == 'AUTORIZADO' or sol.estatus|upper == 'COMPLETADO' %}
+                                        <span class="px-3 py-1.5 rounded-md text-[10px] font-black {% if origen == 'catopar' %}bg-[#dbeafe] text-[#1e40af] border border-[#bfdbfe]{% else %}bg-[#dcfce7] text-[#166534] border border-[#bbf7d0]{% endif %} uppercase tracking-wider">{{ sol.estatus }}</span>
+                                    {% elif sol.estatus|upper == 'RECHAZADO' %}
+                                        <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-[#fee2e2] text-[#991b1b] uppercase tracking-wider border border-[#fecaca]">{{ sol.estatus }}</span>
                                     {% else %}
-                                        <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-emerald-100 text-emerald-800 uppercase tracking-wider">{{ sol['estatus'] }}</span>
+                                        <span class="px-3 py-1.5 rounded-md text-[10px] font-black bg-slate-100 text-slate-600 uppercase tracking-wider border border-slate-200">{{ sol.estatus }}</span>
                                     {% endif %}
                                 </td>
                                 <td class="px-7 py-4 whitespace-nowrap text-center">
-                                    <!-- AQUÍ CAMBIAMOS EL LAPICITO PARA QUE ABRA EL MODAL DE EDICIÓN -->
-                                    {% if sol['estatus']|upper == 'RECHAZADO' %}
-                                    <button type="button" onclick="abrirModalEdicion({{ sol['id_solicitud'] }})" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors inline-block" title="Editar Solicitud">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                    {% if sol.estatus|upper == 'RECHAZADO' %}
+                                    <button type="button" onclick="abrirModalEdicion({{ sol.id_solicitud }})" class="text-blue-600 hover:text-white bg-blue-50 hover:bg-blue-600 border border-blue-200 hover:border-transparent p-2 rounded-xl transition-all shadow-sm inline-block" title="Corregir Solicitud">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                     </button>
                                     {% else %}
-                                        <span class="text-slate-300">-</span>
+                                        <span class="text-slate-300 font-bold">-</span>
                                     {% endif %}
                                 </td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="5" class="px-7 py-8 text-center text-slate-500 font-medium">No has realizado ninguna solicitud recientemente.</td>
+                                <td colspan="5" class="px-7 py-10 text-center text-slate-500 font-medium text-sm">No has realizado ninguna solicitud recientemente.</td>
                             </tr>
                             {% endfor %}
 
@@ -186,74 +200,78 @@
     </main>
 
     <!-- Modal para Solicitud / Edición -->
-    <div id="modal-solicitud" class="hidden fixed inset-0 bg-slate-900/60 z-[9999] flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-slate-100 space-y-5 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
-                <div>
-                    <!-- LE PUSIMOS UN ID AL TÍTULO PARA CAMBIARLO CON JS -->
-                    <h3 id="modal-titulo" class="font-black text-slate-800 text-lg">Solicitud de Materiales Habituales</h3>
-                    <p class="text-[11px] text-slate-500 font-medium">Marque y ajuste la cantidad de los insumos requeridos.</p>
-                </div>
-                <button type="button" onclick="document.getElementById('modal-solicitud').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
-            </div>
+    <div id="modal-solicitud" class="hidden fixed inset-0 z-[99999] bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+        <div class="flex items-start justify-center min-h-screen px-4 pt-24 pb-10">
             
-            <!-- FORMULARIO CONECTADO A PYTHON -->
-            <!-- Nota: ajusta la ruta url_for si usas Blueprint diferente para catopar -->
-            <form action="{{ url_for('prod_chrysopa.guardar_materiales') }}" method="POST" class="space-y-5 text-sm">
+            <div class="bg-white rounded-[2rem] w-full max-w-lg shadow-2xl border border-slate-100 flex flex-col max-h-[75vh]">
                 
-                <!-- ESTE INPUT OCULTO GUARDA EL ID CUANDO ES EDICIÓN -->
-                <input type="hidden" name="id_solicitud_editar" id="id_solicitud_editar" value="">
+                <div class="flex justify-between items-center border-b border-slate-100 p-6 sm:px-8 shrink-0">
+                    <div>
+                        <h3 id="modal-titulo" class="font-black text-slate-800 text-xl tracking-tight">Solicitud de Materiales</h3>
+                        <p class="text-xs text-slate-500 font-medium mt-1">Marque y ajuste la cantidad requerida.</p>
+                    </div>
+                    <button type="button" onclick="document.getElementById('modal-solicitud').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 transition-colors font-black text-3xl leading-none">&times;</button>
+                </div>
                 
-                <!-- Lista de Materiales Frecuentes -->
-                <div class="space-y-3 border border-slate-200 rounded-2xl p-4 bg-slate-50">
-                    
-                    <!-- Miel -->
-                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
-                        <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
-                            <input type="checkbox" name="material_1" value="1" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
-                            <span>Miel</span>
-                        </label>
-                        <input type="number" name="cant_1" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
-                    </div>
+                <div class="p-6 sm:px-8 overflow-y-auto">
+                    <form id="form-materiales" action="{% if origen == 'catopar' %}{{ url_for('prod_catopar.guardar_materiales') }}{% else %}{{ url_for('prod_chrysopa.guardar_materiales') }}{% endif %}" method="POST" class="space-y-6 text-sm">
+                        
+                        <input type="hidden" name="id_solicitud_editar" id="id_solicitud_editar" value="">
+                        
+                        <div class="space-y-3 bg-slate-50/50 p-4 rounded-2xl border border-slate-200/80">
+                            <!-- Miel -->
+                            <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors {% if origen == 'catopar' %}hover:border-[#93c5fd]{% else %}hover:border-[#6ee7b7]{% endif %}">
+                                <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
+                                    <input type="checkbox" name="material_1" value="1" class="rounded {% if origen == 'catopar' %}text-[#2563eb] focus:ring-[#2563eb]{% else %}text-[#059669] focus:ring-[#059669]{% endif %} w-5 h-5 border-slate-300">
+                                    <span>Miel</span>
+                                </label>
+                                <input type="number" name="cant_1" min="1" placeholder="Cant." class="w-20 border border-slate-200 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 {% if origen == 'catopar' %}focus:ring-blue-500/20 focus:border-blue-500{% else %}focus:ring-emerald-500/20 focus:border-emerald-500{% endif %} transition-all">
+                            </div>
 
-                    <!-- Leche en Polvo -->
-                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
-                        <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
-                            <input type="checkbox" name="material_2" value="2" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
-                            <span>Leche en polvo</span>
-                        </label>
-                        <input type="number" name="cant_2" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
-                    </div>
+                            <!-- Leche en Polvo -->
+                            <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors {% if origen == 'catopar' %}hover:border-[#93c5fd]{% else %}hover:border-[#6ee7b7]{% endif %}">
+                                <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
+                                    <input type="checkbox" name="material_2" value="2" class="rounded {% if origen == 'catopar' %}text-[#2563eb] focus:ring-[#2563eb]{% else %}text-[#059669] focus:ring-[#059669]{% endif %} w-5 h-5 border-slate-300">
+                                    <span>Leche en polvo</span>
+                                </label>
+                                <input type="number" name="cant_2" min="1" placeholder="Cant." class="w-20 border border-slate-200 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 {% if origen == 'catopar' %}focus:ring-blue-500/20 focus:border-blue-500{% else %}focus:ring-emerald-500/20 focus:border-emerald-500{% endif %} transition-all">
+                            </div>
 
-                    <!-- Espirulina -->
-                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
-                        <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
-                            <input type="checkbox" name="material_3" value="3" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
-                            <span>Espirulina</span>
-                        </label>
-                        <input type="number" name="cant_3" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
-                    </div>
+                            <!-- Espirulina -->
+                            <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors {% if origen == 'catopar' %}hover:border-[#93c5fd]{% else %}hover:border-[#6ee7b7]{% endif %}">
+                                <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
+                                    <input type="checkbox" name="material_3" value="3" class="rounded {% if origen == 'catopar' %}text-[#2563eb] focus:ring-[#2563eb]{% else %}text-[#059669] focus:ring-[#059669]{% endif %} w-5 h-5 border-slate-300">
+                                    <span>Espirulina</span>
+                                </label>
+                                <input type="number" name="cant_3" min="1" placeholder="Cant." class="w-20 border border-slate-200 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 {% if origen == 'catopar' %}focus:ring-blue-500/20 focus:border-blue-500{% else %}focus:ring-emerald-500/20 focus:border-emerald-500{% endif %} transition-all">
+                            </div>
 
-                    <!-- Sustrato -->
-                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors hover:border-emerald-300">
-                        <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
-                            <input type="checkbox" name="material_4" value="4" class="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4 border-slate-300">
-                            <span>Sustrato / Alimento (Bulto)</span>
-                        </label>
-                        <input type="number" name="cant_4" min="1" placeholder="Cant." class="w-20 border border-slate-300 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all">
-                    </div>
+                            <!-- Sustrato -->
+                            <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200 shadow-sm transition-colors {% if origen == 'catopar' %}hover:border-[#93c5fd]{% else %}hover:border-[#6ee7b7]{% endif %}">
+                                <label class="flex items-center space-x-3 font-bold text-slate-700 cursor-pointer flex-1">
+                                    <input type="checkbox" name="material_4" value="4" class="rounded {% if origen == 'catopar' %}text-[#2563eb] focus:ring-[#2563eb]{% else %}text-[#059669] focus:ring-[#059669]{% endif %} w-5 h-5 border-slate-300">
+                                    <span>Sustrato / Alimento (Bulto)</span>
+                                </label>
+                                <input type="number" name="cant_4" min="1" placeholder="Cant." class="w-20 border border-slate-200 rounded-lg px-3 py-2 text-center text-sm font-bold text-slate-800 outline-none focus:ring-2 {% if origen == 'catopar' %}focus:ring-blue-500/20 focus:border-blue-500{% else %}focus:ring-emerald-500/20 focus:border-emerald-500{% endif %} transition-all">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="font-bold text-slate-700 block mb-2 text-xs">Firma de Autorización (NIP de Operador)</label>
+                            <input type="password" name="nip" placeholder="Ingrese su NIP" required class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3.5 outline-none focus:bg-white focus:ring-2 focus:ring-offset-1 transition-all text-center tracking-widest text-lg {% if origen == 'catopar' %}focus:border-[#2563eb] focus:ring-[#2563eb]/30{% else %}focus:border-[#059669] focus:ring-[#059669]/30{% endif %}">
+                        </div>
+                    </form>
                 </div>
 
-                <div>
-                    <label class="font-bold text-slate-700 block mb-1.5">Firma de Autorización (NIP de Operador)</label>
-                    <input type="password" name="nip" placeholder="Ingrese su NIP" required class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 transition-colors">
+                <div class="p-6 sm:px-8 border-t border-slate-100 bg-slate-50 flex space-x-3 shrink-0 rounded-b-[2rem]">
+                    <button type="button" onclick="document.getElementById('modal-solicitud').classList.add('hidden')" class="w-1/3 bg-white border border-slate-300 text-slate-600 font-bold py-3.5 rounded-xl hover:bg-slate-100 transition-colors shadow-sm">Cancelar</button>
+                    <!-- Atributo form vincula el botón al formulario de arriba -->
+                    <button type="submit" form="form-materiales" class="w-2/3 text-white font-bold py-3.5 rounded-xl shadow-md transition-colors flex justify-center items-center gap-2 {% if origen == 'catopar' %}bg-[#2563eb] hover:bg-[#1d4ed8]{% else %}bg-[#059669] hover:bg-[#047857]{% endif %}">
+                        Enviar Pedido <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    </button>
                 </div>
-
-                <div class="pt-4 flex space-x-3 border-t border-slate-100 mt-2">
-                    <button type="button" onclick="document.getElementById('modal-solicitud').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
-                    <button type="submit" class="flex-1 bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-700 transition-colors shadow-md">Enviar al Almacén</button>
-                </div>
-            </form>
+                
+            </div>
         </div>
     </div>
 
@@ -262,7 +280,6 @@
 {% block scripts %}
 <script>
     function abrirModalNuevo() {
-        // Modo Nuevo Pedido: Vaciamos el ID y limpiamos casillas
         document.getElementById('id_solicitud_editar').value = "";
         document.getElementById('modal-titulo').innerText = "Solicitud de Materiales Habituales";
         
@@ -273,59 +290,46 @@
     }
 
     async function abrirModalEdicion(idSolicitud) {
-        // Modo Edición: Ponemos el ID oculto y cambiamos título
         document.getElementById('id_solicitud_editar').value = idSolicitud;
         document.getElementById('modal-titulo').innerText = "Corregir Solicitud #SOL-00" + idSolicitud;
         
-        // Limpiamos las casillas por si había algo escrito antes
         document.querySelectorAll('input[type="number"]').forEach(input => input.value = "");
         document.querySelectorAll('input[type="checkbox"]').forEach(check => check.checked = false);
 
         try {
-            // 🌟 MAGIA AJAX: Vamos a Python a pedir los detalles del ticket
             let respuesta = await fetch(`/piso/chrysopa/materiales/detalle/${idSolicitud}`);
             let materiales = await respuesta.json();
 
-            // Python nos devolverá algo como: [{"id_material": 1, "cantidad": 5}, ...]
-            // Recorremos los datos y llenamos los checkboxes y los inputs
             materiales.forEach(mat => {
                 let checkbox = document.querySelector(`input[name="material_${mat.id_material}"]`);
                 let inputCant = document.querySelector(`input[name="cant_${mat.id_material}"]`);
                 
                 if (checkbox && inputCant) {
-                    checkbox.checked = true;       // Marcamos la palomita
-                    inputCant.value = mat.cantidad; // Escribimos el número que había pedido
+                    checkbox.checked = true;       
+                    inputCant.value = mat.cantidad; 
                 }
             });
         } catch (error) {
             console.error("Error al cargar los detalles:", error);
         }
         
-        // Finalmente, mostramos el modal ya rellenado
         document.getElementById('modal-solicitud').classList.remove('hidden');
     }
 
-    // =======================================================================
-    // NUEVO SCRIPT: Auto-rellenar cantidad en "1" al marcar el checkbox
-    // =======================================================================
     document.addEventListener('DOMContentLoaded', () => {
-        // Vigila todos los checkboxes que su name empiece con "material_"
         const checkboxes = document.querySelectorAll('input[type="checkbox"][name^="material_"]');
         
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', function() {
-                // Obtenemos el número del material (ej. extrae el "1" de "material_1")
                 const matId = this.name.split('_')[1]; 
                 const inputCantidad = document.querySelector(`input[name="cant_${matId}"]`);
 
                 if (inputCantidad) {
                     if (this.checked) {
-                        // Si se marca y está vacío o en 0, ponemos 1 por defecto
                         if (!inputCantidad.value || inputCantidad.value == 0) {
                             inputCantidad.value = 1;
                         }
                     } else {
-                        // Si se desmarca, limpiamos la cantidad
                         inputCantidad.value = "";
                     }
                 }

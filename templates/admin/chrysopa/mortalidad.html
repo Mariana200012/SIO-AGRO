@@ -54,10 +54,10 @@
                 </div>
             </div>
 
-            <!-- Tarjetas de Identificadores y KPIs reordenadas -->
+            <!-- Tarjetas de Identificadores y KPIs -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
-                <!-- Tarjeta 1: Semana de Lote (Fondo Esmeralda Original) -->
+                <!-- Tarjeta 1: Semana de Lote -->
                 <div class="bg-gradient-to-br from-emerald-800 to-emerald-950 p-6 rounded-3xl shadow-lg shadow-emerald-900/20 relative overflow-hidden flex flex-col justify-between">
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                     <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl"></div>
@@ -100,26 +100,27 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta 3: Tasa de Supervivencia (Cambia de color) -->
+                <!-- Tarjeta 3: Tasa de Mortalidad (Promedio de bajas) -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between group">
-                    <div id="blobSupervivencia" class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full transition-colors duration-500"></div>
+                    <div id="blobPromedio" class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full transition-colors duration-500"></div>
                     
                     <div class="relative z-10 flex justify-between items-start">
                         <div>
-                            <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Tasa Supervivencia</h3>
-                            <span class="text-[10px] text-slate-400 font-medium mt-1 block">Efectividad global del lote</span>
+                            <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Promedio de Bajas</h3>
+                            <span class="text-[10px] text-slate-400 font-medium mt-1 block">Límite tolerable: 15.0</span>
                         </div>
-                        <div id="iconBoxSupervivencia" class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center transition-colors duration-500">
+                        <div id="iconBoxPromedio" class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center transition-colors duration-500">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                         </div>
                     </div>
                     <div class="relative z-10 mt-6 flex items-end gap-1">
-                        <p id="valSupervivencia" class="text-5xl font-black text-slate-800 tracking-tight transition-colors duration-500">95.8</p>
-                        <span id="symbolSupervivencia" class="text-2xl font-bold text-slate-600 mb-1 transition-colors duration-500">%</span>
+                        <!-- VALOR GLOBAL INYECTADO DESDE PYTHON -->
+                        <p id="valPromedio" class="text-5xl font-black text-slate-800 tracking-tight transition-colors duration-500" data-global="{{ promedio_global }}">{{ promedio_global }}</p>
+                        <span id="symbolPromedio" class="text-2xl font-bold text-slate-600 mb-1 transition-colors duration-500">uds</span>
                     </div>
                     <div class="relative z-10 mt-2 flex items-center gap-2">
-                        <div id="dotSupervivencia" class="w-2 h-2 rounded-full bg-emerald-500 transition-colors duration-500"></div>
-                        <span id="subSupervivencia" class="text-xs text-slate-500 font-medium">Promedio global general</span>
+                        <div id="dotPromedio" class="w-2 h-2 rounded-full bg-emerald-500 transition-colors duration-500"></div>
+                        <span id="subPromedio" class="text-xs text-slate-500 font-medium">Promedio global general</span>
                     </div>
                 </div>
             </div>
@@ -145,118 +146,35 @@
                                 <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Bote #4</th>
                                 <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Bote #5</th>
                                 <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Bote #6</th>
-                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] bg-slate-50">% Supervivencia</th>
+                                <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] bg-slate-50">Promedio Bajas</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white" id="lotesTableBody">
                             
-                            <!-- LOTE 102 - SEMANA 1 -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-102" data-semana="1" data-fecha="2026-07-15" data-total="2" data-supervivencia="98.2">
+                            <!-- CICLO JINJA2 CONECTADO A BD -->
+                            {% for reg in historial %}
+                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="{{ reg.lote }}" data-semana="{{ reg.semana }}" data-fecha="{{ reg.fecha_iso }}" data-promedio="{{ reg.promedio }}">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-102</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">15/Jul/2026 - 09:15 AM</div>
+                                    <div class="font-bold text-slate-800 text-sm">{{ reg.lote }}</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">{{ reg.fecha_str }}</div>
                                 </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 1</span></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">0</div></td>
+                                <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem {{ reg.semana }}</span></td>
+                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">{{ reg.r1 }}</div></td>
+                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">{{ reg.r2 }}</div></td>
+                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">{{ reg.r3 }}</div></td>
+                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">{{ reg.r4 }}</div></td>
+                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">{{ reg.r5 }}</div></td>
+                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">{{ reg.r6 }}</div></td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">98.2%</span>
+                                    <!-- En mortalidad, un promedio BAJO es bueno (Verde) y ALTO es malo (Naranja) -->
+                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black {% if reg.promedio <= 15.0 %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">{{ reg.promedio }}</span>
                                 </td>
                             </tr>
-                            
-                            <!-- LOTE 102 - SEMANA 2 -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors bg-slate-50/30" data-lote="CHR-LOTE-102" data-semana="2" data-fecha="2026-07-22" data-total="5" data-supervivencia="95.8">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-102</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">22/Jul/2026 - 10:30 AM</div>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 2</span></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">2</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">95.8%</span>
-                                </td>
+                            {% else %}
+                            <tr>
+                                <td colspan="9" class="px-6 py-8 text-center text-slate-500 font-medium">Aún no hay registros de mortalidad en la base de datos.</td>
                             </tr>
-
-                            <!-- LOTE 101 - SEMANA 1 -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-101" data-semana="1" data-fecha="2026-07-14" data-total="1" data-supervivencia="99.1">
-                                <td class="px-6 py-4 whitespace-nowrap border-t-2 border-slate-100">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-101</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">14/Jul/2026 - 11:00 AM</div>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 1</span></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50 border-t-2 border-slate-100">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">99.1%</span>
-                                </td>
-                            </tr>
-                            
-                            <!-- LOTE 101 - SEMANA 2 -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors bg-slate-50/30" data-lote="CHR-LOTE-101" data-semana="2" data-fecha="2026-07-21" data-total="2" data-supervivencia="98.2">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-101</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">21/Jul/2026 - 12:45 PM</div>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 2</span></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">98.2%</span>
-                                </td>
-                            </tr>
-
-                            <!-- LOTE 100 - SEMANA 1 (Ejemplo Alerta, > 9 bajas = amber) -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-100" data-semana="1" data-fecha="2026-07-07" data-total="4" data-supervivencia="96.5">
-                                <td class="px-6 py-4 whitespace-nowrap border-t-2 border-slate-100">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-100</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">07/Jul/2026 - 08:30 AM</div>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 1</span></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center border-t-2 border-slate-100"><div class="text-slate-800 font-bold text-sm">0</div></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50 border-t-2 border-slate-100">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">96.5%</span>
-                                </td>
-                            </tr>
-
-                            <!-- LOTE 100 - SEMANA 2 (Alerta por total acumulado > 9 bajas, Supervivencia baja) -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors bg-slate-50/30" data-lote="CHR-LOTE-100" data-semana="2" data-fecha="2026-07-14" data-total="10" data-supervivencia="90.5">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-100</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">14/Jul/2026 - 02:20 PM</div>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 2</span></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">2</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">2</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">2</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">1</div></td>
-                                <td class="px-4 py-4 whitespace-nowrap text-center"><div class="text-slate-800 font-bold text-sm">2</div></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-800">90.5%</span>
-                                </td>
-                            </tr>
+                            {% endfor %}
 
                         </tbody>
                     </table>
@@ -280,29 +198,31 @@
         const valLote = document.getElementById('valLote');
         const subLote = document.getElementById('subLote');
         
-        const valSupervivencia = document.getElementById('valSupervivencia');
-        const symbolSupervivencia = document.getElementById('symbolSupervivencia');
-        const subSupervivencia = document.getElementById('subSupervivencia');
-        const blobSupervivencia = document.getElementById('blobSupervivencia');
-        const iconBoxSupervivencia = document.getElementById('iconBoxSupervivencia');
-        const dotSupervivencia = document.getElementById('dotSupervivencia');
+        const valPromedio = document.getElementById('valPromedio');
+        const symbolPromedio = document.getElementById('symbolPromedio');
+        const subPromedio = document.getElementById('subPromedio');
+        const blobPromedio = document.getElementById('blobPromedio');
+        const iconBoxPromedio = document.getElementById('iconBoxPromedio');
+        const dotPromedio = document.getElementById('dotPromedio');
+        
+        const promedioGlobalOriginal = valPromedio.getAttribute('data-global');
 
-        // Función para cambiar colores (Alerta si el total de bajas es > 9)
+        // Función para cambiar colores (Alerta si el promedio de bajas es > 15)
         function updateCardColors(isAlert) {
             const allClasses = ['bg-emerald-50', 'bg-amber-50', 'text-emerald-600', 'text-amber-600', 'text-slate-800', 'text-amber-700', 'text-slate-600', 'bg-slate-300', 'bg-emerald-500', 'bg-amber-500'];
 
             if (isAlert) {
-                blobSupervivencia.classList.remove(...allClasses); blobSupervivencia.classList.add('bg-amber-50');
-                iconBoxSupervivencia.classList.remove(...allClasses); iconBoxSupervivencia.classList.add('bg-amber-50', 'text-amber-600');
-                valSupervivencia.classList.remove(...allClasses); valSupervivencia.classList.add('text-amber-700');
-                symbolSupervivencia.classList.remove(...allClasses); symbolSupervivencia.classList.add('text-amber-700');
-                dotSupervivencia.classList.remove(...allClasses); dotSupervivencia.classList.add('bg-amber-500');
+                blobPromedio.classList.remove(...allClasses); blobPromedio.classList.add('bg-amber-50');
+                iconBoxPromedio.classList.remove(...allClasses); iconBoxPromedio.classList.add('bg-amber-50', 'text-amber-600');
+                valPromedio.classList.remove(...allClasses); valPromedio.classList.add('text-amber-700');
+                symbolPromedio.classList.remove(...allClasses); symbolPromedio.classList.add('text-amber-700');
+                dotPromedio.classList.remove(...allClasses); dotPromedio.classList.add('bg-amber-500');
             } else {
-                blobSupervivencia.classList.remove(...allClasses); blobSupervivencia.classList.add('bg-emerald-50');
-                iconBoxSupervivencia.classList.remove(...allClasses); iconBoxSupervivencia.classList.add('bg-emerald-50', 'text-emerald-600');
-                valSupervivencia.classList.remove(...allClasses); valSupervivencia.classList.add('text-slate-800');
-                symbolSupervivencia.classList.remove(...allClasses); symbolSupervivencia.classList.add('text-slate-600');
-                dotSupervivencia.classList.remove(...allClasses); dotSupervivencia.classList.add('bg-emerald-500');
+                blobPromedio.classList.remove(...allClasses); blobPromedio.classList.add('bg-emerald-50');
+                iconBoxPromedio.classList.remove(...allClasses); iconBoxPromedio.classList.add('bg-emerald-50', 'text-emerald-600');
+                valPromedio.classList.remove(...allClasses); valPromedio.classList.add('text-slate-800');
+                symbolPromedio.classList.remove(...allClasses); symbolPromedio.classList.add('text-slate-600');
+                dotPromedio.classList.remove(...allClasses); dotPromedio.classList.add('bg-emerald-500');
             }
         }
 
@@ -318,8 +238,7 @@
                 // Extraer datos
                 const semana = row.getAttribute('data-semana');
                 const lote = row.getAttribute('data-lote');
-                const totalBajas = parseInt(row.getAttribute('data-total'));
-                const supervivencia = parseFloat(row.getAttribute('data-supervivencia'));
+                const promedio = parseFloat(row.getAttribute('data-promedio'));
 
                 // Actualizar Textos
                 valSemana.innerText = "Semana " + semana;
@@ -332,15 +251,15 @@
                 valLote.classList.add('text-2xl');
                 subLote.innerText = "Identificador de registro";
 
-                valSupervivencia.innerText = supervivencia.toFixed(1);
+                valPromedio.innerText = promedio.toFixed(1);
 
-                // Lógica de Alerta (más de 9 bajas en total)
-                if(totalBajas > 9) {
+                // Lógica de Alerta (más de 15 bajas en promedio es malo)
+                if(promedio > 15.0) {
                     updateCardColors(true);
-                    subSupervivencia.innerText = "⚠️ Límite de bajas excedido (> 9)";
+                    subPromedio.innerText = "⚠️ Límite de bajas excedido (> 15)";
                 } else {
                     updateCardColors(false);
-                    subSupervivencia.innerText = "Cumple estándar de calidad";
+                    subPromedio.innerText = "Mortalidad dentro de lo esperado";
                 }
 
                 btnResetCards.classList.remove('hidden');
@@ -364,10 +283,16 @@
             valLote.classList.add('text-3xl');
             subLote.innerText = "Lote correspondiente";
             
-            valSupervivencia.innerText = "95.8";
-            subSupervivencia.innerText = "Promedio global general";
+            valPromedio.innerText = promedioGlobalOriginal;
+            subPromedio.innerText = "Promedio global general";
             
-            updateCardColors(false);
+            // Evaluamos el color para el promedio global
+            if(parseFloat(promedioGlobalOriginal) > 15.0) {
+                updateCardColors(true);
+            } else {
+                updateCardColors(false);
+            }
+            
             btnResetCards.classList.add('hidden');
         });
 
@@ -403,6 +328,4 @@
         });
 
     </script>
-</body>
-</html>
 {% endblock %}

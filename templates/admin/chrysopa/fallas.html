@@ -53,10 +53,10 @@
                 </div>
             </div>
 
-            <!-- Tarjetas de Identificadores y KPIs reordenadas -->
+            <!-- Tarjetas de Identificadores y KPIs -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 
-                <!-- Tarjeta 1: Semana de Lote (Fondo Esmeralda Original) -->
+                <!-- Tarjeta 1: Semana de Producción -->
                 <div class="bg-gradient-to-br from-emerald-800 to-emerald-950 p-6 rounded-3xl shadow-lg shadow-emerald-900/20 relative overflow-hidden flex flex-col justify-between">
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
                     <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-emerald-400/20 rounded-full blur-2xl"></div>
@@ -99,21 +99,21 @@
                     </div>
                 </div>
 
-                <!-- Tarjeta 3: Porcentaje de Fallas (Cambia de color > 3.0%) -->
+                <!-- Tarjeta 3: Porcentaje de Fallas -->
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between group">
                     <div id="blobFalla" class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full transition-colors duration-500"></div>
                     
                     <div class="relative z-10 flex justify-between items-start">
                         <div>
                             <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Tasa de Falla</h3>
-                            <span class="text-[10px] text-slate-400 font-medium mt-1 block">Límite operativo: 3.0%</span>
+                            <span class="text-[10px] text-slate-400 font-medium mt-1 block">Límite operativo: 10.0%</span>
                         </div>
                         <div id="iconBoxFalla" class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center transition-colors duration-500">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                         </div>
                     </div>
                     <div class="relative z-10 mt-6 flex items-end gap-1">
-                        <p id="valFalla" class="text-5xl font-black text-slate-800 tracking-tight transition-colors duration-500">2.8</p>
+                        <p id="valFalla" class="text-5xl font-black text-slate-800 tracking-tight transition-colors duration-500" data-global="{{ promedio_global }}">{{ promedio_global }}</p>
                         <span id="symbolFalla" class="text-2xl font-bold text-slate-600 mb-1 transition-colors duration-500">%</span>
                     </div>
                     <div class="relative z-10 mt-2 flex items-center gap-2">
@@ -123,7 +123,7 @@
                 </div>
             </div>
 
-            <!-- Historial de Fallas de Pupación (6 Rejillas) -->
+            <!-- Historial de Fallas de Pupación -->
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
                     <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
@@ -150,97 +150,31 @@
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white" id="lotesTableBody">
                             
-                            <!-- Se agregó data-semana y data-porcentaje -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-104" data-semana="30" data-fecha="2026-07-23" data-porcentaje="2.0">
+                            <!-- BUCLE JINJA2 PARA IMPRIMIR LA BD -->
+                            {% for reg in historial %}
+                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="{{ reg.lote }}" data-semana="{{ reg.semana }}" data-fecha="{{ reg.fecha_iso }}" data-porcentaje="{{ reg.promedio }}">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-104</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">23/Jul/2026 - 10:15 AM</div>
+                                    <div class="font-bold text-slate-800 text-sm">{{ reg.lote }}</div>
+                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">{{ reg.fecha_str }}</div>
                                 </td>
-                                <td class="px-3 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 30</span></td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
+                                <td class="px-3 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem {{ reg.semana }}</span></td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">{{ reg.r1 }}</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">{{ reg.r2 }}</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">{{ reg.r3 }}</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">{{ reg.r4 }}</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">{{ reg.r5 }}</td>
+                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">{{ reg.r6 }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">2.0%</span>
+                                    <!-- Si el porcentaje de falla es menor o igual a 10.0%, se marca verde, de lo contrario naranja -->
+                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black {% if reg.promedio <= 10.0 %}bg-emerald-100 text-emerald-800{% else %}bg-amber-100 text-amber-800{% endif %}">{{ reg.promedio }}%</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">Juan Pérez <span class="text-slate-400 text-[10px] ml-1">(OP-04)</span></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">{{ reg.operador }}</td>
                             </tr>
-
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-103" data-semana="29" data-fecha="2026-07-22" data-porcentaje="2.8">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-103</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">22/Jul/2026 - 03:00 PM</div>
-                                </td>
-                                <td class="px-3 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 29</span></td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">3</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">4</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">3</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">3</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">2.8%</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">María López <span class="text-slate-400 text-[10px] ml-1">(OP-02)</span></td>
+                            {% else %}
+                            <tr>
+                                <td colspan="10" class="px-6 py-8 text-center text-slate-500 font-medium">Aún no hay registros de fallas en la base de datos.</td>
                             </tr>
-
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-102" data-semana="29" data-fecha="2026-07-21" data-porcentaje="1.8">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-102</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">21/Jul/2026 - 03:20 PM</div>
-                                </td>
-                                <td class="px-3 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 29</span></td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">1</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">3</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">1</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">1.8%</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">Carlos Ruiz <span class="text-slate-400 text-[10px] ml-1">(OP-01)</span></td>
-                            </tr>
-                            
-                            <!-- Lote que excede el parámetro de 3.0% -->
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-095" data-semana="28" data-fecha="2026-07-15" data-porcentaje="4.3">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-095</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">15/Jul/2026 - 02:45 PM</div>
-                                </td>
-                                <td class="px-3 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 28</span></td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">4</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">5</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">4</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">4</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">5</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">4</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-amber-100 text-amber-800">4.3%</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">María López <span class="text-slate-400 text-[10px] ml-1">(OP-02)</span></td>
-                            </tr>
-                            
-                            <tr class="data-row hover:bg-slate-50 cursor-pointer transition-colors" data-lote="CHR-LOTE-090" data-semana="28" data-fecha="2026-07-10" data-porcentaje="2.3">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-bold text-slate-800 text-sm">CHR-LOTE-090</div>
-                                    <div class="text-[11px] text-slate-400 font-medium mt-0.5">10/Jul/2026 - 01:20 PM</div>
-                                </td>
-                                <td class="px-3 py-4 whitespace-nowrap text-center"><span class="text-xs font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">Sem 28</span></td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">3</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">3</td>
-                                <td class="px-3 py-4 text-center text-slate-800 font-bold text-sm">2</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center bg-slate-50/50">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-black bg-emerald-100 text-emerald-800">2.3%</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-slate-600 text-xs font-medium">Juan Pérez <span class="text-slate-400 text-[10px] ml-1">(OP-04)</span></td>
-                            </tr>
+                            {% endfor %}
 
                         </tbody>
                     </table>
@@ -249,9 +183,9 @@
 
         </div>
     </main>
-    {% endblock %}
+{% endblock %}
 
-    {% block scripts %}
+{% block scripts %}
     <!-- Funciones Javascript -->
     <script>
         const rows = document.querySelectorAll('.data-row');
@@ -270,8 +204,10 @@
         const blobFalla = document.getElementById('blobFalla');
         const iconBoxFalla = document.getElementById('iconBoxFalla');
         const dotFalla = document.getElementById('dotFalla');
+        
+        const promedioGlobalOriginal = valFalla.getAttribute('data-global');
 
-        // Función para cambiar colores (Límite operativo > 3.0%)
+        // Función para cambiar colores (Alerta si falla > 10.0%)
         function updateCardColors(isAlert) {
             const allClasses = ['bg-emerald-50', 'bg-amber-50', 'text-emerald-600', 'text-amber-600', 'text-slate-800', 'text-amber-700', 'text-slate-600', 'bg-slate-300', 'bg-emerald-500', 'bg-amber-500'];
 
@@ -317,13 +253,13 @@
 
                 valFalla.innerText = porcentaje.toFixed(1);
 
-                // Lógica de porcentaje > 3.0%
-                if(porcentaje > 3.0) {
+                // Lógica de porcentaje > 10.0%
+                if(porcentaje > 10.0) {
                     updateCardColors(true);
-                    subFalla.innerText = "⚠️ Límite de fallas superado (> 3.0%)";
+                    subFalla.innerText = "⚠️ Límite de fallas superado (> 10.0%)";
                 } else {
                     updateCardColors(false);
-                    subFalla.innerText = "Dentro del parámetro aceptable (≤ 3.0%)";
+                    subFalla.innerText = "Dentro del parámetro aceptable (≤ 10.0%)";
                 }
 
                 btnResetCards.classList.remove('hidden');
@@ -347,10 +283,16 @@
             valLote.classList.add('text-3xl');
             subLote.innerText = "Lote correspondiente";
             
-            valFalla.innerText = "2.8";
+            valFalla.innerText = promedioGlobalOriginal;
             subFalla.innerText = "Porcentaje global general";
             
-            updateCardColors(false);
+            // Evaluamos el color para el promedio global
+            if(parseFloat(promedioGlobalOriginal) > 10.0) {
+                updateCardColors(true);
+            } else {
+                updateCardColors(false);
+            }
+            
             btnResetCards.classList.add('hidden');
         });
 

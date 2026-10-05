@@ -1,138 +1,119 @@
 {% extends "empaque/base_empaque.html" %}
 
-{% block title %}Panel de Empaque - Koppert{% endblock %}
+{% block title %}Dashboard Huevo - Empaque Koppert{% endblock %}
 
 {% block navbar_menu %}
-<div class="flex space-x-1 items-center">
-    <!-- PESTAÑA 1: ACTIVA -->
-    <a href="{{ url_for('empaque.dashboard_empaque') }}" class="px-4 py-2 rounded-xl text-xs font-bold bg-teal-600 text-white shadow-sm whitespace-nowrap">Registro de Lotes</a>
-    
-    <!-- Pestaña 2: Inactiva -->
-    <a href="{{ url_for('empaque.inventario') }}" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-teal-900 text-teal-100 hover:text-white transition-colors whitespace-nowrap">Semáforo de Inventario</a>
-    
-    <!-- Pestaña 3: Inactiva -->
-    <a href="#" class="px-3 py-2 rounded-md text-xs font-semibold hover:bg-teal-900 text-teal-100 hover:text-white transition-colors whitespace-nowrap">Mermas y Daños</a>
+<div class="flex items-center gap-1.5 p-1.5 bg-slate-900/60 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
+    <a href="{{ url_for('empaque.dashboard_empaque') }}" class="px-4 py-1.5 rounded-full text-xs font-bold text-white bg-cyan-600 shadow-md border border-cyan-500/30 whitespace-nowrap">Dashboard</a>
+    <a href="{{ url_for('empaque.inventario_empaque') }}" class="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Entradas / Salidas</a>
+    <a href="{{ url_for('empaque.historial_empaque') }}" class="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Historial</a>
 </div>
 {% endblock %}
 
 {% block content %}
-<!-- Encabezado y Botón de Registro -->
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-5 rounded-3xl shadow-sm border border-slate-200 gap-4">
-    <div>
-        <h1 class="text-xl font-black text-slate-800 tracking-tight">Gestión de Empaque <span class="text-teal-600 font-bold text-base">(Inventario)</span></h1>
-        <p class="text-xs text-slate-500 font-medium mt-1">Control de lotes procesados y semáforo de insumos.</p> 
-    </div>
-    <div class="flex items-center w-full md:w-auto">
-        <!-- ESTE BOTÓN ABRE EL MODAL DE REGISTRO -->
-        <button onclick="document.getElementById('modal-empaque').classList.remove('hidden')" class="bg-teal-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-teal-700 transition-all shadow-md flex items-center justify-center gap-2 whitespace-nowrap w-full md:w-auto">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Registrar Nuevo Empaque
-        </button>
-    </div>
-</div>
-
-<!-- KPIs / Semáforo (Cajas compactas) -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-    
-    <!-- Tarjeta 1: Producción del Día -->
-    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between">
-        <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-4">Lotes Empacados Hoy</h3>
-        <div class="flex items-end gap-2">
-            <p class="text-4xl font-black text-slate-800 tracking-tight">12</p>
-            <span class="text-[11px] text-slate-500 font-medium mb-1">lotes completados</span>
-        </div>
-    </div>
-
-    <!-- Tarjeta 2: Semáforo de Botes -->
-    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between border-l-4 border-l-emerald-500">
-        <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-4">Stock: Botes (500ml)</h3>
-        <div class="flex items-end gap-2">
-            <p class="text-4xl font-black text-slate-800 tracking-tight">4,500</p>
-            <span class="text-[11px] text-emerald-600 font-bold mb-1 bg-emerald-50 px-2 py-0.5 rounded">Óptimo</span>
-        </div>
-    </div>
-
-    <!-- Tarjeta 3: Semáforo de Tapas (Ejemplo Alerta) -->
-    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between border-l-4 border-l-amber-500">
-        <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-4">Stock: Tapas</h3>
-        <div class="flex items-end gap-2">
-            <p class="text-4xl font-black text-slate-800 tracking-tight">850</p>
-            <span class="text-[11px] text-amber-600 font-bold mb-1 bg-amber-50 px-2 py-0.5 rounded">Resurtir pronto</span>
-        </div>
-    </div>
-</div>
-
-<!-- Tabla Historial de Empaque -->
-<div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
-    <div class="bg-slate-50/50 px-5 py-4 border-b border-slate-100 flex justify-between items-center">
-        <h2 class="text-sm font-bold text-slate-800">Últimos Lotes Empacados</h2>
-        <span class="text-[10px] text-slate-500 font-mono bg-white px-3 py-1 rounded-lg border border-slate-200 shadow-sm">TABLA: EMP_LOTE</span>
-    </div>
-    
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-slate-100 text-sm">
-            <thead class="bg-white text-slate-500">
-                <tr>
-                    <th class="px-5 py-3 text-left font-extrabold uppercase tracking-wider text-[10px]">Lote Empaque</th>
-                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Producto</th>
-                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Cantidad</th>
-                    <th class="px-4 py-3 text-center font-extrabold uppercase tracking-wider text-[10px]">Fecha</th>
-                    <th class="px-5 py-3 text-left font-extrabold uppercase tracking-wider text-[10px]">Operador</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100 bg-white">
-                <!-- Fila de ejemplo estática por ahora -->
-                <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-5 py-3 whitespace-nowrap font-bold text-slate-800">EMP-2609-001</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center text-xs font-bold text-teal-700 bg-teal-50 rounded">Chrysopa</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center font-bold text-slate-800">150 Botes</td>
-                    <td class="px-4 py-3 whitespace-nowrap text-center text-[11px] text-slate-500">Hoy, 10:30 AM</td>
-                    <td class="px-5 py-3 whitespace-nowrap text-slate-600 text-xs font-medium">Dalila (OP-03)</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- ==========================================
-     MODAL DE REGISTRO 
-     ========================================== -->
-<div id="modal-empaque" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
-            <div>
-                <h3 class="font-black text-slate-800 text-lg">Registrar Empaque</h3>
-                <p class="text-[11px] text-slate-500 font-medium">Captura los datos del lote procesado.</p>
-            </div>
-            <button onclick="document.getElementById('modal-empaque').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
-        </div>
+<main class="flex-1 overflow-y-auto px-6 pt-4 pb-10 lg:px-10 bg-slate-50/50">
+    <div class="max-w-6xl mx-auto space-y-5 relative z-10 animate-fade-in-up">
         
-        <!-- Fíjate cómo la ruta apunta al backend -->
-        <form action="{{ url_for('empaque.registrar_empaque') }}" method="POST" class="space-y-4 text-sm">            
+        <!-- Encabezado Compacto y Sólido -->
+        <div class="bg-white border border-slate-200/70 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 backdrop-blur-xl">
             <div>
-                <label class="font-bold text-slate-700 block mb-1.5">Lote Origen (Producción)</label>
-                <input type="text" name="lote_origen" placeholder="Ej. CHR-LOTE-104" required class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors uppercase">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-50 border border-cyan-100 text-cyan-700 text-[10px] font-bold tracking-widest uppercase mb-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
+                    Área de Empaque
+                </div>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-1">Monitoreo de Caducidades</h1>
+                <p class="text-xs text-slate-500 font-medium">Resumen del stock actual y prioridades de uso.</p>
+            </div>
+        </div>
+
+        <!-- Tarjetas de Métricas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <!-- Stock Total -->
+            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-cyan-950 text-white p-6 rounded-3xl shadow-xl flex flex-col justify-between relative overflow-hidden ring-1 ring-white/10">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-cyan-500/20 blur-2xl rounded-full pointer-events-none"></div>
+                <h3 class="text-cyan-300 text-[10px] font-black uppercase tracking-widest relative z-10">Stock Total</h3>
+                <div class="mt-6 flex items-baseline gap-2 relative z-10">
+                    <p class="text-4xl font-black text-white tracking-tight">4,250</p>
+                    <span class="text-sm font-bold text-cyan-300">ml</span>
+                </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="font-bold text-slate-700 block mb-1.5">Producto</label>
-                    <select name="especie" class="w-full font-medium text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors">
-                        <option value="Chrysopa">Chrysopa</option>
-                        <option value="Catopar">Catopar</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="font-bold text-slate-700 block mb-1.5">Unidades (Botes)</label>
-                    <input type="number" name="cantidad" min="1" required class="w-full font-bold text-center text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 transition-colors">
+            <!-- Próximos a Caducar -->
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/70 flex flex-col justify-between">
+                <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Próximos a Caducar</h3>
+                <div class="mt-6 flex items-baseline gap-2">
+                    <p class="text-4xl font-black text-rose-600 tracking-tight">2</p>
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Fechas en Riesgo</span>
                 </div>
             </div>
 
-            <div class="pt-4 flex space-x-3 border-t border-slate-100 mt-2">
-                <button type="button" onclick="document.getElementById('modal-empaque').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-700 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors">Cancelar</button>
-                <button type="submit" class="flex-1 bg-teal-600 text-white font-bold py-3 rounded-xl hover:bg-teal-700 transition-colors shadow-md">Guardar Lote</button>
+            <!-- Huevo Fresco -->
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/70 flex flex-col justify-between">
+                <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Huevo Fresco</h3>
+                <div class="mt-6 flex items-baseline gap-2">
+                    <p class="text-4xl font-black text-slate-800 tracking-tight">4</p>
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Fechas Sanas</span>
+                </div>
             </div>
-        </form>
+        </div>
+
+        <!-- Sección FIFO / Prioridad de Uso -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/70 overflow-hidden">
+            <div class="bg-slate-50/80 px-7 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h2 class="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
+                    Prioridad de Uso Sugerida (FIFO por Fecha)
+                </h2>
+                <span class="text-[10px] text-slate-400 font-mono font-semibold uppercase tracking-widest bg-white border border-slate-100 px-2 py-1 rounded-md hidden sm:block">Control de Lotes</span>
+            </div>
+            
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Fecha Crítica -->
+                <div class="p-5 rounded-2xl border border-rose-200/80 bg-rose-50/40 flex justify-between items-center transition-all hover:bg-rose-50/70">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-slate-800 text-sm">Huevo del 27/Sep</span>
+                            <span class="px-2 py-0.5 rounded-md text-[9px] font-black bg-rose-100 text-rose-700 uppercase tracking-widest">Usar Ya</span>
+                        </div>
+                        <div class="text-xs font-bold text-rose-600 mt-1.5 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Caduca en: 12 hrs
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-black text-slate-800">350 <span class="text-xs font-bold text-slate-400">ml</span></p>
+                    </div>
+                </div>
+
+                <!-- Fecha Precaución -->
+                <div class="p-5 rounded-2xl border border-amber-200/80 bg-amber-50/40 flex justify-between items-center transition-all hover:bg-amber-50/70">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-slate-800 text-sm">Huevo del 28/Sep</span>
+                            <span class="px-2 py-0.5 rounded-md text-[9px] font-black bg-amber-100 text-amber-700 uppercase tracking-widest">Precaución</span>
+                        </div>
+                        <div class="text-xs font-bold text-amber-600 mt-1.5 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Caduca en: 2 días
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-black text-slate-800">500 <span class="text-xs font-bold text-slate-400">ml</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
-</div>
+</main>
+
+<style>
+    .animate-fade-in-up {
+        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 {% endblock %}
