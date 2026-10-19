@@ -3,16 +3,47 @@
 {% block title %}Dashboard Huevo - Empaque Koppert{% endblock %}
 
 {% block navbar_menu %}
-<div class="flex items-center gap-1.5 p-1.5 bg-slate-900/60 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
-    <a href="{{ url_for('empaque.dashboard_empaque') }}" class="px-4 py-1.5 rounded-full text-xs font-bold text-white bg-cyan-600 shadow-md border border-cyan-500/30 whitespace-nowrap">Dashboard</a>
-    <a href="{{ url_for('empaque.inventario_empaque') }}" class="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Entradas / Salidas</a>
-    <a href="{{ url_for('empaque.historial_empaque') }}" class="px-4 py-1.5 rounded-full text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Historial</a>
+<!-- Envoltura responsiva con scroll horizontal -->
+<div id="pillMenuContainer" class="w-full max-w-full overflow-x-auto hide-scroll flex justify-start sm:justify-center px-4 py-1">
+    
+    <!-- Cápsula contenedora elegante (diseño sobrio estandarizado) -->
+    <div class="inline-flex items-center gap-1 p-1 bg-slate-900/80 rounded-full border border-slate-700/60 backdrop-blur-md shadow-inner shadow-black/40 flex-nowrap min-w-max">
+        
+        <!-- BOTÓN ACTIVO (Dashboard - Cyan corporativo) -->
+        <a id="activePill" href="{{ url_for('empaque.dashboard_empaque') }}" 
+           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-black text-white bg-gradient-to-r from-cyan-600 to-cyan-500 shadow-[0_2px_12px_rgba(8,145,178,0.35)] border border-cyan-400/40 scale-[1.03] transition-all duration-200 cursor-default whitespace-nowrap">
+            Dashboard
+        </a>
+
+        <!-- BOTÓN INACTIVO (Entradas / Salidas) -->
+        <a href="{{ url_for('empaque.inventario_empaque') }}" 
+           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
+            Entradas / Salidas
+        </a>
+
+        <!-- BOTÓN INACTIVO (Historial) -->
+        <a href="{{ url_for('empaque.historial_empaque') }}" 
+           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
+            Historial
+        </a>
+
+    </div>
 </div>
+
+<!-- Script para centrar automáticamente en móviles -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const activePill = document.getElementById("activePill");
+        if (activePill && window.innerWidth < 640) {
+            activePill.scrollIntoView({ inline: "center", block: "nearest", behavior: "instant" });
+        }
+    });
+</script>
 {% endblock %}
 
 {% block content %}
 <main class="flex-1 overflow-y-auto px-6 pt-4 pb-10 lg:px-10 bg-slate-50/50">
-    <div class="max-w-6xl mx-auto space-y-5 relative z-10 animate-fade-in-up">
+    <div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
         
         <!-- Encabezado Compacto y Sólido -->
         <div class="bg-white border border-slate-200/70 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 backdrop-blur-xl">
@@ -33,7 +64,8 @@
                 <div class="absolute -right-10 -top-10 w-32 h-32 bg-cyan-500/20 blur-2xl rounded-full pointer-events-none"></div>
                 <h3 class="text-cyan-300 text-[10px] font-black uppercase tracking-widest relative z-10">Stock Total</h3>
                 <div class="mt-6 flex items-baseline gap-2 relative z-10">
-                    <p class="text-4xl font-black text-white tracking-tight">4,250</p>
+                    <!-- VARIABLE JINJA: stock_total -->
+                    <p class="text-4xl font-black text-white tracking-tight">{{ stock_total }}</p>
                     <span class="text-sm font-bold text-cyan-300">ml</span>
                 </div>
             </div>
@@ -42,7 +74,8 @@
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/70 flex flex-col justify-between">
                 <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Próximos a Caducar</h3>
                 <div class="mt-6 flex items-baseline gap-2">
-                    <p class="text-4xl font-black text-rose-600 tracking-tight">2</p>
+                    <!-- VARIABLE JINJA: fechas_riesgo -->
+                    <p class="text-4xl font-black text-rose-600 tracking-tight">{{ fechas_riesgo }}</p>
                     <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Fechas en Riesgo</span>
                 </div>
             </div>
@@ -51,7 +84,8 @@
             <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/70 flex flex-col justify-between">
                 <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Huevo Fresco</h3>
                 <div class="mt-6 flex items-baseline gap-2">
-                    <p class="text-4xl font-black text-slate-800 tracking-tight">4</p>
+                    <!-- VARIABLE JINJA: fechas_sanas -->
+                    <p class="text-4xl font-black text-slate-800 tracking-tight">{{ fechas_sanas }}</p>
                     <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Fechas Sanas</span>
                 </div>
             </div>
@@ -68,39 +102,47 @@
             </div>
             
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Fecha Crítica -->
-                <div class="p-5 rounded-2xl border border-rose-200/80 bg-rose-50/40 flex justify-between items-center transition-all hover:bg-rose-50/70">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-extrabold text-slate-800 text-sm">Huevo del 27/Sep</span>
-                            <span class="px-2 py-0.5 rounded-md text-[9px] font-black bg-rose-100 text-rose-700 uppercase tracking-widest">Usar Ya</span>
+                
+                <!-- INICIO DEL CICLO FOR PARA LOTES FIFO -->
+                {% if lotes_fifo %}
+                    {% for lote in lotes_fifo %}
+                        <!-- La tarjeta adapta su color (rojo o amarillo) dependiendo si está en riesgo -->
+                        <div class="p-5 rounded-2xl border flex justify-between items-center transition-all 
+                            {% if lote.estado == 'RIESGO' %} border-rose-200/80 bg-rose-50/40 hover:bg-rose-50/70 
+                            {% else %} border-amber-200/80 bg-amber-50/40 hover:bg-amber-50/70 {% endif %}">
+                            
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="font-extrabold text-slate-800 text-sm">Huevo del {{ lote.fecha_ingreso }}</span>
+                                    
+                                    {% if lote.estado == 'RIESGO' %}
+                                        <span class="px-2 py-0.5 rounded-md text-[9px] font-black bg-rose-100 text-rose-700 uppercase tracking-widest">Usar Ya</span>
+                                    {% else %}
+                                        <span class="px-2 py-0.5 rounded-md text-[9px] font-black bg-amber-100 text-amber-700 uppercase tracking-widest">Precaución</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="text-xs font-bold mt-1.5 flex items-center gap-1 
+                                    {% if lote.estado == 'RIESGO' %} text-rose-600 {% else %} text-amber-600 {% endif %}">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Caduca en: {{ lote.dias_restantes }} días
+                                </div>
+                            </div>
+                            
+                            <div class="text-right">
+                                <p class="text-2xl font-black text-slate-800">{{ lote.cantidad }} <span class="text-xs font-bold text-slate-400">ml</span></p>
+                            </div>
                         </div>
-                        <div class="text-xs font-bold text-rose-600 mt-1.5 flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Caduca en: 12 hrs
-                        </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- Mensaje si no hay huevo en inventario -->
+                    <div class="col-span-1 md:col-span-2 p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+                        <p class="text-slate-500 font-bold">No hay stock de huevo disponible en el cuarto frío.</p>
+                        <p class="text-xs text-slate-400 mt-1">Registra una entrada en la pestaña de Entradas / Salidas.</p>
                     </div>
-                    <div class="text-right">
-                        <p class="text-2xl font-black text-slate-800">350 <span class="text-xs font-bold text-slate-400">ml</span></p>
-                    </div>
-                </div>
+                {% endif %}
+                <!-- FIN DEL CICLO FOR -->
 
-                <!-- Fecha Precaución -->
-                <div class="p-5 rounded-2xl border border-amber-200/80 bg-amber-50/40 flex justify-between items-center transition-all hover:bg-amber-50/70">
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-extrabold text-slate-800 text-sm">Huevo del 28/Sep</span>
-                            <span class="px-2 py-0.5 rounded-md text-[9px] font-black bg-amber-100 text-amber-700 uppercase tracking-widest">Precaución</span>
-                        </div>
-                        <div class="text-xs font-bold text-amber-600 mt-1.5 flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Caduca en: 2 días
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-2xl font-black text-slate-800">500 <span class="text-xs font-bold text-slate-400">ml</span></p>
-                    </div>
-                </div>
             </div>
         </div>
 

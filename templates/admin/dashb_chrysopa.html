@@ -1,0 +1,160 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Dashboard Analítico - Koppert Biofactory{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-container { max-height: 400px; overflow-y: auto; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block navbar_menu %}
+<!-- Envoltura responsiva con scroll horizontal -->
+<div id="pillMenuContainer" class="w-full max-w-full overflow-x-auto hide-scroll flex justify-start sm:justify-center px-4 py-1">
+    
+    <!-- Cápsula contenedora -->
+    <div class="inline-flex items-center gap-1 p-1 bg-slate-900/80 rounded-full border border-slate-700/60 backdrop-blur-md shadow-inner shadow-black/40 flex-nowrap min-w-max">
+        
+        <!-- BOTÓN ACTIVO (Chrysopa) -->
+        <a id="activePill" href="{{ url_for('admin.dashb_chrysopa') }}" 
+           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-black text-white bg-gradient-to-r from-amber-600 to-amber-500 shadow-[0_2px_12px_rgba(245,158,11,0.35)] border border-amber-400/40 scale-[1.03] transition-all duration-200 cursor-default whitespace-nowrap">
+            Chrysopa
+        </a>
+
+        <!-- BOTÓN INACTIVO (Catopar) -->
+        <a href="{{ url_for('admin.dashb_catopar') }}" 
+           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
+            Catopar
+        </a>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
+    
+    <!-- Encabezado Principal y Buscador -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Panel General de Operaciones <span class="text-amber-600 font-bold text-lg bg-amber-50 px-2 py-0.5 rounded-lg ml-1">(Chrysopa)</span></h1>
+            <p class="text-xs text-slate-500 font-medium mt-1">Monitoreo de rendimiento y estado de lotes organizados por semana de inicio.</p>
+        </div>
+        <div class="flex items-center space-x-3 w-full md:w-auto">
+            <select class="border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-amber-500 bg-slate-50 font-bold transition-all hover:border-amber-300 cursor-pointer">
+                <option value="30">Semana 30 (Actual)</option>
+                <option value="29">Semana 29</option>
+            </select>
+            <button class="bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-900 transition-all shadow-md flex items-center justify-center gap-2">
+                Consultar
+            </button>
+        </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 border-t-4 border-t-blue-500 relative overflow-hidden flex flex-col justify-between group">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-blue-50 rounded-full transition-colors duration-500"></div>
+            <div class="relative z-10 flex justify-between items-start">
+                <div>
+                    <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">En Proceso</h3>
+                    <span class="text-[10px] text-slate-400 font-medium mt-1 block">Lotes activos</span>
+                </div>
+                <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                </div>
+            </div>
+            <div class="relative z-10 mt-6 flex items-end justify-between">
+                <p class="text-3xl font-black text-slate-800 tracking-tight">8</p>
+                <span class="text-[10px] font-extrabold text-blue-800 bg-blue-100 px-3 py-1 rounded-md border border-blue-200">🔵 Activos</span>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 border-t-4 border-t-emerald-500 relative overflow-hidden flex flex-col justify-between group">
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full transition-colors duration-500"></div>
+            <div class="relative z-10 flex justify-between items-start">
+                <div>
+                    <h3 class="text-slate-500 text-xs font-bold uppercase tracking-widest">Finalizados</h3>
+                    <span class="text-[10px] text-slate-400 font-medium mt-1 block">Lotes concluidos</span>
+                </div>
+                <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+            </div>
+            <div class="relative z-10 mt-6 flex items-end justify-between">
+                <p class="text-3xl font-black text-slate-800 tracking-tight">14</p>
+                <span class="text-[10px] font-extrabold text-emerald-800 bg-emerald-100 px-3 py-1 rounded-md border border-emerald-200">🟢 Concluidos</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficas de Análisis Visual -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <div class="w-2 h-4 bg-emerald-500 rounded-full"></div>
+                    Eficiencia Global por Módulo (%)
+                </h2>
+            </div>
+            <div class="relative h-72 w-full">
+                <canvas id="efficiencyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3">
+                <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <div class="w-2 h-4 bg-amber-500 rounded-full"></div>
+                    Incidencias Semanales
+                </h2>
+            </div>
+            <div class="relative h-72 w-full flex items-center justify-center">
+                <canvas id="incidentsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.color = '#64748b'; 
+
+    const ctxEfficiency = document.getElementById('efficiencyChart').getContext('2d');
+    new Chart(ctxEfficiency, {
+        type: 'line',
+        data: {
+            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+            datasets: [{
+                label: 'Ocupación (%)',
+                data: [85, 86, 88, 87, 89, 87.3],
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    const ctxIncidents = document.getElementById('incidentsChart').getContext('2d');
+    new Chart(ctxIncidents, {
+        type: 'bar',
+        data: {
+            labels: ['Ocupación Baja', 'Fallas Pupación', 'No Eclosionados', 'Bajas'],
+            datasets: [{
+                label: 'Registros',
+                data: [4, 18, 12, 12],
+                backgroundColor: ['#3b82f6', '#f59e0b', '#10b981', '#ef4444'],
+                borderRadius: 6
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+</script>
+{% endblock %}

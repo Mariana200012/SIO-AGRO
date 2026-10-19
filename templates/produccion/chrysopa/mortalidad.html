@@ -15,16 +15,16 @@
     .table-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
     
     input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button { 
-        -webkit-appearance: none; 
-        margin: 0; 
-    }
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
+
+    .modal-scroll::-webkit-scrollbar { width: 6px; }
+    .modal-scroll::-webkit-scrollbar-track { background: transparent; }
+    .modal-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
 </style>
 {% endblock %}
 
 {% block navbar_menu %}
-<!-- Contenedor tipo cápsula -->
 <div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
     <a href="{{ url_for('prod_chrysopa.ocupacion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Ocupación</a>
     <a href="{{ url_for('prod_chrysopa.pupacion') }}" class="px-3 sm:px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">Pupación</a>
@@ -37,9 +37,8 @@
 
 {% block content %}
     <main class="flex-1 overflow-y-auto px-6 pt-4 pb-10 lg:px-10 bg-slate-50">
-        <div class="max-w-[1200px] mx-auto space-y-5">
+        <div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
             
-            <!-- Encabezado (Sólido) -->
             <div class="bg-white border border-slate-200 p-5 md:p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-widest uppercase mb-1 border border-emerald-100/50">
@@ -47,79 +46,56 @@
                         Módulo Chrysopa
                     </div>
                     <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-1">Registro de Mortalidad</h1>
-                    <p class="text-xs text-slate-500 font-medium">Ingrese el conteo directo de insectos muertos por cada uno de los 6 botes de la muestra.</p>
+                    <p class="text-xs text-slate-500 font-medium">Capture la revisión de botes. El sistema detectará automáticamente si es la primera o segunda revisión del lote.</p>
                 </div>
-                <button onclick="abrirCapturaMortalidad()" class="bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold py-3 px-6 rounded-xl transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap">
+                <button onclick="abrirModalIdentificar()" class="bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold py-3 px-6 rounded-xl transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap">
                     <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
                     Nuevo Registro
                 </button>
             </div>
 
-            <!-- Sección Media (Último Lote + Desglose) -->
             {% if ultimo %}
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                
-                <!-- Tarjeta: Último Lote Procesado -->
-                <div class="lg:col-span-4 bg-[#064e3b] text-white p-7 rounded-3xl shadow-md flex flex-col justify-between relative overflow-hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5" id="panel-visor">
+                <!-- CUADRO VERDE CON LA ETIQUETA COMPLETA DE REVISIÓN Y SEMANA -->
+                <div class="lg:col-span-4 bg-[#064e3b] text-white p-7 rounded-3xl shadow-md flex flex-col justify-between relative overflow-hidden transition-colors" id="panel-bg-color">
                     <div class="relative z-10">
-                        <span class="inline-block text-[10px] font-bold tracking-widest uppercase text-emerald-100 bg-[#022c22] px-3 py-1.5 rounded-lg mb-4 shadow-sm border border-white/5">Último Lote Procesado</span>
-                        <h2 class="text-4xl font-black tracking-tight mb-1">{{ ultimo.lote }}</h2>
-                        <div class="flex items-center gap-3 mt-1 relative z-10">
-                            <span class="text-[11px] font-bold bg-emerald-700/50 border border-emerald-600/50 px-2 py-0.5 rounded-md text-emerald-100">Semana {{ ultimo.semana }}</span>
-                            <p class="text-[11px] text-emerald-200/80 font-medium">{{ ultimo.fecha }}</p>
+                        <span id="panel-etiqueta" class="inline-block text-[10px] font-bold tracking-widest uppercase text-emerald-100 bg-[#022c22] px-3 py-1.5 rounded-lg mb-4 shadow-sm border border-white/5 transition-colors">Último Registro</span>
+                        <h2 id="panel-lote" class="text-4xl font-black tracking-tight mb-2">Lote {{ ultimo.lote }}</h2>
+                        
+                        <div class="flex flex-col gap-1.5 relative z-10">
+                            <!-- Se usa semana_etiqueta para que muestre exactamente "1ra Rev. (Sem. X)" o "2da Rev. (Sem. X)" -->
+                            <span id="panel-semana" class="inline-block px-3 py-1 rounded-md bg-emerald-800/90 border border-emerald-600/50 text-emerald-100 text-xs font-bold w-fit shadow-sm">
+                                {{ ultimo.semana_etiqueta }}
+                            </span>
+                            <p id="panel-fecha" class="text-[11px] text-emerald-200/80 font-medium">{{ ultimo.fecha }}</p>
                         </div>
                     </div>
-                    <div class="mt-6 border-t border-emerald-700/50 pt-5 flex items-end justify-between relative z-10">
+                    <div class="mt-6 border-t border-emerald-700/50 pt-5 flex items-end justify-between relative z-10" id="panel-borde-divisor">
                         <div>
                             <p class="text-[11px] text-emerald-200 font-medium mb-1 tracking-wide">Prom. de Muertes/Bote</p>
-                            <p class="text-5xl font-black text-white leading-none tracking-tighter">{{ ultimo.promedio }}</p>
+                            <p id="panel-promedio" class="text-5xl font-black text-white leading-none tracking-tighter">{{ ultimo.promedio }}</p>
                         </div>
-                        <span class="px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm mb-1 {% if ultimo.promedio <= 15.0 %}bg-emerald-500 border border-emerald-400{% else %}bg-[#f59e0b] border border-[#d97706]{% endif %}">
+                        <span id="panel-estatus" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm mb-1 {% if ultimo.promedio <= 15.0 %}bg-emerald-500 border border-emerald-400{% else %}bg-[#f59e0b] border border-[#d97706]{% endif %}">
                             {{ ultimo.estatus }}
                         </span>
                     </div>
                 </div>
 
-                <!-- Tarjeta: Desglose de 6 Botes -->
                 <div class="lg:col-span-8 bg-white border border-slate-200/80 p-6 pt-5 rounded-3xl shadow-sm flex flex-col justify-between">
                     <div>
                         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Desglose de Mortalidad de los 6 Botes</h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">BOTE 1</span>
-                                <p class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r1 }}</p>
-                                <span class="text-[10px] font-bold text-[#059669]">Bajas</span>
-                            </div>
-                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">BOTE 2</span>
-                                <p class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r2 }}</p>
-                                <span class="text-[10px] font-bold text-[#059669]">Bajas</span>
-                            </div>
-                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">BOTE 3</span>
-                                <p class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r3 }}</p>
-                                <span class="text-[10px] font-bold text-[#059669]">Bajas</span>
-                            </div>
-                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">BOTE 4</span>
-                                <p class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r4 }}</p>
-                                <span class="text-[10px] font-bold text-[#059669]">Bajas</span>
-                            </div>
-                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">BOTE 5</span>
-                                <p class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r5 }}</p>
-                                <span class="text-[10px] font-bold text-[#059669]">Bajas</span>
-                            </div>
-                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm">
-                                <span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">BOTE 6</span>
-                                <p class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r6 }}</p>
-                                <span class="text-[10px] font-bold text-[#059669]">Bajas</span>
-                            </div>
+                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm transition-all" id="panel-tarjeta-r1"><span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">BOTE 1</span><p id="panel-r1" class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1">{{ ultimo.r1 }}</p><span class="text-[10px] font-bold text-[#059669]">Bajas</span></div>
+                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm transition-all" id="panel-tarjeta-r2"><span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">BOTE 2</span><p id="panel-r2" class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1">{{ ultimo.r2 }}</p><span class="text-[10px] font-bold text-[#059669]">Bajas</span></div>
+                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm transition-all" id="panel-tarjeta-r3"><span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">BOTE 3</span><p id="panel-r3" class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1">{{ ultimo.r3 }}</p><span class="text-[10px] font-bold text-[#059669]">Bajas</span></div>
+                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm transition-all" id="panel-tarjeta-r4"><span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">BOTE 4</span><p id="panel-r4" class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1">{{ ultimo.r4 }}</p><span class="text-[10px] font-bold text-[#059669]">Bajas</span></div>
+                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm transition-all" id="panel-tarjeta-r5"><span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">BOTE 5</span><p id="panel-r5" class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1">{{ ultimo.r5 }}</p><span class="text-[10px] font-bold text-[#059669]">Bajas</span></div>
+                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm transition-all" id="panel-tarjeta-r6"><span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">BOTE 6</span><p id="panel-r6" class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1">{{ ultimo.r6 }}</p><span class="text-[10px] font-bold text-[#059669]">Bajas</span></div>
                         </div>
                     </div>
                     <div class="mt-5 pt-4 border-t border-slate-100 flex justify-between items-center">
-                        <span class="text-xs text-slate-500 font-medium">Operador responsable: <strong class="text-slate-700">{{ ultimo.operador }}</strong></span>
-                        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100 shadow-sm">Guardado Exitoso</span>
+                        <span class="text-xs text-slate-500 font-medium">Operador: <strong id="panel-operador" class="text-slate-700">{{ ultimo.operador }}</strong></span>
+                        <span id="panel-badge-guardado" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100 shadow-sm transition-colors">Guardado Exitoso</span>
                     </div>
                 </div>
             </div>
@@ -132,36 +108,42 @@
             <!-- Tabla de Registros -->
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden mt-6">
                 <div class="bg-white px-7 py-5 border-b border-slate-100 flex justify-between items-center">
-                    <h2 class="text-[15px] font-bold text-slate-800 tracking-tight">Tus Registros de Hoy en Turno</h2>
-                    <span class="text-[10px] text-slate-400 font-mono bg-slate-50 border border-slate-100 px-2 py-1 rounded-md shadow-sm hidden sm:block"></span>
+                    <h2 class="text-[15px] font-bold text-slate-800 tracking-tight">Historial General (Por Revisión)</h2>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest bg-slate-50 border border-slate-100 px-2 py-1 rounded-md shadow-sm">Haz clic para visualizar</span>
                 </div>
-                <div class="overflow-x-auto table-container px-2 pb-2">
+                <div class="overflow-x-auto overflow-y-auto max-h-[55vh]" id="scrollTable">
                     <table class="min-w-full text-sm">
                         <thead class="bg-white sticky top-0 z-10 shadow-sm border-b border-slate-200">
                             <tr>
                                 <th class="px-7 py-4 text-left font-extrabold text-slate-400 uppercase tracking-wider text-[10px]">ID Lote</th>
-                                <th class="px-7 py-4 text-center font-extrabold text-slate-400 uppercase tracking-wider text-[10px]">Semana</th>
-                                <th class="px-7 py-4 text-center font-extrabold text-slate-400 uppercase tracking-wider text-[10px]">Botes Muestreados</th>
+                                <th class="px-7 py-4 text-center font-extrabold text-slate-400 uppercase tracking-wider text-[10px]">Revisión / Semana</th>
+                                <th class="px-7 py-4 text-center font-extrabold text-slate-400 uppercase tracking-wider text-[10px]">Botes</th>
                                 <th class="px-7 py-4 text-center font-extrabold text-slate-400 uppercase tracking-wider text-[10px]">Operador</th>
                                 <th class="px-7 py-4 text-center font-extrabold text-slate-400 uppercase tracking-wider text-[10px] bg-emerald-50/30">Prom. Muertes / Bote</th>
                                 <th class="px-7 py-4 text-right font-extrabold text-slate-400 uppercase tracking-wider text-[10px]">Hora de Registro</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-50 bg-white text-xs">
-                            {% for reg in historial %}
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-7 py-4 font-bold text-slate-800 text-sm">{{ reg.lote }}</td>
-                                <td class="px-7 py-4 text-center text-slate-600 font-bold">{{ reg.semana }}</td>
-                                <td class="px-7 py-4 text-center"><span class="px-3 py-1.5 bg-slate-100 rounded-md text-[10px] font-bold text-slate-500 border border-slate-200">1 al 6</span></td>
-                                <td class="px-7 py-4 text-center text-slate-700 font-medium"><span class="bg-slate-50 text-slate-600 border border-slate-200 px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider">{{ reg.operador }}</span></td>
-                                <td class="px-7 py-4 text-center bg-emerald-50/10">
-                                    <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black {% if reg.porcentaje <= 15.0 %}bg-[#dcfce7] text-[#166534]{% else %}bg-[#fef3c7] text-[#92400e]{% endif %}">{{ reg.porcentaje }}</span>
-                                </td>
-                                <td class="px-7 py-4 text-right text-slate-500 font-medium text-[11px]">{{ reg.fecha }}</td>
-                            </tr>
+                            {% for reg in historial[:15] %}
+                        <tr class="hover:bg-slate-100 transition-colors cursor-pointer group"
+                            onclick="cargarEnPanel('{{ reg.lote }}', '{{ reg.semana_etiqueta }}', '{{ reg.fecha }}', '{{ reg.porcentaje }}', '{{ reg.r1 }}', '{{ reg.r2 }}', '{{ reg.r3 }}', '{{ reg.r4 }}', '{{ reg.r5 }}', '{{ reg.r6 }}', '{{ reg.operador }}', '{% if reg.porcentaje <= 15.0 %}Óptimo{% else %}Revisión / Alto{% endif %}')">
+                            <td class="px-7 py-4 font-bold text-slate-800 text-sm">Lote {{ reg.lote }}</td>
+                            <td class="px-7 py-4 text-center text-slate-600 font-bold whitespace-nowrap">{{ reg.semana_etiqueta }}</td>
+                            <td class="px-7 py-4 text-center"><span class="px-3 py-1.5 bg-slate-100 rounded-md text-[10px] font-bold text-slate-500 border border-slate-200">1 al 6</span></td>
+                            <td class="px-7 py-4 text-center text-slate-700 font-medium"><span class="bg-slate-50 text-slate-600 border border-slate-200 px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider">{{ reg.operador }}</span></td>
+                            <td class="px-7 py-4 text-center bg-emerald-50/10">
+                                <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black {% if reg.porcentaje <= 15.0 %}bg-[#dcfce7] text-[#166534]{% else %}bg-[#fef3c7] text-[#92400e]{% endif %}">{{ reg.porcentaje }}</span>
+                            </td>
+                        <td class="px-7 py-4 text-right text-slate-500 font-medium text-[11px]">
+        <div class="flex items-center justify-end gap-3">
+            <span>{{ reg.fecha }}</span>
+            <svg class="w-4 h-4 text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+        </div>
+    </td>
+</tr>
                             {% else %}
                             <tr>
-                                <td colspan="6" class="px-7 py-10 text-center text-slate-500 font-medium">No se han registrado datos en este turno.</td>
+                                <td colspan="6" class="px-7 py-10 text-center text-slate-500 font-medium">No se han registrado datos.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -171,86 +153,116 @@
         </div>
     </main>
 
-    <!-- MODAL ÚNICO DE CAPTURA RÁPIDA DE MORTALIDAD -->
-    <div id="modal-registro" class="hidden fixed inset-0 z-[99999] bg-slate-900/60 backdrop-blur-sm overflow-y-auto transition-all">
-        <div class="flex items-start justify-center min-h-screen px-4 pt-28 pb-10">
+    <!-- ========================================== -->
+    <!-- MODAL 1: IDENTIFICAR LOTE (TARJETA PEQUEÑA) -->
+    <!-- ========================================== -->
+    <div id="modal-identificar" class="hidden fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl overflow-hidden flex flex-col transform transition-all border border-slate-100">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="font-black text-slate-800 text-lg">Identificar Lote</h3>
+                    <p class="text-[11px] text-slate-500 font-medium">Autenticación requerida</p>
+                </div>
+                <button onclick="cerrarModales()" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
+            </div>
             
-            <div class="bg-white rounded-[2rem] w-full max-w-2xl shadow-2xl border border-slate-100 flex flex-col max-h-[80vh] overflow-hidden">
+            <div class="space-y-5 text-sm">
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1.5">Lote a Revisar</label>
+                    <input type="number" id="lote-inicial" placeholder="Ej. 20" class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1.5">Firma Electrónica (NIP)</label>
+                    <input type="password" id="nip-inicial" placeholder="****" class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors tracking-widest text-center text-lg">
+                </div>
+            </div>
+
+            <button type="button" onclick="buscarLote(this)" id="btn-buscar-lote" class="w-full bg-[#059669] text-white font-bold py-3.5 rounded-xl hover:bg-[#047857] transition-colors shadow-md shadow-emerald-600/20 text-sm mt-8 flex justify-center items-center gap-2">
+                Continuar <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </div>
+    </div>
+
+   <!-- ========================================== -->
+    <!-- MODAL 2: CAPTURA DE SEMANAS (TARJETA ANCHA MÁS ABAJO) -->
+    <!-- ========================================== -->
+    <div id="modal-captura" class="hidden fixed inset-0 bg-slate-900/70 z-[99999] flex items-start justify-center p-4 pt-20 sm:pt-24 backdrop-blur-md overflow-y-auto">
+        <div class="bg-white rounded-[2rem] max-w-4xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[85vh] border border-slate-100 my-auto">
+            
+            <!-- HEADER DEL MODAL -->
+            <div class="flex justify-between items-center border-b border-slate-100 p-5 sm:px-8 shrink-0 bg-white">
+                <div>
+                    <h3 class="font-black text-slate-800 text-lg sm:text-xl">Captura de Botes</h3>
+                </div>
+                <button type="button" onclick="cerrarModales()" class="text-slate-400 hover:text-slate-600 font-black text-3xl leading-none transition-colors">&times;</button>
+            </div>
+            
+            <!-- CUERPO DEL MODAL (Scroll interno) -->
+            <div class="p-5 sm:p-8 overflow-y-auto modal-scroll bg-slate-50/50 flex-1">
                 
-                <!-- HEADER FIJO -->
-                <div class="flex justify-between items-center border-b border-slate-100 p-6 sm:p-8 shrink-0">
+                <div class="flex items-center justify-between mb-6 bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
                     <div>
-                        <h3 class="font-black text-slate-800 text-xl">Captura de Mortalidad</h3>
-                        <p class="text-xs text-slate-500 font-medium mt-1">Conteo directo de insectos muertos por bote</p>
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Lote Evaluado</span>
+                        <span class="text-xl font-black text-emerald-700" id="lote-mostrado">Lote XX</span>
                     </div>
-                    <button type="button" onclick="cerrarCaptura()" class="text-slate-300 hover:text-slate-500 font-black text-3xl leading-none transition-colors">&times;</button>
-                </div>
-                
-                <!-- BODY SCROLLEABLE -->
-                <div class="p-6 sm:p-8 overflow-y-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        
-                        <!-- Columna Izquierda: Configuración -->
-                        <div class="space-y-4 bg-slate-50 p-5 rounded-2xl border border-slate-200/80">
-                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Identificador de Lote</h4>
-                            
-                            <div class="grid grid-cols-1 gap-4">
-                                <div>
-                                    <label class="font-bold text-slate-700 block mb-1.5 text-xs">Semana de Origen (Lote)</label>
-                                    <input type="number" id="input-semana" placeholder="Ej. 30" class="w-full font-bold text-slate-800 bg-white border border-slate-300 rounded-lg px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors">
-                                    <p class="text-[9px] text-slate-500 mt-1.5">Esta semana identifica al lote en todo su ciclo.</p>
-                                </div>
-                                <div>
-                                    <label class="font-bold text-slate-700 block mb-1.5 text-xs">Firma Electrónica (NIP)</label>
-                                    <input type="password" id="input-nip" placeholder="****" class="w-full font-bold text-slate-800 bg-white border border-slate-300 rounded-lg px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors tracking-widest text-center text-lg">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Columna Derecha: Conteo de los 6 Botes -->
-                        <div class="space-y-3">
-                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Cantidad de Muertos</h4>
-                            <div class="grid grid-cols-2 gap-3">
-                                
-                                <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-colors shadow-sm">
-                                    <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-3 py-3 border-r border-slate-200 w-16 text-center uppercase tracking-wider">Bote 1</span>
-                                    <input type="number" id="bote-1" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-2 outline-none">
-                                </div>
-                                
-                                <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-colors shadow-sm">
-                                    <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-3 py-3 border-r border-slate-200 w-16 text-center uppercase tracking-wider">Bote 2</span>
-                                    <input type="number" id="bote-2" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-2 outline-none">
-                                </div>
-                                
-                                <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-colors shadow-sm">
-                                    <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-3 py-3 border-r border-slate-200 w-16 text-center uppercase tracking-wider">Bote 3</span>
-                                    <input type="number" id="bote-3" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-2 outline-none">
-                                </div>
-                                
-                                <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-colors shadow-sm">
-                                    <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-3 py-3 border-r border-slate-200 w-16 text-center uppercase tracking-wider">Bote 4</span>
-                                    <input type="number" id="bote-4" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-2 outline-none">
-                                </div>
-                                
-                                <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-colors shadow-sm">
-                                    <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-3 py-3 border-r border-slate-200 w-16 text-center uppercase tracking-wider">Bote 5</span>
-                                    <input type="number" id="bote-5" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-2 outline-none">
-                                </div>
-                                
-                                <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-colors shadow-sm">
-                                    <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-3 py-3 border-r border-slate-200 w-16 text-center uppercase tracking-wider">Bote 6</span>
-                                    <input type="number" id="bote-6" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-2 outline-none">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- FOOTER FIJO -->
-                <div class="p-6 sm:p-8 border-t border-slate-100 bg-slate-50 shrink-0">
-                    <button id="btn-guardar-mortalidad" onclick="guardarMortalidad(this)" class="w-full bg-[#059669] text-white font-bold py-3.5 rounded-xl hover:bg-[#047857] transition-colors shadow-md shadow-emerald-600/20 text-sm flex justify-center items-center gap-2">
-                        Finalizar y Guardar Mortalidad ✔
+                    <button onclick="volverModalIdentificar()" class="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg transition-colors border border-slate-200">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path></svg>
+                        Cambiar Lote
                     </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- COLUMNA: SEMANA 1 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative transition-opacity" id="caja-sem1">
+                        <h4 class="font-black text-slate-700 text-lg mb-4">1ra Revisión</h4>
+                        <div class="mb-5">
+                            <label class="font-bold text-slate-500 block mb-1.5 text-xs">Semana de Revisión</label>
+                            <input type="number" id="sem1-num" placeholder="Ej. 24" class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 outline-none focus:bg-white focus:border-emerald-500 transition-colors">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            {% for i in range(1, 7) %}
+                            <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:border-emerald-500 transition-colors shadow-sm">
+                                <span class="bg-slate-50 text-slate-500 font-bold text-[10px] px-2 py-2 border-r border-slate-200 w-12 text-center">B{{i}}</span>
+                                <input type="number" id="sem1-b{{i}}" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 border-none outline-none">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button onclick="guardarRevision(1)" id="btn-guardar-1" class="w-full bg-[#059669] hover:bg-[#047857] text-white font-bold py-3 rounded-xl transition-colors shadow-sm text-xs mt-5">
+                            Guardar 1ra Revisión
+                        </button>
+                        <div id="overlay-sem1" class="hidden absolute inset-0 bg-white/60 backdrop-blur-[2px] rounded-2xl z-10 flex items-center justify-center border border-slate-200">
+                            <span class="bg-white text-emerald-700 font-bold text-xs px-4 py-2 rounded-full shadow-md border border-emerald-100 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Ya registrada
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- COLUMNA: SEMANA 2 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm relative opacity-50 transition-opacity" id="caja-sem2">
+                        <h4 class="font-black text-slate-700 text-lg mb-4">2da Revisión</h4>
+                        <div class="mb-5">
+                            <label class="font-bold text-slate-500 block mb-1.5 text-xs">Semana de Revisión</label>
+                            <input type="number" id="sem2-num" placeholder="Ej. 25" class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 outline-none focus:bg-white focus:border-emerald-500 transition-colors" disabled>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            {% for i in range(1, 7) %}
+                            <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:border-emerald-500 transition-colors shadow-sm">
+                                <span class="bg-slate-50 text-slate-500 font-bold text-[10px] px-2 py-2 border-r border-slate-200 w-12 text-center">B{{i}}</span>
+                                <input type="number" id="sem2-b{{i}}" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 border-none outline-none" disabled>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <button onclick="guardarRevision(2)" id="btn-guardar-2" class="w-full bg-[#059669] hover:bg-[#047857] text-white font-bold py-3 rounded-xl transition-colors shadow-sm text-xs mt-5" disabled>
+                            Guardar 2da Revisión
+                        </button>
+                        <div id="overlay-sem2" class="hidden absolute inset-0 bg-white/60 backdrop-blur-[2px] rounded-2xl z-10 flex items-center justify-center border border-slate-200">
+                            <span class="bg-white text-emerald-700 font-bold text-xs px-4 py-2 rounded-full shadow-md border border-emerald-100 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Lote Finalizado
+                            </span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -259,89 +271,181 @@
 
 {% block scripts %}
     <script>
-        const modalRegistro = document.getElementById('modal-registro');
-        const btnGuardar = document.getElementById('btn-guardar-mortalidad');
+        const modalIdentificar = document.getElementById('modal-identificar');
+        const modalCaptura = document.getElementById('modal-captura');
+        
+        let nipConfirmado = ''; 
 
-        function abrirCapturaMortalidad() {
-            document.getElementById('input-semana').value = '';
-            document.getElementById('input-nip').value = '';
-            for(let i=1; i<=6; i++) {
-                document.getElementById('bote-'+i).value = '';
-            }
-            modalRegistro.classList.remove('hidden');
-        }
-
-        function cerrarCaptura() {
-            modalRegistro.classList.add('hidden');
-        }
-
-        async function guardarMortalidad(boton) {
-            const semana = document.getElementById('input-semana').value;
-            const nip = document.getElementById('input-nip').value;
+        function cargarEnPanel(lote, semanaEtiqueta, fecha, promedio, r1, r2, r3, r4, r5, r6, operador, estatus) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('panel-bg-color').classList.replace('bg-[#064e3b]', 'bg-slate-800');
+            document.getElementById('panel-etiqueta').innerText = 'Visualizando Historial';
+            document.getElementById('panel-lote').innerText = 'Lote ' + lote;
             
-            // La semana es el Lote
-            const lote_id = "Lote " + semana;
+            // Actualizamos la etiqueta de la semana con la revisión completa
+            document.getElementById('panel-semana').innerText = semanaEtiqueta;
+            
+            document.getElementById('panel-fecha').innerText = fecha;
+            document.getElementById('panel-promedio').innerText = promedio;
+            document.getElementById('panel-r1').innerText = r1; document.getElementById('panel-r2').innerText = r2; document.getElementById('panel-r3').innerText = r3;
+            document.getElementById('panel-r4').innerText = r4; document.getElementById('panel-r5').innerText = r5; document.getElementById('panel-r6').innerText = r6;
+            document.getElementById('panel-operador').innerText = operador;
+        }
 
-            // Recolectar datos de los 6 botes
-            let botesData = [];
-            for(let i=1; i<=6; i++) {
-                let val = document.getElementById('bote-'+i).value;
-                botesData.push(parseInt(val) || 0);
-            }
+        function abrirModalIdentificar() {
+            document.getElementById('lote-inicial').value = '';
+            document.getElementById('nip-inicial').value = '';
+            modalCaptura.classList.add('hidden');
+            modalIdentificar.classList.remove('hidden');
+        }
 
-            if(!semana || !nip) {
-                alert("Por favor, indique la Semana (Lote) y su NIP para autorizar.");
+        function volverModalIdentificar() {
+            modalCaptura.classList.add('hidden');
+            modalIdentificar.classList.remove('hidden');
+        }
+
+        function cerrarModales() {
+            modalIdentificar.classList.add('hidden');
+            modalCaptura.classList.add('hidden');
+        }
+
+        async function buscarLote(boton) {
+            const lote = document.getElementById('lote-inicial').value;
+            const nip = document.getElementById('nip-inicial').value;
+
+            if(!lote || !nip) {
+                alert("Ingrese el Lote y su NIP.");
                 return;
             }
 
             let textoOriginal = boton.innerHTML;
-            boton.innerHTML = "Guardando registros...";
+            boton.innerHTML = "Buscando...";
             boton.disabled = true;
 
             try {
-                // 1. Validar NIP primero
-                let respNip = await fetch("{{ url_for('prod_chrysopa.validar_nip_ajax') }}", {
+                let resp = await fetch("{{ url_for('prod_chrysopa.buscar_lote_mortalidad') }}", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({nip: nip})
+                    body: JSON.stringify({lote: lote, nip: nip})
                 });
                 
-                let dataNip = await respNip.json();
+                let data = await resp.json();
 
-                if(dataNip.status === 'error') {
-                    alert("El NIP ingresado es incorrecto o el usuario no está activo.");
+                if(data.status === 'error') {
+                    alert(data.message);
                     boton.innerHTML = textoOriginal;
                     boton.disabled = false;
-                    return; 
+                    return;
                 }
 
-                // 2. Si el NIP es válido, guardar la mortalidad
-                let respMortalidad = await fetch("{{ url_for('prod_chrysopa.guardar_mortalidad') }}", {
+                nipConfirmado = nip;
+                document.getElementById('lote-mostrado').innerText = "Lote " + lote;
+                
+                document.getElementById('sem1-num').value = ''; document.getElementById('sem2-num').value = '';
+                for(let i=1; i<=6; i++) {
+                    document.getElementById('sem1-b'+i).value = ''; document.getElementById('sem2-b'+i).value = '';
+                }
+
+                const revs = data.revisiones;
+
+                if (revs.length === 0) {
+                    desbloquearColumna(1);
+                    bloquearColumnaTotalmente(2);
+                    document.getElementById('overlay-sem1').classList.add('hidden');
+                    document.getElementById('overlay-sem2').classList.add('hidden');
+                } 
+                else if (revs.length === 1) {
+                    llenarYBloquearColumna(1, revs[0].semana, revs[0].botes);
+                    desbloquearColumna(2);
+                    document.getElementById('overlay-sem2').classList.add('hidden');
+                } 
+                else {
+                    llenarYBloquearColumna(1, revs[0].semana, revs[0].botes);
+                    llenarYBloquearColumna(2, revs[1].semana, revs[1].botes);
+                }
+
+                modalIdentificar.classList.add('hidden');
+                modalCaptura.classList.remove('hidden');
+                
+                boton.innerHTML = textoOriginal;
+                boton.disabled = false;
+
+            } catch (error) {
+                alert("Error al comunicarse con el servidor.");
+                boton.innerHTML = textoOriginal;
+                boton.disabled = false;
+            }
+        }
+
+        function desbloquearColumna(col) {
+            document.getElementById(`caja-sem${col}`).classList.remove('opacity-50');
+            document.getElementById(`sem${col}-num`).disabled = false;
+            for(let i=1; i<=6; i++) document.getElementById(`sem${col}-b${i}`).disabled = false;
+            document.getElementById(`btn-guardar-${col}`).disabled = false;
+        }
+
+        function bloquearColumnaTotalmente(col) {
+            document.getElementById(`caja-sem${col}`).classList.add('opacity-50');
+            document.getElementById(`sem${col}-num`).disabled = true;
+            for(let i=1; i<=6; i++) document.getElementById(`sem${col}-b${i}`).disabled = true;
+            document.getElementById(`btn-guardar-${col}`).disabled = true;
+        }
+
+        function llenarYBloquearColumna(col, semana, botes) {
+            document.getElementById(`caja-sem${col}`).classList.remove('opacity-50');
+            document.getElementById(`sem${col}-num`).value = semana;
+            for(let i=1; i<=6; i++) {
+                document.getElementById(`sem${col}-b${i}`).value = botes[i-1];
+            }
+            document.getElementById(`overlay-sem${col}`).classList.remove('hidden');
+        }
+
+        async function guardarRevision(columna) {
+            const lote = document.getElementById('lote-inicial').value;
+            const semana = document.getElementById(`sem${columna}-num`).value;
+            const btn = document.getElementById(`btn-guardar-${columna}`);
+            
+            let botesData = [];
+            for(let i=1; i<=6; i++) {
+                let val = document.getElementById(`sem${columna}-b${i}`).value;
+                if(val === "") { alert("Por favor llene los 6 botes."); return; }
+                botesData.push(parseInt(val));
+            }
+
+            if(!semana) {
+                alert("Debe indicar en qué Semana se realizó esta revisión.");
+                return;
+            }
+
+            let textoOriginal = btn.innerText;
+            btn.innerText = "Guardando...";
+            btn.disabled = true;
+
+            try {
+                let resp = await fetch("{{ url_for('prod_chrysopa.guardar_mortalidad') }}", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        lote: lote_id,     // Mandamos la semana también como ID de lote
+                        lote: lote, 
                         semana: semana,
-                        nip: nip,
+                        nip: nipConfirmado,
                         botes: botesData 
                     })
                 });
 
-                let dataMort = await respMortalidad.json();
+                let data = await resp.json();
 
-                if (dataMort.status === 'success') {
-                    cerrarCaptura();
+                if (data.status === 'success') {
                     location.reload(); 
                 } else {
-                    alert("Error al guardar: " + dataMort.message);
-                    boton.innerHTML = textoOriginal;
-                    boton.disabled = false;
+                    alert("Error: " + data.message);
+                    btn.innerText = textoOriginal;
+                    btn.disabled = false;
                 }
-
             } catch (error) {
-                alert("Ocurrió un error al comunicarse con el servidor.");
-                boton.innerHTML = textoOriginal;
-                boton.disabled = false;
+                alert("Error al guardar.");
+                btn.innerText = textoOriginal;
+                btn.disabled = false;
             }
         }
     </script>

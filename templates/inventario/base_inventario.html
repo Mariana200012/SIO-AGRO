@@ -5,19 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Centro de Control - Koppert Biofactory{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        html { scroll-behavior: smooth; }
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        /* Ocultar barra de scroll en el menú pero permitir deslizar con el mouse/dedo */
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        {% block extra_css %}{% endblock %}
-    </style>
+<style>
+    html { scroll-behavior: smooth; font-size: 14px; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    
+    .hide-scroll::-webkit-scrollbar { display: none; }
+    .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    
+
+
+    {% block extra_css %}{% endblock %}
+</style>
+<style>
+    /* El zoom solo se aplicará en computadoras y laptops (pantallas de 1024px en adelante) */
+    @media (min-width: 1024px) {
+        html {
+            zoom: 120%; 
+            /* Si elegiste la opción de font-size, usa: font-size: 18.5px; */
+        }
+    }
+</style>
 </head>
 <body class="bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-50/80 via-slate-50 to-slate-100 flex flex-col h-screen font-sans overflow-hidden relative">
 
@@ -41,7 +51,7 @@
                 </div>
                 
                 <!-- 2. SECCIÓN CENTRAL (Píldoras Dinámicas) -->
-                <div class="w-full md:flex-1 md:min-w-0 order-last md:order-none overflow-x-auto hide-scroll flex md:justify-center pb-2 md:pb-0 px-2">
+                <div class="w-full md:flex-1 md:min-w-0 order-last md:order-none overflow-x-auto hide-scroll flex justify-center pb-2 md:pb-0 px-2">
                     {% block navbar_menu %}
                     {% endblock %}
                 </div>

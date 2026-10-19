@@ -1,0 +1,112 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Materiales - Koppert Biofactory{% endblock %}
+
+
+{% block content %}
+<div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
+    
+    <!-- ENCABEZADO LIMPIO -->
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/80 flex flex-col justify-center">
+        <div class="inline-flex items-center gap-2 mb-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-[10px] font-black uppercase tracking-widest text-emerald-700">Módulo de Administración</span>
+        </div>
+        
+        <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-800 font-sans leading-none">
+            Catálogo de Materiales
+        </h1>
+        <p class="text-xs text-slate-400 font-medium mt-2">
+            Control e insumos asignados por áreas operativas
+        </p>
+    </div>
+
+    <!-- FORMULARIO LIMPIO -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-5">
+        <form action="{{ url_for('admin.agregar_material') }}" method="POST" class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+            
+            <!-- ÁREA -->
+            <div class="sm:col-span-4">
+                <div class="relative">
+                    <select name="id_area" required class="w-full border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs font-bold text-slate-700 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all cursor-pointer appearance-none">
+                        <option value="" disabled selected>Seleccionar área...</option>
+                        {% for area in areas %}
+                            <option value="{{ area.id_area }}">{{ area.nombre_area }}</option>
+                        {% endfor %}
+                    </select>
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                </div>
+            </div>
+
+            <!-- INSUMO -->
+            <div class="sm:col-span-4">
+                <div class="relative">
+                    <input type="text" name="nombre_material" placeholder="Nombre del insumo..." required class="w-full border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs font-bold text-slate-700 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                </div>
+            </div>
+
+            <!-- PRESENTACIÓN -->
+            <div class="sm:col-span-2">
+                <input type="text" name="presentacion" placeholder="Presentación..." required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+            </div>
+
+            <!-- BOTÓN GUARDAR -->
+            <div class="sm:col-span-2">
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 rounded-xl text-xs shadow-md transition-all flex items-center justify-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                    Agregar
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- TABLA  -->
+    <div class="overflow-x-auto overflow-y-auto max-h-[55vh]" id="scrollTable">
+        <div class="overflow-x-auto table-container">
+            <table class="min-w-full divide-y divide-slate-100 text-sm relative">
+                <thead class="bg-slate-50/80 text-slate-400 sticky top-0 z-10">
+                    <tr>
+                        <th class="px-6 py-3.5 text-left font-black uppercase text-[10px]">ID</th>
+                        <th class="px-6 py-3.5 text-left font-black uppercase text-[10px]">Área</th>
+                        <th class="px-6 py-3.5 text-left font-black uppercase text-[10px]">Material</th>
+                        <th class="px-6 py-3.5 text-left font-black uppercase text-[10px]">Presentación</th>
+                        <th class="px-6 py-3.5 text-center font-black uppercase text-[10px]">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white">
+                    
+                    {% for mat in materiales %}
+                    <tr class="hover:bg-slate-50/80 transition-colors">
+                        <td class="px-6 py-3.5 font-mono font-bold text-slate-400 text-xs">#{{ "%03d"|format(mat.id_material) }}</td>
+                        <td class="px-6 py-3.5 whitespace-nowrap">
+                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200/60 uppercase">
+                                {{ mat.nombre_area or 'General' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-3.5 font-bold text-slate-800 text-xs">{{ mat.nombre_material }}</td>
+                        <td class="px-6 py-3.5 text-slate-500 font-semibold text-xs">{{ mat.presentacion }}</td>
+                        <td class="px-6 py-3.5 text-center whitespace-nowrap">
+                            <form action="{{ url_for('admin.eliminar_material', id_material=mat.id_material) }}" method="POST" onsubmit="return confirm('¿Eliminar material?');" class="inline">
+                                <button type="submit" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Eliminar">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-10 text-center text-slate-400 font-medium text-xs">
+                            Sin materiales registrados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

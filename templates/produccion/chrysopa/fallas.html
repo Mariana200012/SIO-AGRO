@@ -20,6 +20,10 @@
         margin: 0; 
     }
     input[type=number] { -moz-appearance: textfield; }
+
+    .modal-scroll::-webkit-scrollbar { width: 6px; }
+    .modal-scroll::-webkit-scrollbar-track { background: transparent; }
+    .modal-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
 </style>
 {% endblock %}
 
@@ -36,9 +40,9 @@
 
 {% block content %}
     <main class="flex-1 overflow-y-auto px-6 pt-4 pb-10 lg:px-10 bg-slate-50">
-        <div class="max-w-[1200px] mx-auto space-y-5">
+        <div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
             
-            <!-- Encabezado (Sólido) -->
+            <!-- Encabezado -->
             <div class="bg-white border border-slate-200 p-5 md:p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-bold tracking-widest uppercase mb-1 border border-emerald-100/50">
@@ -48,76 +52,75 @@
                     <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-1">Registro de Fallas de Pupación</h1>
                     <p class="text-xs text-slate-500 font-medium">Ingrese el número de larvas que no lograron formar pupa en cada una de las 6 rejillas muestreadas.</p>
                 </div>
-                <button onclick="abrirCapturaFallas()" class="bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold py-3 px-6 rounded-xl transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap">
+                <button onclick="abrirModalIdentificar()" class="bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold py-3 px-6 rounded-xl transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap">
                     <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
                     Nuevo Registro
                 </button>
             </div>
 
             {% if ultimo %}
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <!-- PANEL PRINCIPAL -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5" id="panel-visor">
                 
-                <!-- Tarjeta: Último Lote Procesado -->
-                <div class="lg:col-span-4 bg-[#064e3b] text-white p-7 rounded-3xl shadow-md flex flex-col justify-between relative overflow-hidden">
+                <div class="lg:col-span-4 bg-[#064e3b] text-white p-7 rounded-3xl shadow-md flex flex-col justify-between relative overflow-hidden transition-colors" id="panel-bg-color">
                     <div class="relative z-10">
-                        <span class="inline-block text-[10px] font-bold tracking-widest uppercase text-emerald-100 bg-[#022c22] px-3 py-1.5 rounded-lg mb-4 shadow-sm border border-white/5">Último Lote Procesado</span>
-                        <h2 class="text-4xl font-black tracking-tight mb-1">{{ ultimo.lote }}</h2>
+                        <span id="panel-etiqueta" class="inline-block text-[10px] font-bold tracking-widest uppercase text-emerald-100 bg-[#022c22] px-3 py-1.5 rounded-lg mb-4 shadow-sm border border-white/5 transition-colors">Último Lote Procesado</span>
+                        <h2 id="panel-lote" class="text-4xl font-black tracking-tight mb-1">Lote {{ ultimo.lote }}</h2>
                         <div class="flex items-center gap-3 mt-1 relative z-10">
-                            <span class="text-[11px] font-bold bg-emerald-700/50 border border-emerald-600/50 px-2 py-0.5 rounded-md text-emerald-100">Semana {{ ultimo.semana }}</span>
-                            <p class="text-[11px] text-emerald-200/80 font-medium">{{ ultimo.fecha }}</p>
+                            <span id="panel-semana" class="text-[11px] font-bold bg-emerald-700/50 border border-emerald-600/50 px-2 py-0.5 rounded-md text-emerald-100">Semana {{ ultimo.semana }}</span>
+                            <p id="panel-fecha" class="text-[11px] text-emerald-200/80 font-medium">{{ ultimo.fecha }}</p>
                         </div>
                     </div>
-                    <div class="mt-6 border-t border-emerald-700/50 pt-5 flex items-end justify-between relative z-10">
+                    <div class="mt-6 border-t border-emerald-700/50 pt-5 flex items-end justify-between relative z-10" id="panel-borde-divisor">
                         <div>
                             <p class="text-[11px] text-emerald-200 font-medium mb-1 tracking-wide">Promedio Fallas/Rejilla</p>
-                            <p class="text-5xl font-black text-white leading-none tracking-tighter">{{ ultimo.promedio }}<span class="text-2xl ml-1">%</span></p>
+                            <p id="panel-promedio" class="text-5xl font-black text-white leading-none tracking-tighter">{{ ultimo.promedio }}<span class="text-2xl ml-1">%</span></p>
                         </div>
-                        <span class="px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm mb-1 {% if ultimo.promedio <= 10.0 %}bg-emerald-500 border border-emerald-400{% else %}bg-[#f59e0b] border border-[#d97706]{% endif %}">
+                        <span id="panel-estatus" class="px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm mb-1 {% if ultimo.promedio <= 10.0 %}bg-emerald-500 border border-emerald-400{% else %}bg-[#f59e0b] border border-[#d97706]{% endif %}">
                             {{ ultimo.estatus }}
                         </span>
                     </div>
                 </div>
 
-                <!-- Tarjeta: Desglose de 6 Rejillas -->
                 <div class="lg:col-span-8 bg-white border border-slate-200/80 p-6 pt-5 rounded-3xl shadow-sm flex flex-col justify-between">
                     <div>
                         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Desglose de Fallas en 6 Rejillas</h3>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm">
+                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm transition-all" id="panel-tarjeta-r1">
                                 <span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">REJILLA 1</span>
-                                <p class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r1 }}</p>
+                                <p id="panel-r1" class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r1 }}</p>
                                 <span class="text-[10px] font-bold text-[#059669]">Sin pupar</span>
                             </div>
-                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm">
+                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm transition-all" id="panel-tarjeta-r2">
                                 <span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">REJILLA 2</span>
-                                <p class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r2 }}</p>
+                                <p id="panel-r2" class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r2 }}</p>
                                 <span class="text-[10px] font-bold text-[#059669]">Sin pupar</span>
                             </div>
-                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm">
+                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm transition-all" id="panel-tarjeta-r3">
                                 <span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">REJILLA 3</span>
-                                <p class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r3 }}</p>
+                                <p id="panel-r3" class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r3 }}</p>
                                 <span class="text-[10px] font-bold text-[#059669]">Sin pupar</span>
                             </div>
-                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm">
+                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm transition-all" id="panel-tarjeta-r4">
                                 <span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">REJILLA 4</span>
-                                <p class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r4 }}</p>
+                                <p id="panel-r4" class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r4 }}</p>
                                 <span class="text-[10px] font-bold text-[#059669]">Sin pupar</span>
                             </div>
-                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm">
+                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm transition-all" id="panel-tarjeta-r5">
                                 <span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">REJILLA 5</span>
-                                <p class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r5 }}</p>
+                                <p id="panel-r5" class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r5 }}</p>
                                 <span class="text-[10px] font-bold text-[#059669]">Sin pupar</span>
                             </div>
-                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm">
+                            <div class="bg-[#f0fdf4] border border-[#bbf7d0] p-4 rounded-2xl text-center shadow-sm transition-all" id="panel-tarjeta-r6">
                                 <span class="text-[10px] font-black uppercase tracking-wider text-[#166534]">REJILLA 6</span>
-                                <p class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r6 }}</p>
+                                <p id="panel-r6" class="text-3xl font-black text-slate-900 leading-none mt-2 mb-1 tracking-tighter">{{ ultimo.r6 }}</p>
                                 <span class="text-[10px] font-bold text-[#059669]">Sin pupar</span>
                             </div>
                         </div>
                     </div>
                     <div class="mt-5 pt-4 border-t border-slate-100 flex justify-between items-center">
-                        <span class="text-xs text-slate-500 font-medium">Operador responsable: <strong class="text-slate-700">{{ ultimo.operador }}</strong></span>
-                        <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100 shadow-sm">Guardado Exitoso</span>
+                        <span class="text-xs text-slate-500 font-medium">Operador responsable: <strong id="panel-operador" class="text-slate-700">{{ ultimo.operador }}</strong></span>
+                        <span id="panel-badge-guardado" class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-100 shadow-sm transition-colors">Guardado Exitoso</span>
                     </div>
                 </div>
             </div>
@@ -130,10 +133,10 @@
             <!-- Tabla de Registros -->
             <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden mt-6">
                 <div class="bg-white px-7 py-5 border-b border-slate-100 flex justify-between items-center">
-                    <h2 class="text-[15px] font-bold text-slate-800 tracking-tight">Tus Registros de Hoy en Turno</h2>
-                    <span class="text-[10px] text-slate-400 font-mono bg-slate-50 border border-slate-100 px-2 py-1 rounded-md shadow-sm hidden sm:block"></span>
+                    <h2 class="text-[15px] font-bold text-slate-800 tracking-tight">Tus Registros</h2>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest bg-slate-50 border border-slate-100 px-2 py-1 rounded-md shadow-sm hidden sm:block">Haz clic para visualizar</span>
                 </div>
-                <div class="overflow-x-auto table-container px-2 pb-2">
+                <div class="overflow-x-auto overflow-y-auto max-h-[55vh]" id="scrollTable">
                     <table class="min-w-full text-sm">
                         <thead class="bg-white sticky top-0 z-10 shadow-sm border-b border-slate-200">
                             <tr>
@@ -145,17 +148,23 @@
                                 <th class="px-7 py-4 text-right font-extrabold text-slate-400 uppercase tracking-wider text-[10px]">Hora de Registro</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-50 bg-white text-xs">
+                       <tbody class="divide-y divide-slate-50 bg-white text-xs">
                             {% for reg in historial %}
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="px-7 py-4 font-bold text-slate-800 text-sm">{{ reg.lote }}</td>
-                                <td class="px-7 py-4 text-center text-slate-600 font-bold">{{ reg.semana }}</td>
+                            <tr class="hover:bg-slate-100 transition-colors cursor-pointer group"
+                                onclick="cargarEnPanel('Lote {{ reg.lote }}', '{{ reg.semana }}', '{{ reg.fecha }}', '{{ reg.porcentaje }}', '{{ reg.r1 }}', '{{ reg.r2 }}', '{{ reg.r3 }}', '{{ reg.r4 }}', '{{ reg.r5 }}', '{{ reg.r6 }}', '{{ reg.operador }}', '{% if reg.porcentaje <= 10.0 %}Óptimo{% else %}Revisión / Alto{% endif %}')">
+                                <td class="px-7 py-4 font-bold text-slate-800 text-sm">Lote {{ reg.lote }}</td>
+                                <td class="px-7 py-4 text-center text-slate-600 font-bold">Semana {{ reg.semana }}</td>
                                 <td class="px-7 py-4 text-center"><span class="px-3 py-1.5 bg-slate-100 rounded-md text-[10px] font-bold text-slate-500 border border-slate-200">1 al 6</span></td>
                                 <td class="px-7 py-4 text-center text-slate-700 font-medium"><span class="bg-slate-50 text-slate-600 border border-slate-200 px-3 py-1.5 rounded-md text-[9px] font-bold uppercase tracking-wider">{{ reg.operador }}</span></td>
                                 <td class="px-7 py-4 text-center bg-emerald-50/10">
                                     <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-black {% if reg.porcentaje <= 10.0 %}bg-[#dcfce7] text-[#166534]{% else %}bg-[#fef3c7] text-[#92400e]{% endif %}">{{ reg.porcentaje }}%</span>
                                 </td>
-                                <td class="px-7 py-4 text-right text-slate-500 font-medium text-[11px]">{{ reg.fecha }}</td>
+                                <td class="px-7 py-4 text-right text-slate-500 font-medium text-[11px]">
+                                    <div class="flex items-center justify-end gap-3">
+                                        <span>{{ reg.fecha }}</span>
+                                        <svg class="w-4 h-4 text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    </div>
+                                </td>
                             </tr>
                             {% else %}
                             <tr>
@@ -169,89 +178,81 @@
         </div>
     </main>
 
-    <!-- MODAL ÚNICO DE CAPTURA RÁPIDA DE FALLAS -->
-    <div id="modal-registro" class="hidden fixed inset-0 z-[99999] bg-slate-900/80 backdrop-blur-sm overflow-y-auto transition-all">
-        <div class="flex items-start justify-center min-h-screen px-4 pt-28 pb-10">
-            
-            <div class="bg-white rounded-[2rem] w-full max-w-2xl shadow-2xl border border-slate-100 flex flex-col max-h-[80vh] overflow-hidden">
-                
-                <!-- HEADER FIJO -->
-                <div class="flex justify-between items-center border-b border-slate-100 p-6 sm:p-8 shrink-0">
-                    <div>
-                        <h3 class="font-black text-slate-800 text-xl">Captura de Fallas</h3>
-                        <p class="text-xs text-slate-500 font-medium mt-1">Conteo directo de larvas no pupadas por rejilla</p>
-                    </div>
-                    <button type="button" onclick="cerrarCaptura()" class="text-slate-400 hover:text-rose-500 font-black text-3xl leading-none transition-colors">&times;</button>
-                </div>
-                
-                <!-- BODY SCROLLEABLE -->
-                <div class="p-6 sm:p-8 overflow-y-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        
-                        <!-- Columna Izquierda: Configuración -->
-                        <div class="space-y-4 bg-slate-50 p-5 rounded-2xl border border-slate-200/80">
-                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Identificador de Lote</h4>
-                            
-                            <div class="grid grid-cols-1 gap-4">
-                                <div>
-                                    <label class="font-bold text-slate-700 block mb-1.5 text-xs">Semana de Origen (Lote)</label>
-                                    <input type="number" id="input-semana" placeholder="Ej. 30" class="w-full font-bold text-slate-800 bg-white border border-slate-300 rounded-lg px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors">
-                                    <p class="text-[9px] text-slate-500 mt-1.5">Esta semana identifica al lote en todo su ciclo.</p>
-                                </div>
-                                <div>
-                                    <label class="font-bold text-slate-700 block mb-1.5 text-xs">Firma Electrónica (NIP)</label>
-                                    <input type="password" id="input-nip" placeholder="****" class="w-full font-bold text-slate-800 bg-white border border-slate-300 rounded-lg px-4 py-3 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors tracking-widest text-center text-lg">
-                                </div>
-                            </div>
-                        </div>
+    <!-- ========================================== -->
+    <!-- TARJETA 1: IDENTIFICAR LOTE Y NIP          -->
+    <!-- ========================================== -->
 
-                        <!-- Columna Derecha: Conteo de las 6 Rejillas -->
-                        <div class="space-y-3">
-                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Larvas sin pupar</h4>
-                            <div class="grid grid-cols-2 gap-3">
-                                
-                                <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-colors shadow-sm">
-                                    <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-3 py-3 border-r border-slate-200 w-20 text-center uppercase tracking-wider">Rejilla 1</span>
-                                    <input type="number" id="rejilla-1" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-2 outline-none">
-                                </div>
-                                
-                                <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-colors shadow-sm">
-                                    <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-3 py-3 border-r border-slate-200 w-20 text-center uppercase tracking-wider">Rejilla 2</span>
-                                    <input type="number" id="rejilla-2" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-2 outline-none">
-                                </div>
-                                
-                                <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-colors shadow-sm">
-                                    <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-3 py-3 border-r border-slate-200 w-20 text-center uppercase tracking-wider">Rejilla 3</span>
-                                    <input type="number" id="rejilla-3" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-2 outline-none">
-                                </div>
-                                
-                                <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-colors shadow-sm">
-                                    <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-3 py-3 border-r border-slate-200 w-20 text-center uppercase tracking-wider">Rejilla 4</span>
-                                    <input type="number" id="rejilla-4" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-2 outline-none">
-                                </div>
-                                
-                                <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-colors shadow-sm">
-                                    <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-3 py-3 border-r border-slate-200 w-20 text-center uppercase tracking-wider">Rejilla 5</span>
-                                    <input type="number" id="rejilla-5" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-2 outline-none">
-                                </div>
-                                
-                                <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-colors shadow-sm">
-                                    <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-3 py-3 border-r border-slate-200 w-20 text-center uppercase tracking-wider">Rejilla 6</span>
-                                    <input type="number" id="rejilla-6" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-2 outline-none">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div id="modal-identificar" class="hidden fixed inset-0 bg-slate-900/60 z-[99999] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl overflow-hidden flex flex-col transform transition-all border border-slate-100">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="font-black text-slate-800 text-lg">Inicializar Fallas</h3>
+                    <p class="text-[11px] text-slate-500 font-medium">Autenticación requerida</p>
                 </div>
-
-                <!-- FOOTER FIJO -->
-                <div class="p-6 sm:p-8 border-t border-slate-100 bg-slate-50 shrink-0">
-                    <button id="btn-guardar-fallas" onclick="guardarFallas(this)" class="w-full bg-[#059669] text-white font-bold py-3.5 rounded-xl hover:bg-[#047857] transition-colors shadow-md shadow-emerald-600/20 text-sm flex justify-center items-center gap-2">
-                        Finalizar y Guardar Fallas ✔
-                    </button>
-                </div>
-
+                <button onclick="cerrarModales()" class="text-slate-400 hover:text-slate-600 font-black text-2xl leading-none">&times;</button>
             </div>
+            
+            <div class="space-y-4 text-sm">
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1.5 text-xs">Identificador del Lote</label>
+                    <input type="text" id="input-lote-num" placeholder="Ej. 40" class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1.5 text-xs">Semana de Producción</label>
+                    <input type="number" id="input-semana" placeholder="Ej. 30" class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1.5 text-xs">Firma Electrónica (NIP)</label>
+                    <input type="password" id="input-nip" placeholder="****" class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-colors tracking-widest text-center text-lg">
+                </div>
+            </div>
+
+            <button type="button" onclick="validarYAbrirCaptura(this)" class="w-full bg-[#059669] text-white font-bold py-3.5 rounded-xl hover:bg-[#047857] transition-colors shadow-md shadow-emerald-600/20 text-sm mt-6 flex justify-center items-center gap-2">
+                Iniciar Muestreo <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TARJETA 2: CAPTURA DE LAS 6 REJILLAS       -->
+    <!-- ========================================== -->
+    <div id="modal-captura" class="hidden fixed inset-0 bg-slate-900/60 z-[99999] flex items-center justify-center p-4 sm:p-6 backdrop-blur-sm">
+        <div class="bg-white rounded-[2rem] max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-slate-100">
+            
+            <!-- HEADER FIJO -->
+            <div class="flex justify-between items-center border-b border-slate-100 p-6 sm:p-8 shrink-0 bg-white">
+                <div>
+                    <h3 class="font-black text-slate-800 text-xl" id="titulo-captura-lote">Captura de Fallas</h3>
+                    <p class="text-xs text-slate-500 font-medium mt-1">Conteo directo de larvas no pupadas por rejilla</p>
+                </div>
+                <button type="button" onclick="cerrarModales()" class="text-slate-400 hover:text-rose-500 font-black text-3xl leading-none transition-colors">&times;</button>
+            </div>
+            
+            <!-- BODY SCROLLEABLE -->
+            <div class="p-6 sm:p-8 overflow-y-auto modal-scroll bg-slate-50/50 flex-1">
+                <div class="grid grid-cols-1 gap-4">
+                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Larvas sin pupar en las 6 Rejillas</h4>
+                    <div class="grid grid-cols-2 gap-3">
+                        {% for i in range(1, 7) %}
+                        <div class="flex items-center bg-white border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-emerald-500/25 focus-within:border-emerald-500 transition-colors shadow-sm">
+                            <span class="bg-[#f8fafc] text-slate-500 font-bold text-[10px] px-2 py-3 border-r border-slate-200 w-24 text-center uppercase tracking-wider">Rejilla {{i}}</span>
+                            <input type="number" id="rejilla-{{i}}" min="0" placeholder="0" class="w-full text-center font-black text-slate-800 bg-transparent border-none py-2 px-1 outline-none">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER FIJO -->
+            <div class="p-6 sm:p-8 border-t border-slate-100 bg-white shrink-0 flex gap-3">
+                <button onclick="volverModalIdentificar()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-colors text-xs">
+                    &larr; Volver
+                </button>
+                <button id="btn-guardar-fallas" onclick="guardarFallas(this)" class="flex-1 bg-[#059669] text-white font-bold py-3.5 rounded-xl hover:bg-[#047857] transition-colors shadow-md shadow-emerald-600/20 text-sm flex justify-center items-center gap-2">
+                    Finalizar y Guardar Fallas ✔
+                </button>
+            </div>
+
         </div>
     </div>
 
@@ -259,67 +260,142 @@
 
 {% block scripts %}
     <script>
-        const modalRegistro = document.getElementById('modal-registro');
+        const modalIdentificar = document.getElementById('modal-identificar');
+        const modalCaptura = document.getElementById('modal-captura');
 
-        function abrirCapturaFallas() {
-            document.getElementById('input-semana').value = '';
-            document.getElementById('input-nip').value = '';
-            for(let i=1; i<=6; i++) {
-                document.getElementById('rejilla-'+i).value = '';
+        function cargarEnPanel(lote, semana, fecha, porcentaje, r1, r2, r3, r4, r5, r6, operador, estatus) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            const bgCol = document.getElementById('panel-bg-color');
+            if (bgCol) bgCol.className = bgCol.className.replace('bg-[#064e3b]', 'bg-slate-800').replace('bg-slate-800', 'bg-slate-800');
+
+            const divisor = document.getElementById('panel-borde-divisor');
+            if (divisor) divisor.className = divisor.className.replace('border-emerald-700/50', 'border-slate-600/50');
+            
+            let etiqueta = document.getElementById('panel-etiqueta');
+            if (etiqueta) {
+                etiqueta.innerText = 'Visualizando Historial';
+                etiqueta.className = "inline-block text-[10px] font-bold tracking-widest uppercase text-white bg-slate-700 px-3 py-1.5 rounded-lg mb-4 shadow-sm border border-white/5 transition-colors";
             }
-            modalRegistro.classList.remove('hidden');
+
+            if (document.getElementById('panel-lote')) document.getElementById('panel-lote').innerText = lote;
+            if (document.getElementById('panel-semana')) document.getElementById('panel-semana').innerText = 'Semana ' + semana;
+            if (document.getElementById('panel-fecha')) document.getElementById('panel-fecha').innerText = fecha;
+            if (document.getElementById('panel-promedio')) document.getElementById('panel-promedio').innerHTML = porcentaje + '<span class="text-2xl ml-1">%</span>';
+
+            let estatusBadge = document.getElementById('panel-estatus');
+            if (estatusBadge) {
+                estatusBadge.innerText = estatus;
+                if (parseFloat(porcentaje) <= 10.0) {
+                    estatusBadge.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm mb-1 bg-emerald-500 border border-emerald-400";
+                } else {
+                    estatusBadge.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-sm mb-1 bg-[#f59e0b] border border-[#d97706]";
+                }
+            }
+
+            if (document.getElementById('panel-r1')) document.getElementById('panel-r1').innerText = r1;
+            if (document.getElementById('panel-r2')) document.getElementById('panel-r2').innerText = r2;
+            if (document.getElementById('panel-r3')) document.getElementById('panel-r3').innerText = r3;
+            if (document.getElementById('panel-r4')) document.getElementById('panel-r4').innerText = r4;
+            if (document.getElementById('panel-r5')) document.getElementById('panel-r5').innerText = r5;
+            if (document.getElementById('panel-r6')) document.getElementById('panel-r6').innerText = r6;
+
+            if (document.getElementById('panel-operador')) document.getElementById('panel-operador').innerText = operador;
+            
+            let badgeGuardado = document.getElementById('panel-badge-guardado');
+            if (badgeGuardado) {
+                badgeGuardado.innerText = "Histórico Cargado";
+                badgeGuardado.className = "text-[10px] font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-lg border border-slate-200 shadow-sm transition-colors";
+            }
         }
 
-        function cerrarCaptura() {
-            modalRegistro.classList.add('hidden');
+        function abrirModalIdentificar() {
+            if(document.getElementById('input-lote-num')) document.getElementById('input-lote-num').value = '';
+            if(document.getElementById('input-semana')) document.getElementById('input-semana').value = '';
+            if(document.getElementById('input-nip')) document.getElementById('input-nip').value = '';
+            if(modalCaptura) modalCaptura.classList.add('hidden');
+            if(modalIdentificar) modalIdentificar.classList.remove('hidden');
         }
 
-        async function guardarFallas(boton) {
+        function volverModalIdentificar() {
+            if(modalCaptura) modalCaptura.classList.add('hidden');
+            if(modalIdentificar) modalIdentificar.classList.remove('hidden');
+        }
+
+        function cerrarModales() {
+            if(modalIdentificar) modalIdentificar.classList.add('hidden');
+            if(modalCaptura) modalCaptura.classList.add('hidden');
+        }
+
+        async function validarYAbrirCaptura(boton) {
+            const loteInput = document.getElementById('input-lote-num').value;
             const semana = document.getElementById('input-semana').value;
             const nip = document.getElementById('input-nip').value;
-            
-            // La semana es el Lote
-            const lote_id = "Lote " + semana;
 
-            // Recolectar datos de las 6 rejillas
-            let rejillasData = [];
-            for(let i=1; i<=6; i++) {
-                let val = document.getElementById('rejilla-'+i).value;
-                rejillasData.push(parseInt(val) || 0);
-            }
-
-            if(!semana || !nip) {
-                alert("Por favor, indique la Semana (Lote) y su NIP para autorizar.");
+            if(!loteInput || !semana || !nip) {
+                alert("Por favor complete el Lote, la Semana y su NIP para continuar.");
                 return;
             }
 
             let textoOriginal = boton.innerHTML;
-            boton.innerHTML = "Guardando registros...";
+            boton.innerHTML = "Validando firma...";
             boton.disabled = true;
 
             try {
-                // 1. Validar NIP primero
-                let respNip = await fetch("{{ url_for('prod_chrysopa.validar_nip_ajax') }}", {
+                let respuesta = await fetch("{{ url_for('prod_chrysopa.validar_nip_ajax') }}", {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({nip: nip})
                 });
                 
-                let dataNip = await respNip.json();
+                let data = await respuesta.json();
 
-                if(dataNip.status === 'error') {
+                if(data.status === 'error') {
                     alert("El NIP ingresado es incorrecto o el usuario no está activo.");
                     boton.innerHTML = textoOriginal;
                     boton.disabled = false;
                     return; 
                 }
 
-                // 2. Si el NIP es válido, guardar fallas
+                for(let i=1; i<=6; i++) {
+                    let campo = document.getElementById('rejilla-'+i);
+                    if(campo) campo.value = '';
+                }
+                
+                const tituloCaptura = document.getElementById('titulo-captura-lote');
+                if(tituloCaptura) tituloCaptura.innerText = "Captura de Fallas (" + loteInput + " - Sem. " + semana + ")";
+
+                if(modalIdentificar) modalIdentificar.classList.add('hidden');
+                if(modalCaptura) modalCaptura.classList.remove('hidden');
+
+            } catch (error) {
+                alert("Error de conexión al validar el NIP.");
+            }
+            boton.innerHTML = textoOriginal;
+            boton.disabled = false;
+        }
+
+        async function guardarFallas(boton) {
+            const loteInput = document.getElementById('input-lote-num').value;
+            const semana = document.getElementById('input-semana').value;
+            const nip = document.getElementById('input-nip').value;
+
+            let rejillasData = [];
+            for(let i=1; i<=6; i++) {
+                let val = document.getElementById('rejilla-'+i)?.value;
+                rejillasData.push(parseInt(val) || 0);
+            }
+
+            let textoOriginal = boton.innerHTML;
+            boton.innerHTML = "Guardando...";
+            boton.disabled = true;
+
+            try {
                 let respFallas = await fetch("{{ url_for('prod_chrysopa.guardar_fallas') }}", {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        lote: lote_id,
+                        lote: loteInput,
                         semana: semana,
                         nip: nip,
                         rejillas: rejillasData 
@@ -329,7 +405,7 @@
                 let dataFallas = await respFallas.json();
 
                 if (dataFallas.status === 'success') {
-                    cerrarCaptura();
+                    cerrarModales();
                     location.reload(); 
                 } else {
                     alert("Error al guardar: " + dataFallas.message);

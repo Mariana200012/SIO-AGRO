@@ -2,26 +2,16 @@
 
 {% block title %}Directorio de Personal - Koppert Biofactory{% endblock %}
 
-{% block navbar_menu %}
-<!-- Menú superior limpio (exclusivo para la sección actual) -->
-<div class="flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner">
-    <a href="#" class="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-white bg-cyan-600 shadow-md shadow-cyan-900/50 border border-cyan-500/30 transition-all cursor-default whitespace-nowrap">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-        Gestión de Usuarios
-    </a>
-</div>
-{% endblock %}
-
 {% block content %}
-<div class="space-y-8 w-full max-w-7xl mx-auto pb-10 relative z-0">
+<div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
     
-    <!-- Encabezado -->
+    <!-- Encabezado Principal -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
         <div>
             <h1 class="text-2xl font-black text-slate-800 tracking-tight">Directorio de Personal <span class="text-cyan-600 font-bold text-lg bg-cyan-50 px-2 py-0.5 rounded-lg ml-1">Koppert</span></h1>
             <p class="text-xs text-slate-500 font-medium mt-1.5">Administración de operadores, NIPs de seguridad y asignación de áreas.</p>
         </div>
-        <button onclick="openModal('modalAdd')" class="bg-cyan-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-cyan-800 transition-all shadow-md flex items-center justify-center gap-2 hover:shadow-cyan-900/20">
+        <button onclick="openModal('modalAdd')" class="bg-cyan-700 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-cyan-800 transition-all shadow-md flex items-center justify-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
             Registrar Nuevo Usuario
         </button>
@@ -30,20 +20,20 @@
     <!-- Tabla de Usuarios -->
     <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
-            <h2 class="text-sm font-extrabold text-slate-800 flex items-center gap-3">
-                <div class="w-2 h-6 bg-cyan-500 rounded-full"></div>
+            <h2 class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                <div class="w-2 h-4 bg-cyan-500 rounded-full"></div>
                 Operadores Activos en el Sistema
             </h2>
         </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200 text-sm">
-                <thead class="bg-slate-50 text-slate-500">
+        <div class="overflow-x-auto overflow-y-auto max-h-[55vh]" id="scrollTable">
+            <table class="min-w-full divide-y divide-slate-100 text-sm relative">
+                <thead class="bg-white text-slate-500 sticky top-0 z-10 shadow-sm">
                     <tr>
-                        <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px] text-slate-600">ID / Nombre Completo</th>
-                        <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600">Puesto</th>
-                        <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600">Área Asignada</th>
-                        <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] text-slate-600">NIP</th>
-                        <th class="px-6 py-4 text-right font-extrabold uppercase tracking-wider text-[10px] text-slate-600">Acciones</th>
+                        <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">ID / Nombre Completo</th>
+                        <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Puesto</th>
+                        <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Área Asignada</th>
+                        <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">NIP</th>
+                        <th class="px-6 py-4 text-right font-extrabold uppercase tracking-wider text-[10px]">Acciones</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white">
@@ -64,19 +54,23 @@
                             <span class="px-2.5 py-1 rounded-md text-[10px] font-black bg-slate-100 text-slate-600">{{ user.puesto }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200">{{ user.nombre_area }}</span>
+                            <span class="px-3 py-1 rounded-md text-[10px] font-extrabold bg-cyan-50 text-cyan-700 border border-cyan-200">{{ user.nombre_area }}</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
                             <span class="font-mono text-xs font-bold text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-200">****</span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right">
-                            <button onclick="openEditModal({{ user.id_usuario }}, '{{ user.nombre_usuario }}', '{{ user.puesto }}', '{{ user.id_area }}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors inline-block mr-2">
+                            <button onclick="openEditModal({{ user.id_usuario }}, '{{ user.nombre_usuario }}', '{{ user.puesto }}', '{{ user.id_area }}')" class="text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 p-2 rounded-xl transition-colors inline-block mr-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                             </button>
-                            <button onclick="openDeleteModal({{ user.id_usuario }})" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors inline-block">
+                            <button onclick="openDeleteModal({{ user.id_usuario }})" class="text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 p-2 rounded-xl transition-colors inline-block">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                         </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-8 text-center text-slate-500 font-medium">Aún no hay operadores registrados.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -104,16 +98,16 @@
                         </button>
                     </div>
                     
-                    <div class="space-y-5">
+                    <div class="space-y-4">
                         <div>
                             <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Nombre Completo</label>
-                            <input type="text" name="nombre_usuario" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-slate-50 hover:border-cyan-300 transition-colors" placeholder="Ej. Juan Pérez">
+                            <input type="text" name="nombre_usuario" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-slate-50 font-medium" placeholder="Ej. Juan Pérez">
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Puesto</label>
-                                <select name="puesto" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-slate-50 hover:border-cyan-300 transition-colors cursor-pointer">
+                                <select name="puesto" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-slate-50 font-medium cursor-pointer">
                                     <option value="Operador">Operador</option>
                                     <option value="Supervisor">Supervisor</option>
                                     <option value="Administrador">Administrador</option>
@@ -121,7 +115,7 @@
                             </div>
                             <div>
                                 <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Área (ID)</label>
-                                <select name="id_area" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-slate-50 hover:border-cyan-300 transition-colors cursor-pointer">
+                                <select name="id_area" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-slate-50 font-medium cursor-pointer">
                                     <option value="1">1 - Chrysopa</option>
                                     <option value="2">2 - Catopar</option>
                                     <option value="3">3 - Empaque</option>
@@ -133,12 +127,12 @@
 
                         <div>
                             <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">NIP de Acceso</label>
-                            <input type="password" name="nip_firma" required maxlength="4" pattern="\d{4}" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono text-center text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-slate-50 hover:border-cyan-300 transition-colors tracking-[0.5em]" placeholder="****">
+                            <input type="password" name="nip_firma" required maxlength="4" pattern="\d{4}" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-mono text-center text-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 bg-slate-50 font-medium tracking-[0.5em]" placeholder="****">
                         </div>
                     </div>
                 </div>
-                <div class="bg-slate-50 px-8 py-5 flex items-center justify-end gap-3 border-t border-slate-100">
-                    <button type="button" onclick="closeModal('modalAdd')" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-800 transition-all shadow-sm">Cancelar</button>
+                <div class="bg-slate-50 px-8 py-4 flex items-center justify-end gap-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('modalAdd')" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-all shadow-sm">Cancelar</button>
                     <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-cyan-700 hover:bg-cyan-800 shadow-md transition-all">Guardar Usuario</button>
                 </div>
             </form>
@@ -165,16 +159,16 @@
                         </button>
                     </div>
                     
-                    <div class="space-y-5">
+                    <div class="space-y-4">
                         <div>
                             <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Nombre Completo</label>
-                            <input type="text" id="editNombre" name="nombre_usuario" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 transition-colors">
+                            <input type="text" id="editNombre" name="nombre_usuario" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 font-medium">
                         </div>
                         
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Puesto</label>
-                                <select id="editPuesto" name="puesto" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 transition-colors">
+                                <select id="editPuesto" name="puesto" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 font-medium cursor-pointer">
                                     <option value="Operador">Operador</option>
                                     <option value="Supervisor">Supervisor</option>
                                     <option value="Administrador">Administrador</option>
@@ -182,7 +176,7 @@
                             </div>
                             <div>
                                 <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Área (ID)</label>
-                                <select id="editArea" name="id_area" required class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 transition-colors">
+                                <select id="editArea" name="id_area" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 font-medium cursor-pointer">
                                     <option value="1">1 - Chrysopa</option>
                                     <option value="2">2 - Catopar</option>
                                     <option value="3">3 - Empaque</option>
@@ -193,12 +187,15 @@
                         </div>
 
                         <div>
-                            <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider mb-2">Nuevo NIP (Opcional)</label>
-                            <input type="password" name="nip_firma" maxlength="4" pattern="\d{4}" class="w-full border border-slate-200 rounded-xl px-4 py-3 text-sm font-mono text-center text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 transition-colors tracking-[0.5em]" placeholder="En blanco para mantener actual">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="block text-[11px] font-extrabold text-slate-600 uppercase tracking-wider">Nuevo NIP (Opcional)</label>
+                                <span class="text-[10px] font-medium text-slate-400">Dejar en blanco para mantener</span>
+                            </div>
+                            <input type="password" name="nip_firma" maxlength="4" pattern="\d{4}" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-mono text-center text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 font-medium tracking-[0.5em]" placeholder="****">
                         </div>
                     </div>
                 </div>
-                <div class="bg-slate-50 px-8 py-5 flex items-center justify-end gap-3 border-t border-slate-100">
+                <div class="bg-slate-50 px-8 py-4 flex items-center justify-end gap-3 border-t border-slate-100">
                     <button type="button" onclick="closeModal('modalEdit')" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-all">Cancelar</button>
                     <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition-all">Actualizar</button>
                 </div>
@@ -220,9 +217,9 @@
                         <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     </div>
                     <h3 class="text-xl font-black text-slate-800 mb-2">¿Dar de baja operador?</h3>
-                    <p class="text-sm font-medium text-slate-500">El operador cambiará a estatus 'Inactivo' y ya no podrá acceder a los módulos de producción.</p>
+                    <p class="text-xs font-medium text-slate-500">El operador cambiará a estatus 'Inactivo' y ya no podrá acceder a los módulos de producción.</p>
                 </div>
-                <div class="bg-slate-50 px-8 py-5 flex items-center justify-center gap-3 border-t border-slate-100">
+                <div class="bg-slate-50 px-8 py-4 flex items-center justify-center gap-3 border-t border-slate-100">
                     <button type="button" onclick="closeModal('modalDelete')" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 transition-all">Cancelar</button>
                     <button type="submit" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition-all">Sí, dar de baja</button>
                 </div>

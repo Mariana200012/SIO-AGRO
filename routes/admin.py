@@ -15,15 +15,24 @@ def get_db_connection():
     return conn
 
 # ==========================================
-# 1. PANEL PRINCIPAL (DASHBOARD)
+# DASHBOARD PRINCIPAL DEL ADMINISTRADOR
 # ==========================================
-@admin_bp.route('/dashboard')
-def dashboard():
-    return render_template('index.html')
+@admin_bp.route('/metricas')
+def metricas():
+    # Inicia por defecto en Chrysopa
+    return redirect(url_for('admin.dashb_chrysopa'))
+
+@admin_bp.route('/metricas/chrysopa')
+def dashb_chrysopa():
+    return render_template('admin/dashb_chrysopa.html')
+
+@admin_bp.route('/metricas/catopar')
+def dashb_catopar():
+    return render_template('admin/dashb_catopar.html')
 
 
 # ==========================================
-# 2. MÓDULO CHRYSOPA (ADMINISTRADOR)
+# MÓDULO CHRYSOPA
 # ==========================================
 @admin_bp.route('/ocupacion')
 def ocupacion():
@@ -148,12 +157,13 @@ def eclosion():
         suma_promedios = 0
         
         for lote in lotes:
-            cursor.execute("SELECT numero_orificios, cantidad FROM ECLOSION WHERE id_detallechr = ?", (lote['id_detallechr'],))
+            # CORREGIDO: numero_orificio (singular)
+            cursor.execute("SELECT numero_orificio, cantidad FROM ECLOSION WHERE id_detallechr = ?", (lote['id_detallechr'],))
             orificios = cursor.fetchall()
             
-            r1 = sum(1 for o in orificios if 1 <= o['numero_orificios'] <= 100 and o['cantidad'] > 0)
-            r2 = sum(1 for o in orificios if 101 <= o['numero_orificios'] <= 200 and o['cantidad'] > 0)
-            r3 = sum(1 for o in orificios if 201 <= o['numero_orificios'] <= 300 and o['cantidad'] > 0)
+            r1 = sum(1 for o in orificios if 1 <= o['numero_orificio'] <= 100 and o['cantidad'] > 0)
+            r2 = sum(1 for o in orificios if 101 <= o['numero_orificio'] <= 200 and o['cantidad'] > 0)
+            r3 = sum(1 for o in orificios if 201 <= o['numero_orificio'] <= 300 and o['cantidad'] > 0)
             
             promedio = round((r1 + r2 + r3) / 3, 1)
             suma_promedios += promedio
@@ -180,6 +190,7 @@ def eclosion():
         historial = []; promedio_global = 0.0
 
     return render_template('admin/chrysopa/eclosion.html', historial=historial, promedio_global=promedio_global)
+
 
 @admin_bp.route('/mortalidad')
 def mortalidad():
@@ -233,6 +244,7 @@ def mortalidad():
 
     return render_template('admin/chrysopa/mortalidad.html', historial=historial, promedio_global=promedio_global)
 
+    return render_template('admin/chrysopa/eclosion.html', historial=historial, promedio_global=promedio_global, ultimo=ultimo)
 @admin_bp.route('/fallas')
 def fallas():
     try:
@@ -284,10 +296,8 @@ def fallas():
         historial = []; promedio_global = 0.0
 
     return render_template('admin/chrysopa/fallas.html', historial=historial, promedio_global=promedio_global)
-
-
 # =====================================================================
-# 3. MÓDULO CATOPAR (ADMINISTRADOR)
+# MÓDULO CATOPAR 
 # =====================================================================
 @admin_bp.route('/catopar/pre')
 def catopar_pre():
@@ -295,47 +305,102 @@ def catopar_pre():
         conn = get_db_connection()
         cursor = conn.cursor()
         
+        # Leemos el historial incluyendo el estatus y semana
         cursor.execute("""
-            SELECT P.id_lote, P.viables, P.porcentaje, P.fecha_registro, U.nombre_usuario
+            SELECT P.id_pre, P.id_lote, P.semana, P.viables, P.estatus, P.fecha_registro, U.nombre_usuario
             FROM PRE_PARASITISMO P
             JOIN USUARIOS U ON P.id_operador = U.id_usuario
-            ORDER BY P.fecha_registro DESC
+            ORDER BY 
+                CASE WHEN P.estatus = 'Pendiente' THEN 1 ELSE 2 END,
+                P.id_pre DESC
         """)
         filas = cursor.fetchall()
         
         historial = [] 
-        suma_porcentajes = 0
+        pendientes = 0
+        aprobados = 0
         
+        meses_es = {"01":"Ene", "02":"Feb", "03":"Mar", "04":"Abr", "05":"May", "06":"Jun", 
+                    "07":"Jul", "08":"Ago", "09":"Sep", "10":"Oct", "11":"Nov", "12":"Dic"}
+
         for f in filas:
-            try:
-                fecha_obj = datetime.strptime(f['fecha_registro'], '%Y-%m-%d %H:%M:%S')
-                fecha_str = fecha_obj.strftime('%d/%b/%Y - %I:%M %p')
-                fecha_iso = fecha_obj.strftime('%Y-%m-%d')
-            except:
-                fecha_str = fecha_iso = f['fecha_registro']
-                
-            porcentaje = f['porcentaje']
-            suma_porcentajes += porcentaje
+            row_dict = dict(f)
             
-            historial.append({
-                'id_lote': f['id_lote'],
-                'viables': f['viables'],
-                'porcentaje': round(porcentaje, 1),
-                'fecha_str': fecha_str,
-                'fecha_iso': fecha_iso,
-                'operador': f['nombre_usuario']
-            })
+            # Contadores para KPIs
+            if row_dict['estatus'] == 'Pendiente': pendientes += 1
+            if row_dict['estatus'] == 'Aprobado': aprobados += 1
             
-        promedio_global = round(suma_porcentajes / len(historial), 1) if historial else 0.0
+            # Formateo de fecha
+            if row_dict['fecha_registro']:
+                try:
+                    f_obj = datetime.strptime(row_dict['fecha_registro'][:10], '%Y-%m-%d')
+                    hora_str = ""
+                    if len(row_dict['fecha_registro']) > 10:
+                        hora_obj = datetime.strptime(row_dict['fecha_registro'], '%Y-%m-%d %H:%M:%S')
+                        hora_str = hora_obj.strftime(' %I:%M %p')
+                    
+                    row_dict['fecha_str'] = f"{f_obj.strftime('%d')}-{meses_es[f_obj.strftime('%m')]}-{f_obj.strftime('%Y')}{hora_str}"
+                except ValueError:
+                    row_dict['fecha_str'] = row_dict['fecha_registro']
+                    
+            historial.append(row_dict)
+            
         conn.close()
-        
     except Exception as e:
         print("Error en Admin Catopar Pre:", e)
         historial = []
-        promedio_global = 0.0
+        pendientes = aprobados = 0
         
-    return render_template('admin/catopar/pre.html', historial=historial, promedio_global=promedio_global)
+    return render_template('admin/catopar/pre.html', historial=historial, pendientes=pendientes, aprobados=aprobados)
 
+@admin_bp.route('/catopar/pre/revision/<int:id_pre>')
+def catopar_pre_revision(id_pre):
+    # Esta es la ruta que abre la tarjeta detallada de los 21 garbanzos
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT * FROM PRE_PARASITISMO WHERE id_pre = ?", (id_pre,))
+        lote = cursor.fetchone()
+        
+        if not lote:
+            flash("El registro solicitado no existe.", "error")
+            return redirect(url_for('admin.catopar_pre'))
+            
+        cursor.execute("SELECT * FROM PRE_PARASITISMO_DETALLE WHERE id_pre = ? ORDER BY num_garbanzo", (id_pre,))
+        detalles = cursor.fetchall()
+        
+        conn.close()
+        return render_template('admin/catopar/pre_revision.html', lote=lote, detalles=detalles)
+    except Exception as e:
+        print("Error en Revisión Pre:", e)
+        return redirect(url_for('admin.catopar_pre'))
+
+@admin_bp.route('/catopar/pre/autorizar', methods=['POST'])
+def autorizar_pre():
+    id_pre = request.form.get('id_pre')
+    decision = request.form.get('decision')
+    
+    estatus_final = 'Aprobado' if decision == 'autorizar' else 'Rechazado'
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("UPDATE PRE_PARASITISMO SET estatus = ? WHERE id_pre = ?", (estatus_final, id_pre))
+        conn.commit()
+        
+        if estatus_final == 'Aprobado':
+            flash('El lote ha sido AUTORIZADO exitosamente.', 'success')
+        else:
+            flash('El lote ha sido RECHAZADO.', 'error')
+            
+    except Exception as e:
+        flash(f'Error al procesar la autorización: {str(e)}', 'error')
+    finally:
+        if 'conn' in locals(): conn.close()
+        
+    return redirect(url_for('admin.catopar_pre'))
 
 @admin_bp.route('/catopar/post')
 def catopar_post():
@@ -343,6 +408,7 @@ def catopar_post():
         conn = get_db_connection()
         cursor = conn.cursor()
         
+        # Consulta segura: Usamos LEFT JOIN para evitar que un usuario borrado oculte el lote
         cursor.execute("""
             SELECT 
                 C.id_cabecera, C.id_lote, C.fecha_registro, U.nombre_usuario,
@@ -352,10 +418,10 @@ def catopar_post():
                 SUM(D.cat_combinados) as total_cat_combinados,
                 SUM(D.cat_ambar) as total_cat_ambar
             FROM POST_PARASITISMO_CABECERA C
-            JOIN USUARIOS U ON C.id_operador = U.id_usuario
+            LEFT JOIN USUARIOS U ON C.id_operador = U.id_usuario
             LEFT JOIN POST_PARASITISMO_DETALLE D ON C.id_cabecera = D.id_cabecera
             GROUP BY C.id_cabecera
-            ORDER BY C.fecha_registro DESC
+            ORDER BY C.id_cabecera DESC
         """)
         filas = cursor.fetchall()
         
@@ -364,28 +430,38 @@ def catopar_post():
         total_evaluados = 0
         
         for f in filas:
-            t_gorg = (f['total_gorg_nacidos'] or 0) + (f['total_gorg_pupas'] or 0)
-            t_cat = (f['total_cat_negros'] or 0) + (f['total_cat_combinados'] or 0) + (f['total_cat_ambar'] or 0)
+            row = dict(f) # Convertimos a diccionario para evitar errores de sqlite3.Row
+            
+            # Sumas seguras con (or 0) por si hay nulos
+            t_gorg = (row.get('total_gorg_nacidos') or 0) + (row.get('total_gorg_pupas') or 0)
+            t_cat = (row.get('total_cat_negros') or 0) + (row.get('total_cat_combinados') or 0) + (row.get('total_cat_ambar') or 0)
             total_insectos = t_gorg + t_cat
             
             porcentaje = (t_cat / total_insectos * 100) if total_insectos > 0 else 0
             
-            try:
-                fecha_obj = datetime.strptime(f['fecha_registro'], '%Y-%m-%d %H:%M:%S')
-                fecha_str = fecha_obj.strftime('%d/%b/%Y - %I:%M %p')
-                fecha_iso = fecha_obj.strftime('%Y-%m-%d')
-            except:
-                fecha_str = fecha_iso = f['fecha_registro']
+            # Formateo de fecha seguro
+            fecha_str = row.get('fecha_registro', '')
+            if fecha_str:
+                try:
+                    fecha_obj = datetime.strptime(fecha_str[:19], '%Y-%m-%d %H:%M:%S')
+                    fecha_str = fecha_obj.strftime('%d/%b/%Y - %I:%M %p')
+                except ValueError:
+                    try:
+                        fecha_obj = datetime.strptime(fecha_str[:10], '%Y-%m-%d')
+                        fecha_str = fecha_obj.strftime('%d/%b/%Y')
+                    except ValueError:
+                        pass
             
+            # Armamos el diccionario para el HTML
             historial.append({
-                'id_lote': f['id_lote'],
+                'id_cabecera': row.get('id_cabecera'),
+                'id_lote': row.get('id_lote'),
                 't_gorg': t_gorg,
                 't_cat': t_cat,
                 'total_insectos': total_insectos,
                 'porcentaje': round(porcentaje, 1),
                 'fecha_str': fecha_str,
-                'fecha_iso': fecha_iso,
-                'operador': f['nombre_usuario']
+                'operador': row.get('nombre_usuario') or 'Usuario Desconocido'
             })
             
             total_parasitismo += t_cat
@@ -395,12 +471,56 @@ def catopar_post():
             
         conn.close()
     except Exception as e:
-        print("Error en Admin Catopar Post:", e)
+        print("Error CRÍTICO en Admin Catopar Post:", e)
         historial = []
         promedio_global = 0.0
         
     return render_template('admin/catopar/post.html', historial=historial, promedio_global=promedio_global)
 
+@admin_bp.route('/catopar/post/revision/<int:id_cabecera>')
+def catopar_post_revision(id_cabecera):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # 1. Obtenemos la cabecera y el nombre del operador
+        cursor.execute("""
+            SELECT C.*, U.nombre_usuario 
+            FROM POST_PARASITISMO_CABECERA C
+            JOIN USUARIOS U ON C.id_operador = U.id_usuario
+            WHERE C.id_cabecera = ?
+        """, (id_cabecera,))
+        lote_row = cursor.fetchone()
+        
+        if not lote_row:
+            flash("El registro solicitado no existe.", "error")
+            return redirect(url_for('admin.catopar_post'))
+            
+        lote = dict(lote_row)
+
+        # 2. Obtenemos las 10 unidades de detalle
+        cursor.execute("""
+            SELECT * FROM POST_PARASITISMO_DETALLE 
+            WHERE id_cabecera = ? ORDER BY numero_garbanzo
+        """, (id_cabecera,))
+        detalles = [dict(row) for row in cursor.fetchall()]
+
+        # 3. Calculamos los totales para las tarjetas inferiores
+        totales = {
+            'gorgojos': sum(d['gorg_nacidos'] for d in detalles), 
+            'completos': sum(d['gorg_pupas'] for d in detalles),
+            'negro': sum(d['cat_negros'] for d in detalles),
+            'combinado': sum(d['cat_combinados'] for d in detalles),
+            'ambar': sum(d['cat_ambar'] for d in detalles)
+        }
+
+        conn.close()
+        return render_template('admin/catopar/post_revision.html', lote=lote, detalles=detalles, totales=totales)
+        
+    except Exception as e:
+        print("Error en Revisión Post-Parasitismo:", e)
+        return redirect(url_for('admin.catopar_post'))
+    
 @admin_bp.route('/catopar/post/asignar', methods=['POST'])
 def catopar_asignar():
     id_lote = request.form.get('id_lote')
@@ -430,17 +550,10 @@ def catopar_asignar():
 
     return redirect(url_for('admin.catopar_post'))
 
+# ==========================================
+# ASISTENCIA
+# ==========================================
 
-# ==========================================
-# 4. RUTAS NUEVAS PARA EL MENÚ (DASHBOARD Y ASISTENCIA)
-# ==========================================
-@admin_bp.route('/metricas')
-def metricas():
-    if session.get('id_area') != 5:
-        flash('Acceso denegado. Área exclusiva de Administración.', 'error')
-        return redirect(url_for('auth.login'))
-        
-    return render_template('admin/dashboard.html')
 
 @admin_bp.route('/asistencia')
 def asistencia():
@@ -496,7 +609,7 @@ def asistencia():
 
 
 # ==========================================
-# 5. GESTIÓN DE USUARIOS (Conexión a SQLite)
+# GESTIÓN DE USUARIOS
 # ==========================================
 @admin_bp.route('/usuarios')
 def usuarios():
@@ -529,6 +642,9 @@ def agregar_usuario():
     )
     conexion.commit()
     conexion.close()
+    
+    # AGREGAR ESTA LÍNEA AQUÍ
+    flash('¡Usuario registrado correctamente!', 'success')
     
     return redirect(url_for('admin.usuarios'))
 
@@ -603,3 +719,71 @@ def editar_usuario(id_usuario):
         conn.close()
 
     return redirect(url_for('admin.usuarios'))
+
+# ==========================================
+# GESTIÓN DE MATERIALES 
+# ==========================================
+@admin_bp.route('/materiales')
+def gestionar_materiales():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Consultamos los materiales uniendo la tabla de áreas
+        cursor.execute("""
+            SELECT M.id_material, M.nombre_material, M.presentacion, A.nombre_area 
+            FROM MATERIALES M
+            LEFT JOIN CAT_AREAS A ON M.id_area = A.id_area
+            ORDER BY M.id_material DESC
+        """)
+        materiales = cursor.fetchall()
+        
+        # Consultamos exclusivamente Chrysopa y Catopar para el selector
+        cursor.execute("""
+            SELECT id_area, nombre_area FROM CAT_AREAS 
+            WHERE nombre_area LIKE '%Chrysopa%' OR nombre_area LIKE '%Catopar%'
+        """)
+        areas = cursor.fetchall()
+        
+        conn.close()
+    except Exception as e:
+        print("Error al cargar materiales:", e)
+        materiales = []
+        areas = []
+        
+    return render_template('admin/materiales.html', materiales=materiales, areas=areas)
+
+@admin_bp.route('/materiales/agregar', methods=['POST'])
+def agregar_material():
+    id_area = request.form.get('id_area')
+    nombre_material = request.form.get('nombre_material')
+    presentacion = request.form.get('presentacion')
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO MATERIALES (id_area, nombre_material, presentacion) 
+            VALUES (?, ?, ?)
+        """, (id_area, nombre_material, presentacion))
+        conn.commit()
+        conn.close()
+        flash('Material agregado correctamente al catálogo.', 'success')
+    except Exception as e:
+        flash(f'Error al agregar material: {str(e)}', 'error')
+        
+    return redirect(url_for('admin.gestionar_materiales'))
+
+@admin_bp.route('/materiales/eliminar/<int:id_material>', methods=['POST'])
+def eliminar_material(id_material):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM MATERIALES WHERE id_material = ?", (id_material,))
+        conn.commit()
+        conn.close()
+        flash('Material eliminado correctamente.', 'success')
+    except Exception as e:
+        flash(f'Error al eliminar material: {str(e)}', 'error')
+        
+    return redirect(url_for('admin.gestionar_materiales'))

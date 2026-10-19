@@ -1,0 +1,208 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Dashboard Catopar - Koppert Biofactory{% endblock %}
+
+{% block navbar_menu %}
+<!-- Envoltura responsiva con scroll horizontal -->
+<div id="pillMenuContainer" class="w-full max-w-full overflow-x-auto hide-scroll flex justify-start sm:justify-center px-4 py-1">
+    
+    <!-- Cápsula contenedora elegante -->
+    <div class="inline-flex items-center gap-1 p-1 bg-slate-900/80 rounded-full border border-slate-700/60 backdrop-blur-md shadow-inner shadow-black/40 flex-nowrap min-w-max">
+        
+        <!-- BOTÓN INACTIVO (Chrysopa) -->
+        <a href="{{ url_for('admin.dashb_chrysopa') }}" 
+           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
+            Chrysopa
+        </a>
+
+        <!-- BOTÓN ACTIVO (Catopar) -->
+        <a id="activePill" href="{{ url_for('admin.dashb_catopar') }}" 
+           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-black text-white bg-gradient-to-r from-amber-600 to-amber-500 shadow-[0_2px_12px_rgba(245,158,11,0.35)] border border-amber-400/40 scale-[1.03] transition-all duration-200 cursor-default whitespace-nowrap">
+            Catopar
+        </a>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
+    
+    <!-- Encabezado de Catopar -->
+    <div class="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 border border-blue-100 mb-2">
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></div>
+                <span class="text-[10px] font-bold tracking-widest uppercase text-blue-800">Área Operativa • Catopar</span>
+            </div>
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Métricas de Rendimiento: Catopar</h1>
+            <p class="text-xs text-slate-500 font-medium mt-1">Análisis visual estático de Pre-Parasitismo y Post-Parasitismo (Vista de Demostración).</p>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 1: PRE-PARASITISMO (2 Gráficas) -->
+    <div class="flex flex-col gap-3">
+        <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 ml-1">Análisis de Pre-Parasitismo</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Gráfica 1: Viabilidad de Lotes (Ejemplo Visual) -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <div class="w-2 h-4 bg-blue-600 rounded-full"></div>
+                        Viabilidad de Lotes (Pre-Parasitismo)
+                    </h3>
+                    <span class="text-[10px] font-bold text-blue-800 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">Últimos 5 lotes</span>
+                </div>
+                <!-- Gráfica en Barras Simulada (SVG Falso) -->
+                <div class="h-64 w-full flex flex-col justify-between pt-4">
+                    <div class="flex-1 flex items-end justify-between gap-4 px-4 border-b border-slate-200 pb-2">
+                        <div class="w-full bg-blue-100 hover:bg-blue-200 rounded-t-xl transition-all relative group" style="height: 70%;">
+                            <span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-blue-700">3,500</span>
+                        </div>
+                        <div class="w-full bg-blue-500 hover:bg-blue-600 rounded-t-xl transition-all relative group" style="height: 88%;">
+                            <span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-blue-700">4,100</span>
+                        </div>
+                        <div class="w-full bg-blue-200 hover:bg-blue-300 rounded-t-xl transition-all relative group" style="height: 78%;">
+                            <span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-blue-700">3,800</span>
+                        </div>
+                        <div class="w-full bg-blue-600 hover:bg-blue-700 rounded-t-xl transition-all relative group" style="height: 98%;">
+                            <span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-blue-700">4,500</span>
+                        </div>
+                        <div class="w-full bg-blue-500 hover:bg-blue-600 rounded-t-xl transition-all relative group" style="height: 90%;">
+                            <span class="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-blue-700">4,200</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between px-2 pt-2 text-[11px] font-bold text-slate-500">
+                        <span>Lote 201</span>
+                        <span>Lote 202</span>
+                        <span>Lote 203</span>
+                        <span>Lote 204</span>
+                        <span>Lote 205</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfica 2: Tasa de Viabilidad % -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <div class="w-2 h-4 bg-indigo-500 rounded-full"></div>
+                        Tasa de Viabilidad (%)
+                    </h3>
+                    <span class="text-[10px] font-bold text-blue-800 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">Histórico</span>
+                </div>
+                <!-- Gráfica de Tendencia Simulada -->
+                <div class="h-64 w-full flex flex-col justify-between pt-2">
+                    <div class="relative flex-1 w-full flex items-center justify-center">
+                        <svg class="w-full h-full overflow-visible" viewBox="0 0 400 150">
+                            <path d="M 10 90 Q 90 20 180 110 T 380 30" fill="none" stroke="#6366f1" stroke-width="4"/>
+                            <path d="M 10 90 Q 90 20 180 110 T 380 30 L 380 140 L 10 140 Z" fill="rgba(99, 102, 241, 0.1)"/>
+                            <!-- Puntos -->
+                            <circle cx="10" cy="90" r="5" fill="#6366f1"/>
+                            <circle cx="100" cy="40" r="5" fill="#6366f1"/>
+                            <circle cx="190" cy="110" r="5" fill="#6366f1"/>
+                            <circle cx="280" cy="60" r="5" fill="#6366f1"/>
+                            <circle cx="380" cy="30" r="5" fill="#6366f1"/>
+                        </svg>
+                    </div>
+                    <div class="flex justify-between px-2 pt-2 text-[11px] font-bold text-slate-500 border-t border-slate-100">
+                        <span>Lote 201 (91.2%)</span>
+                        <span>Lote 202 (94.5%)</span>
+                        <span>Lote 203 (88.0%)</span>
+                        <span>Lote 204 (95.2%)</span>
+                        <span>Lote 205 (93.8%)</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: POST-PARASITISMO (2 Gráficas) -->
+    <div class="flex flex-col gap-3 mt-2">
+        <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 ml-1">Análisis de Post-Parasitismo</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Gráfica 3: Distribución de Emergencia -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <div class="w-2 h-4 bg-emerald-500 rounded-full"></div>
+                        Distribución de Emergencia
+                    </h3>
+                    <span class="text-[10px] font-bold text-blue-800 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200">Global</span>
+                </div>
+                <div class="h-64 w-full flex items-center justify-around">
+                    <!-- SVG Dona Simulada -->
+                    <div class="relative w-40 h-40">
+                        <svg viewBox="0 0 36 36" class="w-full h-full transform -rotate-90">
+                            <path stroke-dasharray="45 100" stroke="#10b981" stroke-width="6" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path stroke-dasharray="20 100" stroke-dashoffset="-45" stroke="#f59e0b" stroke-width="6" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path stroke-dasharray="25 100" stroke-dashoffset="-65" stroke="#3b82f6" stroke-width="6" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                            <path stroke-dasharray="10 100" stroke-dashoffset="-90" stroke="#ef4444" stroke-width="6" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        </svg>
+                    </div>
+                    <!-- Leyenda Estilizada -->
+                    <div class="flex flex-col gap-2 text-xs font-bold text-slate-600">
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-emerald-500"></div> Catopar Negros (45%)</div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-amber-500"></div> Catopar Ámbar (20%)</div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-500"></div> Gorg. Nacidos (25%)</div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-red-500"></div> Gorg. Pupas (10%)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfica 4: Comparativa Gorgojos vs Catopar -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <div class="w-2 h-4 bg-amber-500 rounded-full"></div>
+                        Rendimiento Parasitismo
+                    </h3>
+                    <span class="text-[10px] font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200">Parasitados vs No Parasitados</span>
+                </div>
+                <div class="h-64 w-full flex flex-col justify-between pt-4">
+                    <div class="flex-1 flex items-end justify-between gap-4 px-4 border-b border-slate-200 pb-2">
+                        <!-- Barra Apilada 1 -->
+                        <div class="w-full flex flex-col h-[85%] rounded-xl overflow-hidden">
+                            <div class="bg-amber-500 h-[35%]" title="Gorgojos"></div>
+                            <div class="bg-emerald-500 h-[65%]" title="Catopar"></div>
+                        </div>
+                        <!-- Barra Apilada 2 -->
+                        <div class="w-full flex flex-col h-[90%] rounded-xl overflow-hidden">
+                            <div class="bg-amber-500 h-[30%]" title="Gorgojos"></div>
+                            <div class="bg-emerald-500 h-[70%]" title="Catopar"></div>
+                        </div>
+                        <!-- Barra Apilada 3 -->
+                        <div class="w-full flex flex-col h-[80%] rounded-xl overflow-hidden">
+                            <div class="bg-amber-500 h-[40%]" title="Gorgojos"></div>
+                            <div class="bg-emerald-500 h-[60%]" title="Catopar"></div>
+                        </div>
+                        <!-- Barra Apilada 4 -->
+                        <div class="w-full flex flex-col h-[95%] rounded-xl overflow-hidden">
+                            <div class="bg-amber-500 h-[25%]" title="Gorgojos"></div>
+                            <div class="bg-emerald-500 h-[75%]" title="Catopar"></div>
+                        </div>
+                        <!-- Barra Apilada 5 -->
+                        <div class="w-full flex flex-col h-[88%] rounded-xl overflow-hidden">
+                            <div class="bg-amber-500 h-[28%]" title="Gorgojos"></div>
+                            <div class="bg-emerald-500 h-[72%]" title="Catopar"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between px-2 pt-2 text-[11px] font-bold text-slate-500">
+                        <span>Lote 201</span>
+                        <span>Lote 202</span>
+                        <span>Lote 203</span>
+                        <span>Lote 204</span>
+                        <span>Lote 205</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

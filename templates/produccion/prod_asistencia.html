@@ -3,42 +3,54 @@
 {% block title %}Pase de Lista - Koppert Biofactory{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto space-y-6 pb-10">
+<!-- Contenedor Estandarizado -->
+<div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
     
-    <!-- BOTÓN DE VOLVER ATRÁS -->
-    <div>
-        <a href="javascript:history.back()" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-xl transition-all shadow-sm border border-slate-200 text-sm hover:-translate-x-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Volver atrás
+    <!-- Botón Volver Perfectamente Alineado a la Izquierda -->
+    {% if request.endpoint != 'index' %}
+    <div class="w-full flex justify-start">
+        <a href="{{ url_for('index') }}" class="self-start inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-slate-200/70 rounded-xl text-sm font-bold text-slate-600 hover:text-emerald-700 hover:border-emerald-400 hover:bg-emerald-50 hover:shadow-md shadow-sm active:scale-95 transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 group-hover:-translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Volver atras
         </a>
     </div>
+    {% endif %}
 
-    <!-- Encabezado Nuevo -->
-    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex justify-between items-center">
+    <!-- Encabezado Principal Estandarizado -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-slate-200/70 backdrop-blur-xl gap-4">
         <div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-violet-50 text-violet-800 text-[10px] font-bold tracking-widest uppercase mb-2">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-violet-50 border border-violet-100 text-violet-700 text-[10px] font-bold tracking-widest uppercase mb-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
                 Mi Área de Trabajo
             </div>
-            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Pase de Lista de Operadores</h1>
-            <p class="text-xs text-slate-500 font-medium mt-1">Marque la entrada del personal asignado a su área.</p>
+            <h1 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight mb-1">Pase de Lista de Operadores</h1>
+            <p class="text-xs text-slate-500 font-medium">Marque la entrada del personal asignado a su área.</p>
         </div>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+    <!-- Contenedor de la Lista -->
+    <div class="overflow-x-auto overflow-y-auto max-h-[55vh]" id="scrollTable">
+        
+        <!-- Barra superior de la lista -->
+        <div class="bg-slate-50/50 px-4 sm:px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-2">
+                Personal Activo Asignado
+            </h2>
+            <span class="hidden sm:inline-block text-[10px] sm:text-xs font-normal text-slate-400 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">Registro Diario</span>
+        </div>
+        
         <ul class="divide-y divide-slate-100">
             
             {% for op in operadores %}
-            <li class="p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-slate-50 transition-colors">
+            <li class="p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-slate-50/80 transition-colors">
                 
                 <!-- Info del Operador -->
                 <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-black border border-slate-200">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-black border border-slate-200/70 text-sm sm:text-base">
                         {{ op['nombre_usuario'][:2] | upper }}
                     </div>
                     <div>
-                        <p class="font-black text-slate-800 text-sm">{{ op['nombre_usuario'] }}</p>
+                        <p class="font-black text-slate-800 text-sm sm:text-base">{{ op['nombre_usuario'] }}</p>
                         
                         <div class="flex items-center gap-2 mt-1">
                             {% if op['hora_entrada'] %}
@@ -52,14 +64,16 @@
                     </div>
                 </div>
 
-                <!-- Botón de Entrada Única -->
-                <div>
+                <!-- Botón de Entrada Única con Íconos -->
+                <div class="w-full sm:w-auto mt-2 sm:mt-0">
                     {% if not op['hora_entrada'] %}
-                        <button onclick="marcarAsistencia(this, {{ op['id_usuario'] }})" class="w-full sm:w-auto px-5 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-black uppercase tracking-wider rounded-xl transition-colors shadow-sm">
+                        <button onclick="marcarAsistencia(this, {{ op['id_usuario'] }})" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-black uppercase tracking-wider rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             Marcar Entrada
                         </button>
                     {% else %}
-                        <button disabled class="w-full sm:w-auto px-5 py-2 bg-slate-100 text-slate-400 text-xs font-black uppercase tracking-wider rounded-xl cursor-not-allowed">
+                        <button disabled class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 text-slate-400 text-xs font-black uppercase tracking-wider rounded-xl cursor-not-allowed flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                             Entrada Registrada
                         </button>
                     {% endif %}
@@ -67,12 +81,12 @@
             </li>
             {% else %}
             <!-- Mensaje si no hay operadores en el área -->
-            <li class="p-8 text-center">
-                <div class="inline-block p-3 bg-slate-50 rounded-full mb-3">
-                    <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            <li class="p-8 sm:p-12 text-center">
+                <div class="inline-flex p-4 bg-slate-50 rounded-full mb-3 border border-slate-100 shadow-inner">
+                    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                 </div>
-                <p class="text-slate-500 font-bold text-sm">No hay operadores registrados o activos en su área.</p>
-                <p class="text-slate-400 text-xs mt-1">Asegúrese de que el personal tenga el puesto "Operador" en el sistema.</p>
+                <p class="text-slate-600 font-bold text-sm sm:text-base">No hay operadores registrados o activos en su área.</p>
+                <p class="text-slate-400 text-xs sm:text-sm mt-1">Asegúrese de que el personal tenga el puesto "Operador" en el sistema.</p>
             </li>
             {% endfor %}
 
@@ -83,15 +97,15 @@
 <script>
     async function marcarAsistencia(boton, idOperador) {
         boton.disabled = true;
-        boton.innerText = "Guardando...";
+        boton.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Guardando...`;
 
         try {
             let respuesta = await fetch(`/asistencia/marcar/${idOperador}`, { method: 'POST' });
             let data = await respuesta.json();
 
             if (data.status === 'success') {
-                boton.className = "w-full sm:w-auto px-5 py-2 bg-slate-100 text-slate-400 text-xs font-black uppercase tracking-wider rounded-xl cursor-not-allowed";
-                boton.innerText = "Entrada Registrada";
+                boton.className = "w-full sm:w-auto px-5 py-2.5 bg-slate-100 text-slate-400 text-xs font-black uppercase tracking-wider rounded-xl cursor-not-allowed flex items-center justify-center gap-2";
+                boton.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Entrada Registrada`;
                 
                 if(data.estado === 'entrada') {
                     let labelEntrada = document.getElementById(`hora-ent-${idOperador}`);
@@ -102,7 +116,7 @@
             }
         } catch (error) {
             console.error("Error:", error);
-            boton.innerText = "Error";
+            boton.innerHTML = "Error";
             boton.disabled = false;
         }
     }

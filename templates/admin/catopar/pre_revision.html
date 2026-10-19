@@ -1,0 +1,131 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Revisión de Lote - Pre-Parasitismo{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-6xl mx-auto flex flex-col gap-6 pb-24 mb-12">
+    
+    <!-- ENCABEZADO Y DATOS DEL LOTE -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <a href="{{ url_for('admin.catopar_pre') }}" class="w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors border border-slate-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                </a>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight">Revisión de Lote <span class="text-emerald-600 font-bold text-lg">#{{ lote.id_lote }}</span></h1>
+            </div>
+            <p class="text-xs text-slate-500 font-medium ml-11">Evaluación de Pre-Parasitismo pendiente de autorización.</p>
+        </div>
+        
+        <div class="flex gap-4">
+            <div class="flex flex-col items-end">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Semana Operativa</span>
+                <span class="text-lg font-black text-slate-700">Semana {{ lote.semana if lote.semana else '--' }}</span>
+            </div>
+            <div class="w-px bg-slate-200"></div>
+            <div class="flex flex-col items-end">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fecha de Captura</span>
+                <span class="text-sm font-bold text-slate-700">{{ lote.fecha_registro }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- PANEL CENTRAL: VISUALIZACIÓN DE LOS 21 GARBANZOS -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+        
+        <!-- Header del panel -->
+        <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+            <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                Detalle de Muestra (21 Unidades)
+            </h3>
+            <span class="px-3 py-1 bg-cyan-50 text-cyan-700 text-[10px] font-black rounded-lg border border-cyan-100 uppercase tracking-widest shadow-inner">
+                Total Viables: {{ lote.viables }}
+            </span>
+        </div>
+
+        <div class="p-6">
+            <!-- Grid de Visualización de Garbanzos (7 columnas para 3 filas exactas) -->
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-4 mb-10">
+                {% for d in detalles %}
+                <div class="bg-white border border-slate-200 hover:border-emerald-300 rounded-2xl p-3 flex flex-col items-center justify-center gap-2 shadow-sm hover:shadow-md transition-all relative group cursor-default">
+                    
+                    <!-- Número de Garbanzo -->
+                    <div class="absolute -top-2 -left-2 w-6 h-6 bg-slate-100 group-hover:bg-emerald-100 text-slate-500 group-hover:text-emerald-700 font-black text-[10px] rounded-full flex items-center justify-center transition-colors border border-white shadow-sm">
+                        {{ d.num_garbanzo }}
+                    </div>
+                    
+                    <!-- Contadores Individuales -->
+                    <div class="mt-3 w-full flex flex-col gap-1.5">
+                        <div class="flex justify-between items-center bg-slate-50 px-2 py-1 rounded-lg border border-slate-100">
+                            <span class="text-[10px] font-black text-slate-400">CH</span>
+                            <span class="text-xs font-black text-slate-700">{{ d.chicas }}</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-blue-50/50 px-2 py-1 rounded-lg border border-blue-100/50">
+                            <span class="text-[10px] font-black text-blue-400">M</span>
+                            <span class="text-xs font-black text-blue-700">{{ d.medianas }}</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-amber-50/50 px-2 py-1 rounded-lg border border-amber-100/50">
+                            <span class="text-[10px] font-black text-amber-500">G</span>
+                            <span class="text-xs font-black text-amber-700">{{ d.grandes }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- ÁREA DE DECISIÓN Y TOTALES (FORMULARIO) -->
+            <form action="{{ url_for('admin.autorizar_pre') }}" method="POST" class="flex flex-col lg:flex-row items-center justify-between gap-6 bg-slate-50/80 p-6 rounded-3xl border border-slate-200 shadow-inner">
+                
+                <input type="hidden" name="id_pre" value="{{ lote.id_pre }}">
+                
+                <!-- KPIs Totales -->
+                <div class="flex flex-wrap gap-4 w-full lg:w-auto justify-center">
+                    <div class="flex flex-col text-center px-6 py-4 bg-white rounded-2xl shadow-sm border border-slate-200 min-w-[120px]">
+                        <span class="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-1">Total Chicos</span>
+                        <span class="text-3xl font-black text-slate-700">{{ lote.chicas }}</span>
+                    </div>
+                    <div class="flex flex-col text-center px-6 py-4 bg-white rounded-2xl shadow-sm border border-blue-200 min-w-[120px] ring-2 ring-blue-500/5">
+                        <span class="text-[10px] uppercase tracking-widest font-black text-blue-400 mb-1">Total Medianos</span>
+                        <span class="text-3xl font-black text-blue-600">{{ lote.medianas }}</span>
+                    </div>
+                    <div class="flex flex-col text-center px-6 py-4 bg-white rounded-2xl shadow-sm border border-amber-200 min-w-[120px] ring-2 ring-amber-500/5">
+                        <span class="text-[10px] uppercase tracking-widest font-black text-amber-500 mb-1">Total Grandes</span>
+                        <span class="text-3xl font-black text-amber-600">{{ lote.grandes }}</span>
+                    </div>
+                </div>
+
+                <!-- Botones de Acción o Estatus Final -->
+                <div class="flex gap-3 w-full lg:w-auto mt-4 lg:mt-0 justify-center">
+                    
+                    {% if lote.estatus == 'Pendiente' %}
+                        <!-- Botones Activos solo si está Pendiente -->
+                        <button type="submit" name="decision" value="rechazar" class="flex-1 lg:flex-none px-8 py-4 bg-white border-2 border-rose-100 hover:bg-rose-50 hover:border-rose-300 text-rose-600 text-sm font-bold rounded-2xl transition-all shadow-sm active:scale-95">
+                            Rechazar Lote
+                        </button>
+                        <button type="submit" name="decision" value="autorizar" class="flex-1 lg:flex-none px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-2xl shadow-md shadow-emerald-900/20 transition-all active:scale-95 flex items-center justify-center gap-2">
+                            Autorizar Parasitismo
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        </button>
+                    {% else %}
+                        <!-- Tarjeta de Solo Lectura si ya fue evaluado -->
+                        <div class="flex items-center gap-4 px-6 py-3 bg-white rounded-2xl border border-slate-200 shadow-sm">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Estatus Final:</span>
+                            
+                            {% if lote.estatus == 'Aprobado' %}
+                                <span class="px-4 py-2 bg-emerald-50 text-emerald-700 text-sm font-black rounded-xl border border-emerald-200 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Aprobado
+                                </span>
+                            {% else %}
+                                <span class="px-4 py-2 bg-red-50 text-red-700 text-sm font-black rounded-xl border border-red-200 flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-red-500"></span> Rechazado
+                                </span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

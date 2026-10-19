@@ -75,7 +75,7 @@
 
     <!-- Área de Trabajo Principal pegada arriba -->
     <main class="flex-1 overflow-y-auto px-6 pt-4 pb-10 lg:px-10 bg-slate-50">
-        <div class="max-w-[1200px] mx-auto space-y-5">
+       <div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
             
             <!-- ALERTA DE MENSAJES CON AUTOCIERRE DINÁMICO -->
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -133,7 +133,7 @@
                     <h2 class="text-[15px] font-bold text-slate-800 tracking-tight">Tus Solicitudes Recientes</h2>
                     <span class="text-[10px] text-slate-400 font-mono bg-slate-50 border border-slate-100 px-2 py-1 rounded-md shadow-sm"></span>
                 </div>
-                <div class="overflow-x-auto table-container px-2 pb-2">
+                <div class="overflow-x-auto overflow-y-auto max-h-[55vh]" id="scrollTable">
                     <table class="min-w-full text-sm">
                         <thead class="bg-white sticky top-0 z-10 shadow-sm">
                             <tr>
