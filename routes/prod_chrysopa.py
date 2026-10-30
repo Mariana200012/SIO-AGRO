@@ -34,7 +34,7 @@ def ocupacion():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Obtener el último registro (AHORA INCLUYE P.id_lote)
+        # Obtener el último registro
         cursor.execute("""
             SELECT P.id_detallechr, P.id_lote, P.semana, P.fecha_registro, U.nombre_usuario
             FROM PROD_DETALLE_CHRYSOPA P
@@ -51,7 +51,6 @@ def ocupacion():
             orificios = cursor.fetchall()
             
             if orificios:
-                # Contamos cuántos orificios tienen más de 0 pupas por cada rejilla (100 orificios por rejilla)
                 r1_ocupados = sum(1 for o in orificios if 1 <= o['numero_orificio'] <= 100 and o['cantidad'] > 0)
                 r2_ocupados = sum(1 for o in orificios if 101 <= o['numero_orificio'] <= 200 and o['cantidad'] > 0)
                 r3_ocupados = sum(1 for o in orificios if 201 <= o['numero_orificio'] <= 300 and o['cantidad'] > 0)
@@ -76,13 +75,13 @@ def ocupacion():
                     'estatus': "Óptimo" if promedio_general >= 90.0 else "Revisión / Bajo"
                 }
 
-        # Obtener historial (últimos 10) - TAMBIÉN SE AGREGA EL LOTE
+        # Obtener historial (últimos 30)
         cursor.execute("""
             SELECT P.id_detallechr, P.id_lote, P.semana, P.fecha_registro, U.nombre_usuario
             FROM PROD_DETALLE_CHRYSOPA P
             JOIN USUARIOS U ON P.id_operador = U.id_usuario
             WHERE P.id_detallechr IN (SELECT DISTINCT id_detallechr FROM OCUPACION)
-            ORDER BY P.id_detallechr DESC LIMIT 10
+            ORDER BY P.id_detallechr DESC LIMIT 30
         """)
         historial = []
         for fila in cursor.fetchall():
@@ -145,19 +144,17 @@ def guardar_ocupacion():
         flash(f'Error al guardar ocupación: {str(e)}', 'error')
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+
 # =====================================================================
 # MÓDULO DE PUPACIÓN
 # =====================================================================
-# ==========================================
-# MÓDULO PUPACIÓN
-# ==========================================
 @prod_chrysopa_bp.route('/pupacion')
 def pupacion():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Obtener el último registro incluyendo P.id_lote
+        # Obtener el último registro
         cursor.execute("""
             SELECT P.id_detallechr, P.id_lote, P.semana, P.fecha_registro, U.nombre_usuario
             FROM PROD_DETALLE_CHRYSOPA P
@@ -196,13 +193,13 @@ def pupacion():
                     'estatus': "Óptimo" if promedio_general >= 90.0 else "Revisión / Bajo"
                 }
 
-        # Obtener historial (últimos 10)
+        # Obtener historial (últimos 30)
         cursor.execute("""
             SELECT P.id_detallechr, P.id_lote, P.semana, P.fecha_registro, U.nombre_usuario
             FROM PROD_DETALLE_CHRYSOPA P
             JOIN USUARIOS U ON P.id_operador = U.id_usuario
             WHERE P.id_detallechr IN (SELECT DISTINCT id_detallechr FROM PUPACION)
-            ORDER BY P.id_detallechr DESC LIMIT 10
+            ORDER BY P.id_detallechr DESC LIMIT 30
         """)
         historial = []
         for fila in cursor.fetchall():
@@ -263,6 +260,7 @@ def guardar_pupacion():
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+
 # =====================================================================
 # MÓDULO DE ECLOSIÓN
 # =====================================================================
@@ -294,7 +292,6 @@ def eclosion():
                 r3 = next((o['cantidad'] for o in orificios if o['numero_orificio'] == 3), 0)
                 
                 total_no_emergidas = r1 + r2 + r3
-                # Porcentaje de falla (no eclosión) basado en 300 pupas totales
                 porcentaje_no_eclosion = round((total_no_emergidas / 300) * 100, 1)
 
                 try:
@@ -312,13 +309,13 @@ def eclosion():
                     'estatus': "Óptimo" if porcentaje_no_eclosion <= 5.0 else "Fuera de Margen"
                 }
 
-        # Obtener historial (últimos 10)
+        # Obtener historial (últimos 30)
         cursor.execute("""
             SELECT P.id_detallechr, P.id_lote, P.semana, P.fecha_registro, U.nombre_usuario
             FROM PROD_DETALLE_CHRYSOPA P
             JOIN USUARIOS U ON P.id_operador = U.id_usuario
             WHERE P.id_detallechr IN (SELECT DISTINCT id_detallechr FROM ECLOSION)
-            ORDER BY P.id_detallechr DESC LIMIT 10
+            ORDER BY P.id_detallechr DESC LIMIT 30
         """)
         historial = []
         for fila in cursor.fetchall():
@@ -380,6 +377,7 @@ def guardar_eclosion():
         flash(f'Error al guardar eclosión: {str(e)}', 'error')
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+
 # =====================================================================
 # MÓDULO DE MORTALIDAD
 # =====================================================================
@@ -416,7 +414,6 @@ def mortalidad():
             except:
                 f_bonita = ultimo_lote['fecha_registro']
             
-            # ESTE ES EL DICCIONARIO QUE EL HTML ESTÁ BUSCANDO
             resumen_ultimo = {
                 'lote': ultimo_lote['id_lote'], 
                 'semana': ultimo_lote['semana'],
@@ -427,13 +424,13 @@ def mortalidad():
                 'estatus': estatus_calidad
             }
 
-# 2. Obtener el historial completo
+        # 2. Obtener el historial completo (últimos 30)
         cursor.execute("""
             SELECT P.id_detallechr, P.id_lote, P.semana, P.fecha_registro, U.nombre_usuario
             FROM PROD_DETALLE_CHRYSOPA P
             JOIN USUARIOS U ON P.id_operador = U.id_usuario
             WHERE P.id_detallechr IN (SELECT DISTINCT id_detallechr FROM MORTALIDAD_BOTES)
-            ORDER BY P.fecha_registro DESC LIMIT 15
+            ORDER BY P.fecha_registro DESC LIMIT 30
         """)
         historial = []
         for fila in cursor.fetchall():
@@ -443,7 +440,6 @@ def mortalidad():
             total_muertos = sum(botes_hist.values())
             promedio_historial = round(total_muertos / 6, 1)
 
-            # Saber si es 1ra o 2da revisión histórica de este lote
             cursor.execute("""
                 SELECT id_detallechr FROM PROD_DETALLE_CHRYSOPA 
                 WHERE id_lote = ? AND id_detallechr IN (SELECT DISTINCT id_detallechr FROM MORTALIDAD_BOTES)
@@ -451,7 +447,6 @@ def mortalidad():
             """, (fila['id_lote'],))
             todas_revs_lote = [r['id_detallechr'] for r in cursor.fetchall()]
             
-            # Texto corto para que quepa perfectamente en la tabla
             if len(todas_revs_lote) > 1 and todas_revs_lote[1] == fila['id_detallechr']:
                 tipo_monitoreo = f"2da Rev. (Sem. {fila['semana']})"
             else:
@@ -462,7 +457,6 @@ def mortalidad():
             except:
                 f_bonita = fila['fecha_registro']
 
-            # Limpiar por si el id_lote ya trae la palabra "Lote" guardada
             lote_limpio = str(fila['id_lote']).replace("Lote ", "").replace("lote ", "")
 
             historial.append({
@@ -481,6 +475,7 @@ def mortalidad():
         historial = []
 
     return render_template('produccion/chrysopa/mortalidad.html', ultimo=resumen_ultimo, historial=historial)
+
 
 @prod_chrysopa_bp.route('/mortalidad/guardar', methods=['POST'])
 def guardar_mortalidad():
@@ -509,12 +504,12 @@ def guardar_mortalidad():
         flash(f'Error al guardar mortalidad: {str(e)}', 'error')
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
+
 @prod_chrysopa_bp.route('/mortalidad/buscar_lote', methods=['POST'])
 def buscar_lote_mortalidad():
     try:
         datos = request.get_json()
         lote = datos.get('lote')
-        # El NIP se recibe pero la validación estricta se hará al presionar "Guardar" en el Paso 2
 
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -530,7 +525,6 @@ def buscar_lote_mortalidad():
         revisiones_db = cursor.fetchall()
         revisiones = []
 
-        # Extraer los botes de las revisiones encontradas
         for rev in revisiones_db:
             cursor.execute("SELECT numero_bote, cant_muertos FROM MORTALIDAD_BOTES WHERE id_detallechr = ?", (rev['id_detallechr'],))
             botes = {fila['numero_bote']: fila['cant_muertos'] for fila in cursor.fetchall()}
@@ -546,9 +540,8 @@ def buscar_lote_mortalidad():
     except Exception as e:
         print("Error al buscar lote:", e)
         return jsonify({'status': 'error', 'message': str(e)})
-# =====================================================================
-# MÓDULO DE FALLAS DE PUPACIÓN
-# =====================================================================
+
+
 # =====================================================================
 # MÓDULO DE FALLAS DE PUPACIÓN
 # =====================================================================
@@ -574,7 +567,6 @@ def fallas():
             cursor.execute("SELECT numero_rejilla, larvas_no_pupadas FROM FALLA_PUPACION WHERE id_detallechr = ?", (id_cabecera,))
             orificios = cursor.fetchall()
             
-            # Mapear rejillas de la 1 a la 6
             r_dict = {o['numero_rejilla']: o['larvas_no_pupadas'] for o in orificios}
             r1 = r_dict.get(1, 0)
             r2 = r_dict.get(2, 0)
@@ -601,13 +593,13 @@ def fallas():
                 'estatus': "Óptimo" if promedio_fallas <= 10.0 else "Revisión / Alto"
             }
 
-        # Historial de Fallas (últimos 10)
+        # Historial de Fallas (últimos 30)
         cursor.execute("""
             SELECT P.id_detallechr, P.id_lote, P.semana, P.fecha_registro, U.nombre_usuario
             FROM PROD_DETALLE_CHRYSOPA P
             JOIN USUARIOS U ON P.id_operador = U.id_usuario
             WHERE P.id_detallechr IN (SELECT DISTINCT id_detallechr FROM FALLA_PUPACION)
-            ORDER BY P.id_detallechr DESC LIMIT 10
+            ORDER BY P.id_detallechr DESC LIMIT 30
         """)
         historial = []
         for fila in cursor.fetchall():
@@ -669,26 +661,32 @@ def guardar_fallas():
         return jsonify({'status': 'success'})
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
 # =====================================================================
 # MÓDULO DE SOLICITUD DE MATERIALES
 # =====================================================================
 @prod_chrysopa_bp.route('/materiales')
 def materiales():
     mis_solicitudes = []
+    cat_materiales = []
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        
+
+        # 1. Obtener historial de solicitudes de Chrysopa
         cursor.execute("""
             SELECT SM.id_solicitud, SM.fecha_solicitud, SM.estatus, U.nombre_usuario, M.nombre_material, SD.cantidad_solicitada
             FROM SOLICITUDES_MATERIAL SM
             JOIN USUARIOS U ON SM.id_operador = U.id_usuario
             JOIN SOLICITUDES_DETALLE SD ON SM.id_solicitud = SD.id_solicitud
             JOIN MATERIALES M ON SD.id_material = M.id_material
+            JOIN CAT_AREAS A ON SM.id_area_solicitante = A.id_area
+            WHERE A.nombre_area LIKE '%Chrysopa%'
             ORDER BY SM.id_solicitud DESC
         """)
         filas = cursor.fetchall()
-        
+
         solicitudes_dict = {}
         for fila in filas:
             id_sol = fila['id_solicitud']
@@ -696,7 +694,9 @@ def materiales():
                 fecha_formateada = fila['fecha_solicitud']
                 if fecha_formateada:
                     try:
-                        dt = datetime.strptime(fecha_formateada, '%Y-%m-%d %H:%M:%S')
+                        dt = datetime.strptime(
+                            fecha_formateada, '%Y-%m-%d %H:%M:%S'
+                        )
                         fecha_formateada = dt.strftime('%d/%m/%Y %I:%M %p')
                     except ValueError:
                         pass
@@ -706,75 +706,127 @@ def materiales():
                     'fecha_solicitud': fecha_formateada,
                     'estatus': fila['estatus'],
                     'nombre_usuario': fila['nombre_usuario'],
-                    'materiales': []
+                    'materiales': [],
                 }
             solicitudes_dict[id_sol]['materiales'].append({
                 'nombre_material': fila['nombre_material'],
-                'cantidad': fila['cantidad_solicitada']
+                'cantidad': fila['cantidad_solicitada'],
             })
-            
+
         mis_solicitudes = list(solicitudes_dict.values())
+
+        # 2. Obtener lista de materiales registrados para Chrysopa
+        cursor.execute("""
+            SELECT M.id_material, M.nombre_material, M.presentacion
+            FROM MATERIALES M
+            JOIN CAT_AREAS A ON M.id_area = A.id_area
+            WHERE A.nombre_area LIKE '%Chrysopa%'
+            ORDER BY M.nombre_material ASC
+        """)
+        cat_materiales = cursor.fetchall()
+
         conn.close()
     except Exception as e:
-        print("Error al cargar materiales:", e)
+        print('Error al cargar materiales:', e)
 
-    return render_template('produccion/materiales.html', origen='chrysopa', mis_solicitudes=mis_solicitudes)
-
-
+    return render_template(
+        'produccion/materiales.html',
+        origen='chrysopa',
+        mis_solicitudes=mis_solicitudes,
+        cat_materiales=cat_materiales,
+    )
 @prod_chrysopa_bp.route('/materiales/guardar', methods=['POST'])
 def guardar_materiales():
-    id_area = session.get('id_area', 1)  # Asume área 1 por default si no hay sesión
+    id_area = session.get('id_area', 1)  # Área de Chrysopa
     nip_ingresado = request.form.get('nip')
     id_solicitud_editar = request.form.get('id_solicitud_editar')
     fecha_hora_mexico = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        
-        cursor.execute("SELECT id_usuario, nombre_usuario FROM USUARIOS WHERE nip_firma = ? AND estatus = 'Activo'", (nip_ingresado,))
+
+        # 1. Validar NIP del operador
+        cursor.execute(
+            "SELECT id_usuario, nombre_usuario FROM USUARIOS WHERE nip_firma = ?"
+            " AND estatus = 'Activo'",
+            (nip_ingresado,),
+        )
         operador_real = cursor.fetchone()
-        
+
         if not operador_real:
-            flash('NIP Incorrecto o usuario no activo.', 'error')
+            flash('NIP incorrecto o usuario no activo.', 'error')
             return redirect(url_for('prod_chrysopa.materiales'))
-            
+
         id_operador_real = operador_real['id_usuario']
         nombre_operador_real = operador_real['nombre_usuario']
 
+        # 2. Extraer dinámicamente los materiales seleccionados del formulario
         materiales_pedidos = []
-        for i in range(1, 20):  
-            if request.form.get(f'material_{i}'):
-                cantidad = request.form.get(f'cant_{i}')
-                if cantidad and int(cantidad) > 0:
-                    materiales_pedidos.append({'id_material': i, 'cantidad': int(cantidad)})
-                    
+        for key, value in request.form.items():
+            if key.startswith('material_') and value:
+                id_mat = value  # El ID real que viene desde la BD
+                cant = request.form.get(f'cant_{id_mat}', 1)
+                cant_val = (
+                    int(cant)
+                    if str(cant).isdigit() and int(cant) > 0
+                    else 1
+                )
+                materiales_pedidos.append({
+                    'id_material': id_mat,
+                    'cantidad': cant_val,
+                })
+
         if not materiales_pedidos:
             flash('Debes seleccionar al menos un material.', 'error')
             return redirect(url_for('prod_chrysopa.materiales'))
 
+        # 3. Insertar o actualizar la solicitud
         if id_solicitud_editar:
-            cursor.execute("UPDATE SOLICITUDES_MATERIAL SET estatus = 'Pendiente', fecha_solicitud = ?, id_operador = ? WHERE id_solicitud = ?", (fecha_hora_mexico, id_operador_real, id_solicitud_editar))
-            cursor.execute("DELETE FROM SOLICITUDES_DETALLE WHERE id_solicitud = ?", (id_solicitud_editar,))
+            cursor.execute(
+                "UPDATE SOLICITUDES_MATERIAL SET estatus = 'Pendiente',"
+                ' fecha_solicitud = ?, id_operador = ? WHERE id_solicitud = ?',
+                (fecha_hora_mexico, id_operador_real, id_solicitud_editar),
+            )
+            cursor.execute(
+                'DELETE FROM SOLICITUDES_DETALLE WHERE id_solicitud = ?',
+                (id_solicitud_editar,),
+            )
             for mat in materiales_pedidos:
-                cursor.execute("INSERT INTO SOLICITUDES_DETALLE (id_solicitud, id_material, cantidad_solicitada) VALUES (?, ?, ?)", (id_solicitud_editar, mat['id_material'], mat['cantidad']))
-            flash(f'Solicitud corregida por {nombre_operador_real}.', 'success')
+                cursor.execute(
+                    'INSERT INTO SOLICITUDES_DETALLE (id_solicitud,'
+                    ' id_material, cantidad_solicitada) VALUES (?, ?, ?)',
+                    (id_solicitud_editar, mat['id_material'], mat['cantidad']),
+                )
+            flash(
+                f'Solicitud corregida por {nombre_operador_real}.', 'success'
+            )
         else:
-            cursor.execute("INSERT INTO SOLICITUDES_MATERIAL (id_area_solicitante, id_operador, estatus, fecha_solicitud) VALUES (?, ?, 'Pendiente', ?)", (id_area, id_operador_real, fecha_hora_mexico))
+            cursor.execute(
+                'INSERT INTO SOLICITUDES_MATERIAL (id_area_solicitante,'
+                " id_operador, estatus, fecha_solicitud) VALUES (?, ?, 'Pendiente',"
+                ' ?)',
+                (id_area, id_operador_real, fecha_hora_mexico),
+            )
             nuevo_folio = cursor.lastrowid
             for mat in materiales_pedidos:
-                cursor.execute("INSERT INTO SOLICITUDES_DETALLE (id_solicitud, id_material, cantidad_solicitada) VALUES (?, ?, ?)", (nuevo_folio, mat['id_material'], mat['cantidad']))
-            flash(f'Solicitud enviada por {nombre_operador_real}.', 'success')
-            
+                cursor.execute(
+                    'INSERT INTO SOLICITUDES_DETALLE (id_solicitud,'
+                    ' id_material, cantidad_solicitada) VALUES (?, ?, ?)',
+                    (nuevo_folio, mat['id_material'], mat['cantidad']),
+                )
+            flash('Solicitud enviada correctamente.', 'success')
+
         conn.commit()
     except Exception as e:
-        if 'conn' in locals() and conn: conn.rollback()
+        if 'conn' in locals() and conn:
+            conn.rollback()
         flash(f'Error al guardar solicitud: {str(e)}', 'error')
     finally:
-        if 'conn' in locals() and conn: conn.close()
-        
-    return redirect(url_for('prod_chrysopa.materiales'))
+        if 'conn' in locals() and conn:
+            conn.close()
 
+    return redirect(url_for('prod_chrysopa.materiales'))
 
 @prod_chrysopa_bp.route('/materiales/detalle/<int:id_solicitud>')
 def detalle_solicitud(id_solicitud):

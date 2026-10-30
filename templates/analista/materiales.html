@@ -1,0 +1,250 @@
+{% extends "analista/base_inventario.html" %}
+
+{% block title %}Materiales - Koppert Biofactory{% endblock %}
+
+{% block navbar_menu %}
+<!-- Envoltura responsiva con scroll horizontal -->
+<div id="pillMenuContainer"
+    class="w-full max-w-full overflow-x-auto hide-scroll flex justify-start sm:justify-center px-4 py-1">
+
+    <!-- Cápsula contenedora elegante (diseño sobrio estandarizado) -->
+    <div
+        class="inline-flex items-center gap-1 p-1 bg-slate-900/80 rounded-full border border-slate-700/60 backdrop-blur-md shadow-inner shadow-black/40 flex-nowrap min-w-max">
+
+        <!-- BOTÓN INACTIVO (Solicitudes Activas) -->
+        <a href="{{ url_for('inventario.listar_solicitudes') }}"
+            class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
+            Solicitudes Activas
+        </a>
+
+        <!-- BOTÓN INACTIVO (Historial Solicitudes) -->
+        <a href="{{ url_for('inventario.historial_solicitudes') }}"
+            class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
+            Historial solicitudes
+        </a>
+
+        <!-- BOTÓN ACTIVO (Materiales) -->
+        <a id="activePill" href="{{ url_for('inventario.gestionar_materiales') }}"
+            class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-black text-white bg-indigo-600 shadow-[0_2px_12px_rgba(99,102,241,0.35)] border border-indigo-400/40 scale-[1.03] transition-all duration-200 cursor-default whitespace-nowrap">
+            Gestión de materiales
+        </a>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Suavizamos el scrollbar de la tabla */
+    .table-container {
+        max-height: 520px;
+        overflow-y: auto;
+    }
+
+    .table-container::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 overflow-y-auto px-6 pt-4 pb-10 lg:px-10 bg-slate-50/50">
+    <div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
+
+        <!-- ENCABEZADO PRINCIPAL -->
+        <div
+            class="bg-white border border-slate-200/70 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 backdrop-blur-xl">
+            <div>
+                <div
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] font-bold tracking-widest uppercase mb-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse"></span>
+                    Módulo Analista
+                </div>
+                <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-0.5">
+                    Catálogo de Materiales <span
+                        class="text-indigo-600 font-extrabold text-base bg-indigo-50 border border-indigo-100/80 px-2.5 py-0.5 rounded-xl ml-1">Koppert</span>
+                </h1>
+                <p class="text-xs text-slate-500 font-medium">Control e insumos asignados por áreas operativas.</p>
+            </div>
+
+            <div class="hidden sm:flex items-center gap-2 bg-slate-50 border border-slate-100 px-4 py-2 rounded-2xl">
+                <div
+                    class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-xs">
+                    {{ materiales|length }}
+                </div>
+                <span class="text-xs font-bold text-slate-600">Materiales Activos</span>
+            </div>
+        </div>
+
+        <!-- FORMULARIO DE REGISTRO -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/70 p-6">
+            <h2 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Registrar Nuevo Insumo
+            </h2>
+            <form action="{{ url_for('inventario.agregar_material') }}" method="POST"
+                class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-center">
+
+                <!-- ÁREA -->
+                <div class="sm:col-span-4">
+                    <div class="relative">
+                        <select name="id_area" required
+                            class="w-full border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs font-bold text-slate-700 bg-slate-50/80 focus:bg-white focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-500 outline-none transition-all cursor-pointer appearance-none">
+                            <option value="" disabled selected>Seleccionar área...</option>
+                            {% for area in areas %}
+                            <option value="{{ area.id_area }}">{{ area.nombre_area }}</option>
+                            {% endfor %}
+                        </select>
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- INSUMO -->
+                <div class="sm:col-span-4">
+                    <div class="relative">
+                        <input type="text" name="nombre_material" placeholder="Nombre del insumo..." required
+                            class="w-full border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 text-xs font-bold text-slate-700 bg-slate-50/80 focus:bg-white focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-500 outline-none transition-all placeholder-slate-400">
+                        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- PRESENTACIÓN -->
+                <div class="sm:col-span-2">
+                    <input type="text" name="presentacion" placeholder="Presentación..." required
+                        class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-700 bg-slate-50/80 focus:bg-white focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-500 outline-none transition-all placeholder-slate-400">
+                </div>
+
+                <!-- BOTÓN GUARDAR -->
+                <div class="sm:col-span-2">
+                    <button type="submit"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 rounded-xl text-xs shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-1.5 active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
+                        Agregar
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- TABLA DE MATERIALES -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/70 overflow-hidden flex flex-col flex-1">
+            <div class="bg-slate-50/60 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+                <h2 class="text-sm font-black text-slate-800 flex items-center gap-3">
+                    <div class="w-2.5 h-6 bg-gradient-to-b from-indigo-500 to-indigo-700 rounded-full shadow-sm"></div>
+                    Lista de Insumos Registrados
+                </h2>
+                <span
+                    class="text-[10px] text-slate-400 font-mono font-semibold uppercase tracking-widest bg-white border border-slate-200/80 px-2.5 py-1.5 rounded-lg hidden sm:block">Tabla:
+                    CATALOGO_MATERIALES</span>
+            </div>
+
+            <div class="overflow-x-auto table-container">
+                <table class="min-w-full divide-y divide-slate-100 text-sm relative">
+                    <thead class="bg-slate-50/80 sticky top-0 z-10 border-b border-slate-200/70 backdrop-blur-sm">
+                        <tr>
+                            <th
+                                class="px-6 py-4 text-left font-black uppercase tracking-wider text-[10px] text-slate-400">
+                                ID</th>
+                            <th
+                                class="px-6 py-4 text-left font-black uppercase tracking-wider text-[10px] text-slate-400">
+                                Área Operativa</th>
+                            <th
+                                class="px-6 py-4 text-left font-black uppercase tracking-wider text-[10px] text-slate-400">
+                                Nombre del Insumo</th>
+                            <th
+                                class="px-6 py-4 text-left font-black uppercase tracking-wider text-[10px] text-slate-400">
+                                Presentación</th>
+                            <th
+                                class="px-6 py-4 text-center font-black uppercase tracking-wider text-[10px] text-slate-400">
+                                Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white text-xs">
+
+                        {% for mat in materiales %}
+                        <tr class="hover:bg-slate-50/80 transition-colors group">
+                            <td class="px-6 py-4 font-mono font-bold text-slate-400">
+                                #{{ "%03d"|format(mat.id_material) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider shadow-sm
+                                    {% if mat.nombre_area == 'Chrysopa' %} bg-emerald-50 text-emerald-700 border border-emerald-100 {% elif mat.nombre_area == 'Catopar' %} bg-amber-50 text-amber-700 border border-amber-100 {% else %} bg-indigo-50 text-indigo-700 border border-indigo-100 {% endif %}">
+                                    {{ mat.nombre_area or 'General' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 font-extrabold text-slate-800 text-xs">{{ mat.nombre_material }}</td>
+                            <td class="px-6 py-4 text-slate-500 font-medium text-xs">{{ mat.presentacion }}</td>
+                            <td class="px-6 py-4 text-center whitespace-nowrap">
+                                <form
+                                    action="{{ url_for('inventario.eliminar_material', id_material=mat.id_material) }}"
+                                    method="POST"
+                                    onsubmit="return confirm('¿Confirma eliminar este material del catálogo?');"
+                                    class="inline">
+                                    <button type="submit"
+                                        class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
+                                        title="Eliminar Insumo">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center justify-center text-slate-400">
+                                    <svg class="w-12 h-12 mb-3 text-slate-200" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4">
+                                        </path>
+                                    </svg>
+                                    <p class="font-bold text-slate-500 text-sm">Catálogo vacío</p>
+                                    <p class="text-xs mt-1">No hay materiales registrados en el sistema.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</main>
+{% endblock %}

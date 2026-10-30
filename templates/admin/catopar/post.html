@@ -3,11 +3,14 @@
 
 {% block navbar_menu %}
 <div class="w-full max-w-full overflow-x-auto hide-scroll flex justify-start sm:justify-center px-3 py-1">
-    <div class="inline-flex items-center gap-1 p-1 bg-slate-900/80 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner flex-nowrap min-w-max">
-        <a href="{{ url_for('admin.catopar_pre') }}" class="px-4 py-1.5 rounded-full text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all whitespace-nowrap">
+    <div
+        class="inline-flex items-center gap-1 p-1 bg-slate-900/80 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner flex-nowrap min-w-max">
+        <a href="{{ url_for('admin.catopar_pre') }}"
+            class="px-4 py-1.5 rounded-full text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all whitespace-nowrap">
             Validación Pre-Parasitismo
         </a>
-        <a id="activePill" href="{{ url_for('admin.catopar_post') }}" class="px-4 py-1.5 rounded-full text-xs font-black text-white bg-gradient-to-r from-cyan-600 to-cyan-500 shadow-md border border-cyan-400/30 scale-[1.03] transition-all cursor-default whitespace-nowrap">
+        <a id="activePill" href="{{ url_for('admin.catopar_post') }}"
+            class="px-4 py-1.5 rounded-full text-xs font-black text-white bg-gradient-to-r from-blue-600 to-blue-500 shadow-md border border-blue-400/30 scale-[1.03] transition-all cursor-default whitespace-nowrap">
             Revisión Post-Parasitismo
         </a>
     </div>
@@ -15,60 +18,97 @@
 {% endblock %}
 
 {% block content %}
-<div class="w-full max-w-7xl mx-auto flex flex-col gap-6 pb-24 mb-12">
-    <!-- ENCABEZADO Y KPIS -->
+<div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
+
+    <!-- ENCABEZADO Y KPI PROMEDIO GLOBAL -->
     <div class="flex flex-col lg:flex-row gap-5">
-        <div class="flex-1 bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-center relative overflow-hidden">
-            <h1 class="text-2xl font-black text-slate-800 tracking-tight z-10">Bandeja de Lectura <span class="text-cyan-600 font-bold text-lg">(Post-Parasitismo)</span></h1>
-            <p class="text-xs text-slate-500 font-medium mt-1 z-10">Revisa el desarrollo final de los lotes evaluados por los operadores.</p>
+        <div
+            class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-center flex-1 w-full min-h-[130px]">
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Post-Parasitismo <span
+                    class="text-blue-600 font-bold text-lg bg-blue-50 px-2 py-0.5 rounded-lg ml-1">Catopar</span></h1>
+            <p class="text-xs text-slate-500 font-medium mt-1.5">Revisa el desarrollo final de los lotes evaluados por
+                los operadores. (10 Garbanzos)</p>
         </div>
-        <div class="flex gap-4">
-            <div class="bg-cyan-50 p-6 rounded-3xl shadow-sm border border-cyan-200 flex flex-col justify-center min-w-[160px]">
-                <h3 class="text-cyan-600/70 text-[10px] font-black uppercase tracking-widest mb-1">Promedio Global</h3>
-                <p class="text-4xl font-black text-cyan-600">{{ promedio_global }}%</p>
+
+        <div
+            class="bg-blue-50/80 p-6 rounded-3xl shadow-sm border border-blue-200 relative overflow-hidden flex flex-col justify-between flex-shrink-0 w-full lg:w-56 min-h-[130px]">
+            <div class="relative z-10 flex justify-between items-start">
+                <h3 class="text-blue-600 text-[10px] font-bold uppercase tracking-widest">Promedio Global</h3>
+                <div class="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="relative z-10 mt-auto pt-2">
+                <p class="text-4xl font-black text-blue-600 tracking-tight leading-none">{{ promedio_global }}<span
+                        class="text-2xl font-bold ml-0.5">%</span></p>
             </div>
         </div>
     </div>
 
     <!-- TABLA GENERAL DE HISTORIAL -->
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col flex-1 overflow-hidden">
-        <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center z-10">
-            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-widest">Historial de Lecturas</h3>
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden flex flex-col flex-1">
+        <div class="bg-slate-50/50 px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+            <h2 class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                <div class="w-2 h-4 bg-blue-500 rounded-full"></div>
+                Historial de Lecturas
+            </h2>
         </div>
-        <div class="overflow-x-auto w-full">
-            <table class="min-w-full text-left divide-y divide-slate-100 text-sm">
-                <thead class="bg-white">
-                    <tr class="text-[10px] uppercase tracking-widest text-slate-400 font-black border-b border-slate-200">
-                        <th class="px-6 py-4 text-center w-24">ID Lote</th>
-                        <th class="px-4 py-4">Captura</th>
-                        <th class="px-4 py-4 text-center">Gorg. (Nacidos/Pup)</th>
-                        <th class="px-4 py-4 text-center">Catop. (Neg/Com/Amb)</th>
-                        <th class="px-4 py-4 text-center">Efectividad (%)</th>
-                        <th class="px-6 py-4 text-right">Acción</th>
+
+        <div class="overflow-x-auto overflow-y-auto max-h-[55vh]" id="scrollTable">
+            <table class="min-w-full divide-y divide-slate-100 text-sm">
+                <thead class="bg-white text-slate-400 sticky top-0 z-10 shadow-sm">
+                    <tr>
+                        <th class="px-6 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] w-24">ID
+                            Lote</th>
+                        <th class="px-6 py-4 text-left font-extrabold uppercase tracking-wider text-[10px]">Captura</th>
+                        <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Gorg.
+                            (Nac/Comp)</th>
+                        <th class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px]">Catop.
+                            (Neg/Comb/Amb)</th>
+                        <th
+                            class="px-4 py-4 text-center font-extrabold uppercase tracking-wider text-[10px] bg-slate-50">
+                            Efectividad (%)</th>
+                        <th class="px-6 py-4 text-right font-extrabold uppercase tracking-wider text-[10px]">Acción</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 bg-white">
                     {% for reg in historial %}
-                    <tr class="hover:bg-slate-50/50 transition-colors group">
-                        <td class="px-6 py-4 text-center font-black text-slate-800">#{{ reg.id_lote }}</td>
-                        <td class="px-4 py-4">
+                    <tr class="hover:bg-slate-50 cursor-pointer transition-colors group">
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <div class="font-bold text-slate-800 text-sm">#{{ reg.id_lote }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-left">
                             <p class="text-xs font-bold text-slate-700">{{ reg.fecha_str }}</p>
-                            <p class="text-[10px] text-slate-400 font-bold mt-0.5 uppercase tracking-widest">Operador: <span class="text-cyan-600">{{ reg.operador }}</span></p>
+                            <!-- Actualizado operador a azul -->
+                            <p class="text-[10px] text-slate-400 font-medium mt-0.5">Operador: <span
+                                    class="text-blue-600 font-bold">{{ reg.operador }}</span></p>
                         </td>
-                        <td class="px-4 py-4 text-center font-black text-slate-500">{{ reg.t_gorg }}</td>
-                        <td class="px-4 py-4 text-center font-black text-purple-600">{{ reg.t_cat }}</td>
-                        <td class="px-4 py-4 text-center font-black {% if reg.porcentaje >= 80 %}text-emerald-600{% elif reg.porcentaje >= 50 %}text-amber-500{% else %}text-rose-500{% endif %}">
-                            {{ reg.porcentaje }}%
+                        <td class="px-4 py-4 whitespace-nowrap text-center font-bold text-slate-600">
+                            {{ reg.t_gorg }}
                         </td>
-                        <td class="px-6 py-4 text-right">
-                            <a href="{{ url_for('admin.catopar_post_revision', id_cabecera=reg.id_cabecera) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 text-xs font-bold rounded-xl transition-all">
+                        <td class="px-4 py-4 whitespace-nowrap text-center font-bold text-purple-600">
+                            {{ reg.t_cat }}
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-center bg-slate-50/50">
+                            <span
+                                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-black {% if reg.porcentaje >= 80 %}text-emerald-700 bg-emerald-100{% elif reg.porcentaje >= 50 %}text-amber-700 bg-amber-100{% else %}text-rose-700 bg-rose-100{% endif %}">
+                                {{ reg.porcentaje }}%
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            <a href="{{ url_for('admin.catopar_post_revision', id_cabecera=reg.id_cabecera) }}"
+                                class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-600 text-xs font-bold rounded-xl transition-all">
                                 Ver Detalle
                             </a>
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="px-6 py-10 text-center text-slate-500">No hay registros de Post-Parasitismo.</td>
+                        <td colspan="6" class="px-6 py-8 text-center text-slate-400 text-sm font-medium">No hay
+                            registros de Post-Parasitismo.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

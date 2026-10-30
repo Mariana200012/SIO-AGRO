@@ -4,26 +4,28 @@
 
 {% block navbar_menu %}
 <!-- Envoltura responsiva con scroll horizontal -->
-<div id="pillMenuContainer" class="w-full max-w-full overflow-x-auto hide-scroll flex justify-start sm:justify-center px-4 py-1">
-    
+<div id="pillMenuContainer"
+    class="w-full max-w-full overflow-x-auto hide-scroll flex justify-start sm:justify-center px-4 py-1">
+
     <!-- Cápsula contenedora elegante (diseño sobrio estandarizado) -->
-    <div class="inline-flex items-center gap-1 p-1 bg-slate-900/80 rounded-full border border-slate-700/60 backdrop-blur-md shadow-inner shadow-black/40 flex-nowrap min-w-max">
-        
+    <div
+        class="inline-flex items-center gap-1 p-1 bg-slate-900/80 rounded-full border border-slate-700/60 backdrop-blur-md shadow-inner shadow-black/40 flex-nowrap min-w-max">
+
         <!-- BOTÓN ACTIVO (Dashboard - Cyan corporativo) -->
-        <a id="activePill" href="{{ url_for('empaque.dashboard_empaque') }}" 
-           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-black text-white bg-gradient-to-r from-cyan-600 to-cyan-500 shadow-[0_2px_12px_rgba(8,145,178,0.35)] border border-cyan-400/40 scale-[1.03] transition-all duration-200 cursor-default whitespace-nowrap">
+        <a id="activePill" href="{{ url_for('empaque.dashboard_empaque') }}"
+            class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-black text-white bg-gradient-to-r from-cyan-600 to-cyan-500 shadow-[0_2px_12px_rgba(8,145,178,0.35)] border border-cyan-400/40 scale-[1.03] transition-all duration-200 cursor-default whitespace-nowrap">
             Dashboard
         </a>
 
         <!-- BOTÓN INACTIVO (Entradas / Salidas) -->
-        <a href="{{ url_for('empaque.inventario_empaque') }}" 
-           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
+        <a href="{{ url_for('empaque.inventario_empaque') }}"
+            class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
             Entradas / Salidas
         </a>
 
         <!-- BOTÓN INACTIVO (Historial) -->
-        <a href="{{ url_for('empaque.historial_empaque') }}" 
-           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
+        <a href="{{ url_for('empaque.historial_empaque') }}"
+            class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
             Historial
         </a>
 
@@ -44,118 +46,149 @@
 {% block content %}
 <main class="flex-1 overflow-y-auto px-6 pt-4 pb-10 lg:px-10 bg-slate-50/50">
     <div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
-        
-        <!-- Encabezado Compacto y Sólido -->
-        <div class="bg-white border border-slate-200/70 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 backdrop-blur-xl">
+
+        <!-- Encabezado Compacto y Elegante -->
+        <div
+            class="bg-white border border-slate-200/80 p-6 rounded-3xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-50 border border-cyan-100 text-cyan-700 text-[10px] font-bold tracking-widest uppercase mb-1.5">
+                <div
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-50 border border-cyan-100 text-cyan-700 text-[10px] font-bold tracking-widest uppercase mb-1.5">
                     <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
                     Área de Empaque
                 </div>
-                <h1 class="text-2xl font-black text-slate-800 tracking-tight mb-1">Monitoreo de Caducidades</h1>
-                <p class="text-xs text-slate-500 font-medium">Resumen del stock actual y prioridades de uso.</p>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight mb-1">Monitoreo de Caducidades</h1>
+                <p class="text-xs text-slate-500 font-medium">Resumen del stock actual y prioridades de uso en cuarto
+                    frío.</p>
             </div>
         </div>
 
         <!-- Tarjetas de Métricas -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             <!-- Stock Total -->
-            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-cyan-950 text-white p-6 rounded-3xl shadow-xl flex flex-col justify-between relative overflow-hidden ring-1 ring-white/10">
-                <div class="absolute -right-10 -top-10 w-32 h-32 bg-cyan-500/20 blur-2xl rounded-full pointer-events-none"></div>
-                <h3 class="text-cyan-300 text-[10px] font-black uppercase tracking-widest relative z-10">Stock Total</h3>
-                <div class="mt-6 flex items-baseline gap-2 relative z-10">
-                    <!-- VARIABLE JINJA: stock_total -->
+            <div
+                class="bg-gradient-to-br from-slate-900 via-slate-800 to-cyan-950 text-white p-6 rounded-3xl shadow-md flex flex-col justify-between relative overflow-hidden ring-1 ring-white/10">
+                <div
+                    class="absolute -right-8 -top-8 w-28 h-28 bg-cyan-500/20 blur-2xl rounded-full pointer-events-none">
+                </div>
+                <div class="flex items-center justify-between relative z-10">
+                    <h3 class="text-cyan-300 text-[10px] font-black uppercase tracking-widest">Stock Total</h3>
+                    <div class="p-2 bg-cyan-500/10 rounded-xl border border-cyan-400/20 text-cyan-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="mt-6 flex items-baseline gap-1.5 relative z-10">
                     <p class="text-4xl font-black text-white tracking-tight">{{ stock_total }}</p>
-                    <span class="text-sm font-bold text-cyan-300">ml</span>
+                    <span class="text-xs font-bold text-cyan-300">ml</span>
                 </div>
             </div>
 
             <!-- Próximos a Caducar -->
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/70 flex flex-col justify-between">
-                <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Próximos a Caducar</h3>
+            <div
+                class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/80 flex flex-col justify-between hover:border-rose-200/80 transition-all">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Próximos a Caducar</h3>
+                    <div class="p-2 bg-rose-50 rounded-xl border border-rose-100 text-rose-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                    </div>
+                </div>
                 <div class="mt-6 flex items-baseline gap-2">
-                    <!-- VARIABLE JINJA: fechas_riesgo -->
                     <p class="text-4xl font-black text-rose-600 tracking-tight">{{ fechas_riesgo }}</p>
-                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Fechas en Riesgo</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fechas en Riesgo</span>
                 </div>
             </div>
 
             <!-- Huevo Fresco -->
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/70 flex flex-col justify-between">
-                <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Huevo Fresco</h3>
+            <div
+                class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/80 flex flex-col justify-between hover:border-emerald-200/80 transition-all">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Huevo Fresco</h3>
+                    <div class="p-2 bg-emerald-50 rounded-xl border border-emerald-100 text-emerald-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                </div>
                 <div class="mt-6 flex items-baseline gap-2">
-                    <!-- VARIABLE JINJA: fechas_sanas -->
-                    <p class="text-4xl font-black text-slate-800 tracking-tight">{{ fechas_sanas }}</p>
-                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Fechas Sanas</span>
+                    <p class="text-4xl font-black text-emerald-600 tracking-tight">{{ fechas_sanas }}</p>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fechas Sanas</span>
                 </div>
             </div>
         </div>
 
         <!-- Sección FIFO / Prioridad de Uso -->
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/70 overflow-hidden">
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden">
             <div class="bg-slate-50/80 px-7 py-4 border-b border-slate-100 flex justify-between items-center">
-                <h2 class="text-xs font-black text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                    <div class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
-                    Prioridad de Uso Sugerida (FIFO por Fecha)
+                <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
+                    Prioridad de Uso Sugerida
                 </h2>
-                <span class="text-[10px] text-slate-400 font-mono font-semibold uppercase tracking-widest bg-white border border-slate-100 px-2 py-1 rounded-md hidden sm:block">Control de Lotes</span>
+                <span
+                    class="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-widest bg-white border border-slate-200 px-2.5 py-1 rounded-lg shadow-2xs hidden sm:block">Control
+                    FIFO</span>
             </div>
-            
-            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                
-                <!-- INICIO DEL CICLO FOR PARA LOTES FIFO -->
-                {% if lotes_fifo %}
-                    {% for lote in lotes_fifo %}
-                        <!-- La tarjeta adapta su color (rojo o amarillo) dependiendo si está en riesgo -->
-                        <div class="p-5 rounded-2xl border flex justify-between items-center transition-all 
-                            {% if lote.estado == 'RIESGO' %} border-rose-200/80 bg-rose-50/40 hover:bg-rose-50/70 
-                            {% else %} border-amber-200/80 bg-amber-50/40 hover:bg-amber-50/70 {% endif %}">
-                            
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-extrabold text-slate-800 text-sm">Huevo del {{ lote.fecha_ingreso }}</span>
-                                    
-                                    {% if lote.estado == 'RIESGO' %}
-                                        <span class="px-2 py-0.5 rounded-md text-[9px] font-black bg-rose-100 text-rose-700 uppercase tracking-widest">Usar Ya</span>
-                                    {% else %}
-                                        <span class="px-2 py-0.5 rounded-md text-[9px] font-black bg-amber-100 text-amber-700 uppercase tracking-widest">Precaución</span>
-                                    {% endif %}
-                                </div>
-                                
-                                <div class="text-xs font-bold mt-1.5 flex items-center gap-1 
-                                    {% if lote.estado == 'RIESGO' %} text-rose-600 {% else %} text-amber-600 {% endif %}">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    Caduca en: {{ lote.dias_restantes }} días
-                                </div>
-                            </div>
-                            
-                            <div class="text-right">
-                                <p class="text-2xl font-black text-slate-800">{{ lote.cantidad }} <span class="text-xs font-bold text-slate-400">ml</span></p>
-                            </div>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <!-- Mensaje si no hay huevo en inventario -->
-                    <div class="col-span-1 md:col-span-2 p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-300">
-                        <p class="text-slate-500 font-bold">No hay stock de huevo disponible en el cuarto frío.</p>
-                        <p class="text-xs text-slate-400 mt-1">Registra una entrada en la pestaña de Entradas / Salidas.</p>
-                    </div>
-                {% endif %}
-                <!-- FIN DEL CICLO FOR -->
 
+            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% if lotes_fifo %}
+                {% for lote in lotes_fifo %}
+                <div class="p-5 rounded-2xl border flex justify-between items-center transition-all shadow-2xs
+                            {% if lote.estado == 'RIESGO' %} border-rose-200 bg-rose-50/30 hover:bg-rose-50/60 
+                            {% elif lote.estado == 'PRECAUCION' %} border-amber-200 bg-amber-50/30 hover:bg-amber-50/60 
+                            {% else %} border-emerald-200 bg-emerald-50/30 hover:bg-emerald-50/60 {% endif %}">
+
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-slate-800 text-sm">Huevo del {{ lote.fecha_ingreso
+                                }}</span>
+
+                            {% if lote.estado == 'RIESGO' %}
+                            <span
+                                class="px-2 py-0.5 rounded-md text-[9px] font-black bg-rose-100 text-rose-700 uppercase tracking-widest border border-rose-200/60">Usar
+                                Ya</span>
+                            {% elif lote.estado == 'PRECAUCION' %}
+                            <span
+                                class="px-2 py-0.5 rounded-md text-[9px] font-black bg-amber-100 text-amber-700 uppercase tracking-widest border border-amber-200/60">Precaución</span>
+                            {% else %}
+                            <span
+                                class="px-2 py-0.5 rounded-md text-[9px] font-black bg-emerald-100 text-emerald-700 uppercase tracking-widest border border-emerald-200/60">Óptimo</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="text-xs font-bold mt-1.5 flex items-center gap-1.5 
+                                    {% if lote.estado == 'RIESGO' %} text-rose-600 
+                                    {% elif lote.estado == 'PRECAUCION' %} text-amber-600 
+                                    {% else %} text-emerald-600 {% endif %}">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Caduca en: {{ lote.dias_restantes }} días
+                        </div>
+                    </div>
+
+                    <div class="text-right">
+                        <p class="text-2xl font-black text-slate-800">{{ lote.cantidad }} <span
+                                class="text-xs font-bold text-slate-400">ml</span></p>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div
+                    class="col-span-1 md:col-span-2 p-8 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+                    <p class="text-slate-600 font-bold text-sm">No hay stock de huevo disponible en el cuarto frío.</p>
+                    <p class="text-xs text-slate-400 mt-1">Registra una entrada en la pestaña de Entradas / Salidas.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
 
     </div>
 </main>
-
-<style>
-    .animate-fade-in-up {
-        animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-</style>
 {% endblock %}

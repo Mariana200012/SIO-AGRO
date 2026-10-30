@@ -4,60 +4,79 @@
 
 {% block navbar_menu %}
 <!-- Envoltura responsiva con scroll horizontal -->
-<div id="pillMenuContainer" class="w-full max-w-full overflow-x-auto hide-scroll flex justify-start sm:justify-center px-4 py-1">
-    
+<div id="pillMenuContainer"
+    class="w-full max-w-full overflow-x-auto hide-scroll flex justify-start sm:justify-center px-4 py-1">
+
     <!-- Cápsula contenedora elegante -->
-    <div class="inline-flex items-center gap-1 p-1 bg-slate-900/80 rounded-full border border-slate-700/60 backdrop-blur-md shadow-inner shadow-black/40 flex-nowrap min-w-max">
-        
+    <div
+        class="inline-flex items-center gap-1 p-1 bg-slate-900/80 rounded-full border border-slate-700/60 backdrop-blur-md shadow-inner shadow-black/40 flex-nowrap min-w-max">
+
         <!-- BOTÓN INACTIVO (Dashboard) -->
-        <a href="{{ url_for('empaque.dashboard_empaque') }}" 
-           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
+        <a href="{{ url_for('empaque.dashboard_empaque') }}"
+            class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
             Dashboard
         </a>
 
         <!-- BOTÓN ACTIVO (Entradas / Salidas - Cyan corporativo) -->
-        <a id="activePill" href="{{ url_for('empaque.inventario_empaque') }}" 
-           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-black text-white bg-gradient-to-r from-cyan-600 to-cyan-500 shadow-[0_2px_12px_rgba(8,145,178,0.35)] border border-cyan-400/40 scale-[1.03] transition-all duration-200 cursor-default whitespace-nowrap">
+        <a id="activePill" href="{{ url_for('empaque.inventario_empaque') }}"
+            class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-black text-white bg-gradient-to-r from-cyan-600 to-cyan-500 shadow-[0_2px_12px_rgba(8,145,178,0.35)] border border-cyan-400/40 scale-[1.03] transition-all duration-200 cursor-default whitespace-nowrap">
             Entradas / Salidas
         </a>
 
         <!-- BOTÓN INACTIVO (Historial) -->
-        <a href="{{ url_for('empaque.historial_empaque') }}" 
-           class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
+        <a href="{{ url_for('empaque.historial_empaque') }}"
+            class="flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-800/70 transition-all duration-200 whitespace-nowrap border border-transparent">
             Historial
         </a>
 
     </div>
 </div>
-
 {% endblock %}
 
 {% block content %}
 <main class="flex-1 overflow-y-auto px-6 pt-4 pb-10 lg:px-10 bg-slate-50/50">
     <div class="max-w-4xl mx-auto space-y-5 relative z-10 animate-fade-in-up">
-        
+
         <!-- Tarjeta Principal de Operaciones -->
-        <div class="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-slate-200/70 text-center flex flex-col items-center justify-center backdrop-blur-xl">
-            <div class="w-16 h-16 bg-cyan-50 rounded-2xl flex items-center justify-center mb-5 border border-cyan-100 shadow-sm">
-                <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+        <div
+            class="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-slate-200/70 text-center flex flex-col items-center justify-center backdrop-blur-xl">
+            <div
+                class="w-16 h-16 bg-cyan-50 rounded-2xl flex items-center justify-center mb-5 border border-cyan-100 shadow-sm">
+                <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                </svg>
             </div>
-            
-            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-50 border border-cyan-100 text-cyan-700 text-[10px] font-bold tracking-widest uppercase mb-2">
+
+            <div
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-cyan-50 border border-cyan-100 text-cyan-700 text-[10px] font-bold tracking-widest uppercase mb-2">
                 <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
                 Gestión de Cuarto Frío
             </div>
-            
+
             <h1 class="text-3xl font-black text-slate-900 tracking-tight mb-2">Control de Inventario</h1>
-            <p class="text-sm text-slate-500 font-medium mb-8 max-w-md">Registre el ingreso de huevo fresco o el retiro para empacado, identificándolo siempre por su fecha de ingreso.</p>
-            
+            <p class="text-sm text-slate-500 font-medium mb-8 max-w-md">Registre el ingreso de huevo o el retiro
+                para empacado, identificándolo siempre por su fecha de ingreso.</p>
+
             <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
-                <button onclick="abrirModalMovimiento('Salida')" class="bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-2xl text-sm font-extrabold hover:bg-slate-50 hover:border-rose-300 hover:text-rose-600 transition-all shadow-sm flex items-center justify-center gap-2.5 w-full sm:w-auto">
-                    <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+                <!-- Pasamos la fecha FIFO más antigua directamente en la función al hacer clic -->
+                <button
+                    onclick="abrirModalMovimiento('Salida', '{% if lotes_fifo and lotes_fifo|length > 0 %}{{ lotes_fifo[0].fecha_iso if lotes_fifo[0].fecha_iso else lotes_fifo[0].fecha_ingreso }}{% elif fecha_fifo %}{{ fecha_fifo }}{% endif %}')"
+                    class="bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-2xl text-sm font-extrabold hover:bg-slate-50 hover:border-rose-300 hover:text-rose-600 transition-all shadow-sm flex items-center justify-center gap-2.5 w-full sm:w-auto">
+                    <svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
                     Retirar para Empaque
                 </button>
-                <button onclick="abrirModalMovimiento('Entrada')" class="bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white px-7 py-3.5 rounded-2xl text-sm font-extrabold shadow-lg shadow-cyan-600/30 transition-all flex items-center justify-center gap-2.5 w-full sm:w-auto ring-1 ring-white/20">
-                    <svg class="w-5 h-5 text-cyan-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-                    Ingresar Huevo Fresco
+
+                <button onclick="abrirModalMovimiento('Entrada')"
+                    class="bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 text-white px-7 py-3.5 rounded-2xl text-sm font-extrabold shadow-lg shadow-cyan-600/30 transition-all flex items-center justify-center gap-2.5 w-full sm:w-auto ring-1 ring-white/20">
+                    <svg class="w-5 h-5 text-cyan-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                    </svg>
+                    Ingresar Huevo
                 </button>
             </div>
         </div>
@@ -65,46 +84,61 @@
 </main>
 
 <!-- Modal de Movimiento -->
-<div id="modal-movimiento" class="hidden fixed inset-0 z-[99999] bg-slate-900/60 backdrop-blur-sm overflow-y-auto transition-all">
+<div id="modal-movimiento"
+    class="hidden fixed inset-0 z-[99999] bg-slate-900/60 backdrop-blur-sm overflow-y-auto transition-all">
     <div class="flex items-center justify-center min-h-screen px-4 py-10 animate-fade-in-up">
-        <div class="bg-white rounded-[2rem] w-full max-w-md shadow-2xl border border-slate-100/50 flex flex-col overflow-hidden relative">
-            <div id="modal-top-bar" class="absolute top-0 left-0 w-full h-2"></div>
-            
+        <div
+            class="bg-white rounded-[2rem] w-full max-w-md shadow-2xl border border-slate-100/50 flex flex-col overflow-hidden relative">
+
             <div class="flex justify-between items-center border-b border-slate-100 p-7 shrink-0 bg-slate-50/50">
                 <div>
-                    <div id="modal-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest mb-1"></div>
+                    <div id="modal-badge"
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-widest mb-1">
+                    </div>
                     <h3 class="font-black text-slate-800 text-xl tracking-tight">Registrar Movimiento</h3>
                 </div>
-                <button type="button" onclick="cerrarModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-rose-100 hover:text-rose-600 transition-colors font-bold text-xl leading-none">&times;</button>
+                <button type="button" onclick="cerrarModal()"
+                    class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-400 hover:bg-rose-100 hover:text-rose-600 transition-colors font-bold text-xl leading-none">&times;</button>
             </div>
-            
+
             <div class="p-7">
-                <!-- Se eliminó el action="#" inicial, el script lo llenará dinámicamente -->
                 <form id="form-movimiento" method="POST" class="space-y-5 text-sm">
                     <input type="hidden" id="tipo_movimiento" name="tipo_movimiento" value="">
-                    
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label id="label-fecha" class="block font-extrabold text-slate-700 mb-2 text-xs uppercase tracking-wider">Fecha del Huevo</label>
-                            <!-- La etiqueta de name en el input debe ser 'fecha_ingreso' o estar deshabilitada si no se usa -->
-                            <input type="date" id="input_fecha" name="fecha_ingreso" required class="w-full font-bold text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all text-xs">
+                            <label id="label-fecha"
+                                class="block font-extrabold text-slate-700 mb-2 text-xs uppercase tracking-wider">Fecha
+                                (DD-MM-AAAA)</label>
+
+                            <div class="relative">
+                                <input type="date" id="input_fecha" name="fecha_ingreso"
+                                    class="w-full font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all text-xs">
+                            </div>
                         </div>
                         <div>
-                            <label class="block font-extrabold text-slate-700 mb-2 text-xs uppercase tracking-wider">Cantidad (ml)</label>
-                            <input type="number" name="cantidad" min="1" step="0.1" placeholder="0" required class="w-full font-black text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all text-sm">
+                            <label
+                                class="block font-extrabold text-slate-700 mb-2 text-xs uppercase tracking-wider">Cantidad
+                                (ml)</label>
+                            <input type="number" name="cantidad" min="1" step="0.1" placeholder="0" required
+                                class="w-full font-black text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all text-sm">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block font-extrabold text-slate-700 mb-2 text-xs uppercase tracking-wider">Firma Electrónica (NIP)</label>
-                        <input type="password" name="nip" placeholder="••••" required class="w-full font-mono font-black text-center tracking-[0.4em] text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all text-lg">
+                        <label class="block font-extrabold text-slate-700 mb-2 text-xs uppercase tracking-wider">Firma
+                            Electrónica (NIP)</label>
+                        <input type="password" name="nip" placeholder="••••" required
+                            class="w-full font-mono font-black text-center tracking-[0.4em] text-slate-800 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 outline-none focus:bg-white focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/10 transition-all text-lg">
                     </div>
                 </form>
             </div>
 
             <div class="p-7 border-t border-slate-100 bg-slate-50 flex gap-3 shrink-0 rounded-b-[2rem]">
-                <button type="button" onclick="cerrarModal()" class="w-1/3 bg-white border border-slate-200 text-slate-600 font-bold py-3.5 rounded-2xl hover:bg-slate-50 hover:text-slate-800 transition-colors shadow-sm text-xs">Cancelar</button>
-                <button type="submit" form="form-movimiento" id="btn-submit-modal" class="w-2/3 text-white font-bold py-3.5 rounded-2xl shadow-lg transition-all text-xs ring-1 ring-white/20 inset-ring">Confirmar</button>
+                <button type="button" onclick="cerrarModal()"
+                    class="w-1/3 bg-white border border-slate-200 text-slate-600 font-bold py-3.5 rounded-2xl hover:bg-slate-50 hover:text-slate-800 transition-colors shadow-sm text-xs">Cancelar</button>
+                <button type="submit" form="form-movimiento" id="btn-submit-modal"
+                    class="w-2/3 text-white font-bold py-3.5 rounded-2xl shadow-lg transition-all text-xs ring-1 ring-white/20 inset-ring">Confirmar</button>
             </div>
         </div>
     </div>
@@ -114,70 +148,114 @@
     .animate-fade-in-up {
         animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
+
     @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    input[type="date"] {
+        position: relative;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        background: transparent;
+        bottom: 0;
+        color: transparent;
+        cursor: pointer;
+        height: auto;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: auto;
     }
 </style>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    function obtenerFechaHoy() {
+    function obtenerFechaHoyISO() {
         const hoy = new Date();
         const offset = hoy.getTimezoneOffset() * 60000;
         const fechaLocal = new Date(hoy.getTime() - offset);
         return fechaLocal.toISOString().split('T')[0];
     }
 
-    function abrirModalMovimiento(tipo) {
+    // Convertir formatos DD/MM/YYYY o DD-MM-YYYY a YYYY-MM-DD para que el input date HTML5 lo reconozca
+    function formatearAISO(fechaStr) {
+        if (!fechaStr) return '';
+        // Si ya viene en formato YYYY-MM-DD
+        if (fechaStr.includes('-') && fechaStr.split('-')[0].length === 4) {
+            return fechaStr;
+        }
+        // Si viene en formato DD/MM/YYYY o DD-MM-YYYY
+        const separador = fechaStr.includes('/') ? '/' : '-';
+        const partes = fechaStr.split(separador);
+        if (partes.length === 3) {
+            const dia = partes[0].padStart(2, '0');
+            const mes = partes[1].padStart(2, '0');
+            const anio = partes[2];
+            return `${anio}-${mes}-${dia}`;
+        }
+        return fechaStr;
+    }
+
+    function abrirModalMovimiento(tipo, fechaFifoSugerida = '') {
         document.getElementById('modal-movimiento').classList.remove('hidden');
-        
+
         const form = document.getElementById('form-movimiento');
         form.reset();
         document.getElementById('tipo_movimiento').value = tipo;
-        
+
         const inputFecha = document.getElementById('input_fecha');
         const labelFecha = document.getElementById('label-fecha');
         const btnSubmit = document.getElementById('btn-submit-modal');
         const badge = document.getElementById('modal-badge');
-        const topBar = document.getElementById('modal-top-bar');
+
+        inputFecha.disabled = false;
 
         if (tipo === 'Entrada') {
-            // === CAMBIO CLAVE: ASIGNAR RUTA DE INGRESO ===
             form.action = "{{ url_for('empaque.ingresar_huevo') }}";
-            
+
+            inputFecha.value = obtenerFechaHoyISO();
+
             badge.innerHTML = 'Nueva Entrada';
             badge.className = "inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest bg-cyan-50 text-cyan-700 border border-cyan-100";
-            topBar.className = "absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cyan-500 to-cyan-700";
             btnSubmit.className = "w-2/3 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-cyan-600/30 text-xs bg-gradient-to-r from-cyan-600 to-cyan-700 hover:from-cyan-700 hover:to-cyan-800 transition-all";
             btnSubmit.innerHTML = "Guardar Ingreso";
-            
-            labelFecha.innerText = "Fecha de Ingreso (Hoy)";
-            inputFecha.value = obtenerFechaHoy();
-            inputFecha.readOnly = true;
-            inputFecha.classList.add("bg-slate-100", "cursor-not-allowed", "text-slate-500");
-            // Se necesita enviar la fecha en ingreso
-            inputFecha.disabled = false; 
-            
+
+            labelFecha.innerText = "Fecha de Ingreso";
+
         } else {
-            // === CAMBIO CLAVE: ASIGNAR RUTA DE RETIRO ===
             form.action = "{{ url_for('empaque.retirar_huevo') }}";
-            
+
+            // Si recibimos una fecha FIFO válida la formateamos a YYYY-MM-DD para asignarla al input date, si no usa hoy
+            const fechaFormateada = formatearAISO(fechaFifoSugerida);
+            if (fechaFormateada && fechaFormateada.trim() !== '') {
+                inputFecha.value = fechaFormateada;
+            } else {
+                inputFecha.value = obtenerFechaHoyISO();
+            }
+
             badge.innerHTML = 'Registrar Salida';
             badge.className = "inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-widest bg-rose-50 text-rose-700 border border-rose-100";
-            topBar.className = "absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-rose-500 to-rose-700";
             btnSubmit.className = "w-2/3 text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-rose-600/30 text-xs bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 transition-all";
             btnSubmit.innerHTML = "Confirmar Retiro";
-            
-            labelFecha.innerText = "Lógica FIFO Automática";
-            inputFecha.value = "";
-            inputFecha.readOnly = true; 
-            inputFecha.classList.add("bg-slate-100", "cursor-not-allowed", "text-slate-500");
-            // Se deshabilita para que no sea required, ya que FIFO retira del más viejo automáticamente
-            inputFecha.disabled = true; 
+
+            labelFecha.innerText = "Fecha del Lote";
         }
     }
-    function cerrarModal() { document.getElementById('modal-movimiento').classList.add('hidden'); }
+
+    function cerrarModal() {
+        document.getElementById('modal-movimiento').classList.add('hidden');
+    }
 </script>
 {% endblock %}

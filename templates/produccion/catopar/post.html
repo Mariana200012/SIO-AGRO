@@ -1,256 +1,346 @@
 {% extends "produccion/base_produc.html" %}
 {% block title %}Catopar - Post-Parasitismo{% endblock %}
 
+{% block extra_css %}
+<style>
+    .table-container {
+        max-height: 500px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+
+    .table-container::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 10px;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .modal-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+
+    .modal-scroll::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .modal-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .modal-scroll::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
 {% block navbar_menu %}
 <div class="w-full max-w-full overflow-x-auto hide-scroll flex justify-start sm:justify-center px-3 py-1">
-    <div class="inline-flex items-center gap-1 p-1 bg-slate-900/80 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner flex-nowrap min-w-max">
-        
-        <!-- BOTÓN INACTIVO (Pre-Parasitismo) -->
-        <a href="{{ url_for('prod_catopar.pre') }}" class="px-4 py-1.5 rounded-full text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all whitespace-nowrap">
+    <div
+        class="inline-flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner flex-nowrap min-w-max">
+        <a href="{{ url_for('prod_catopar.pre') }}"
+            class="px-4 py-1.5 rounded-full text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
             Pre-Parasitismo
         </a>
-
-        <!-- BOTÓN ACTIVO (Post-Parasitismo) -->
-        <a id="activePill" href="{{ url_for('prod_catopar.post') }}" class="px-4 py-1.5 rounded-full text-xs font-black text-white bg-gradient-to-r from-cyan-600 to-cyan-500 shadow-md border border-cyan-400/30 scale-[1.03] transition-all cursor-default whitespace-nowrap">
+        <a id="activePill" href="{{ url_for('prod_catopar.post') }}"
+            class="px-4 py-1.5 rounded-full text-xs font-black text-white bg-gradient-to-r from-amber-500 to-amber-600 shadow-md shadow-amber-900/40 border border-amber-400/30 scale-[1.03] transition-all cursor-default whitespace-nowrap">
             Post-Parasitismo
         </a>
-
-        <!-- BOTÓN INACTIVO (Materiales) -->
-        <a href="{{ url_for('prod_catopar.materiales') }}" class="px-4 py-1.5 rounded-full text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all whitespace-nowrap">
+        <a href="{{ url_for('prod_catopar.materiales') }}"
+            class="px-4 py-1.5 rounded-full text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
             Materiales
         </a>
-
     </div>
 </div>
 {% endblock %}
 
 {% block content %}
-<!-- Contenedor maestro con margen inferior extra (Protección zoom) -->
-<div class="w-full max-w-7xl mx-auto flex flex-col gap-6 pb-24 mb-12">
-    
-    <!-- ENCABEZADO -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
-        <div>
-            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Post-Parasitismo <span class="text-cyan-600 font-bold text-lg">(Catopar)</span></h1>
-            <p class="text-xs text-slate-500 font-medium mt-1">Gestión e historial de evaluaciones de larvas (Muestra de 10 unidades).</p>
-        </div>
-        
-        <!-- BOTÓN MODAL (Inicia en el Paso 1) -->
-        <button onclick="abrirModal('modalRegistroPost'); mostrarPasoPost(1);" class="flex items-center justify-center gap-2 px-6 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl shadow-md shadow-cyan-900/10 transition-all w-full md:w-auto active:scale-95">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-            Realizar Registro
-        </button>
-    </div>
+<div class="flex-1 overflow-y-auto px-6 pt-6 pb-10 lg:px-10 bg-slate-50/50">
+    <div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
 
-    <!-- TARJETAS DE DATOS (KPIs Dinámicos) -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between min-h-[130px]">
-            <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Lote Seleccionado</h3>
-            <p class="text-4xl font-black text-slate-800 tracking-tight mt-auto" id="kpiLote">{{ ultimo.id_lote if ultimo else '--' }}</p>
-        </div>
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between min-h-[130px]">
-            <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Fecha y Hora</h3>
-            <p class="text-lg font-black text-slate-600 tracking-tight mt-auto" id="kpiFecha">{{ ultimo.fecha_registro if ultimo else '--/--/----' }}</p>
-        </div>
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between min-h-[130px]">
-            <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Muestra</h3>
-            <div class="flex items-end gap-1 mt-auto">
-                <p class="text-4xl font-black text-cyan-600 tracking-tight">10</p>
-                <span class="text-sm font-bold text-slate-500 mb-1">Garb.</span>
+        <!-- ENCABEZADO -->
+        <div
+            class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <div
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 border-amber-200/60 border text-[10px] font-bold tracking-widest uppercase mb-1">
+                    <div class="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+                    Módulo Catopar
+                </div>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight mb-1">Post-Parasitismo</h1>
+                <p class="text-xs text-slate-500 font-medium">Gestión e historial de evaluaciones de larvas (Muestra de
+                    10 unidades).</p>
             </div>
+            <button onclick="abrirModal('modalRegistroPost'); mostrarPasoPost(1);"
+                class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-3 px-6 rounded-xl shadow-sm transition-colors flex items-center gap-2 whitespace-nowrap">
+                <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Nuevo Registro
+            </button>
         </div>
-        <div class="bg-slate-50 p-6 rounded-3xl shadow-inner border border-slate-200 flex flex-col justify-between min-h-[130px]">
-            <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Estado del Lote</h3>
-            <div class="mt-auto" id="kpiContenedorEstatus">
-                {% if ultimo %}
-                    {% if ultimo.estatus == 'Aprobado' %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200 shadow-sm"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Aprobado</span>
-                    {% elif ultimo.estatus == 'Rechazado' %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 text-xs font-bold rounded-lg border border-red-200 shadow-sm"><span class="w-2 h-2 rounded-full bg-red-500"></span> No Viable</span>
+
+        <!-- TARJETAS DE DATOS (KPIs Dinámicos) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <!-- 1. Lote Seleccionado -->
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between min-h-[110px]">
+                <h3 class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Lote Seleccionado</h3>
+                <p class="text-3xl font-black text-slate-800 tracking-tight mt-auto" id="kpiLote">{{ ultimo.id_lote if
+                    ultimo else '--' }}</p>
+            </div>
+
+            <!-- 2. Fecha y Hora (Más grande con hora) -->
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between min-h-[110px]">
+                <h3 class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Fecha y Hora</h3>
+                <p class="text-lg font-black text-slate-600 tracking-tight mt-auto" id="kpiFecha">{{
+                    ultimo.fecha_registro if ultimo else '--/--/----' }}</p>
+            </div>
+
+            <!-- 3. Porcentaje de Efectividad -->
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between min-h-[110px]">
+                <h3 class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Efectividad</h3>
+                <div class="flex items-end gap-1 mt-auto">
+                    <p class="text-3xl font-black text-amber-600 tracking-tight" id="kpiPorcentaje">{{ ultimo.porcentaje
+                        if ultimo and ultimo.porcentaje is not none else '0.0' }}</p>
+                    <span class="text-xs font-bold text-slate-500 mb-0.5">%</span>
+                </div>
+            </div>
+
+            <!-- 4. Estado (Registrado) -->
+            <div
+                class="bg-slate-50 p-5 rounded-2xl shadow-inner border border-slate-200 flex flex-col justify-between min-h-[110px]">
+                <h3 class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Estado</h3>
+                <div class="mt-auto" id="kpiContenedorEstatus">
+                    {% if ultimo %}
+                    <span
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-sky-50 text-sky-700 text-xs font-bold rounded-lg border border-sky-200 shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Registrado
+                    </span>
                     {% else %}
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg border border-amber-200 shadow-sm"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Pendiente</span>
+                    <span
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white text-slate-500 text-xs font-bold rounded-lg border border-slate-200 shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> Esperando lote
+                    </span>
                     {% endif %}
-                {% else %}
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-slate-500 text-xs font-bold rounded-lg border border-slate-200 shadow-sm"><span class="w-2 h-2 rounded-full bg-slate-300"></span> Esperando lote</span>
-                {% endif %}
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- TABLA DE HISTORIAL -->
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col flex-1 overflow-hidden">
-        <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center z-10">
-            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-widest">Historial de Registros</h3>
-        </div>
-        
-        <div class="overflow-x-auto overflow-y-auto max-h-[55vh]" id="scrollTable">
-            <table class="min-w-full text-left divide-y divide-slate-100 text-sm">
-                <thead class="sticky top-0 bg-white/95 backdrop-blur-sm z-10 shadow-sm">
-                    <tr class="text-[10px] uppercase tracking-widest text-slate-400 font-black border-b border-slate-200">
-                        <th class="px-6 py-4 text-center w-24">ID Lote</th>
-                        <th class="px-4 py-4 text-center">Semana</th>
-                        <th class="px-4 py-4">Fecha de Captura</th>
-                        <th class="px-4 py-4 text-center">Ácaros (Tot)</th>
-                        <th class="px-4 py-4 text-center">Completos (Tot)</th>
-                        <th class="px-4 py-4 text-center">Estatus Admin</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 bg-white">
-                    {% for reg in historial %}
-                    <tr onclick="seleccionarRegistroPost('{{ reg.id_lote }}', '{{ reg.fecha_registro }}', '{{ reg.estatus if reg.estatus else 'Pendiente' }}', this)" class="hover:bg-cyan-50/40 transition-colors cursor-pointer group">
-                        <td class="px-6 py-4 text-center font-black text-slate-800 group-hover:text-cyan-600">#{{ reg.id_lote }}</td>
-                        <td class="px-4 py-4 text-center font-bold text-slate-600">Sem {{ reg.semana if reg.semana else '--' }}</td>
-                        <td class="px-4 py-4 text-xs font-bold text-slate-600">{{ reg.fecha_registro }} <span class="text-[10px] text-slate-400 font-medium ml-1">por {{ reg.nombre_usuario }}</span></td>
-                        <td class="px-4 py-4 text-center font-bold text-slate-600">{{ reg.total_acaros if reg.total_acaros is not none else 0 }}</td>
-                        <td class="px-4 py-4 text-center font-bold text-slate-600">{{ reg.total_completos if reg.total_completos is not none else 0 }}</td>
-                        <td class="px-4 py-4 text-center">
-                            {% if reg.estatus == 'Aprobado' %}
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-extrabold uppercase rounded-lg border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aprobado</span>
-                            {% elif reg.estatus == 'Rechazado' %}
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-700 text-[10px] font-extrabold uppercase rounded-lg border border-red-200"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> No Viable</span>
-                            {% else %}
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 text-[10px] font-extrabold uppercase rounded-lg border border-amber-200"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pendiente</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="6" class="px-6 py-8 text-center text-slate-500 font-medium">Aún no hay registros de Post-Parasitismo.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- TABLA DE HISTORIAL -->
+        <div
+            class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col flex-1 min-h-[400px]">
+            <div class="bg-slate-50 border-b border-slate-100 px-5 py-4 flex justify-between items-center">
+                <h2 class="text-xs font-bold text-slate-700 uppercase tracking-widest">Tus Registros</h2>
+                <span
+                    class="text-[10px] text-slate-400 font-bold uppercase tracking-widest bg-white border border-slate-200 px-2 py-1 rounded-md shadow-sm">Historial
+                    de Post-Parasitismo</span>
+            </div>
+
+            <div class="overflow-x-auto overflow-y-auto max-h-[55vh] table-container" id="scrollTable">
+                <table class="min-w-full divide-y divide-slate-100 text-sm">
+                    <thead class="bg-white text-slate-400 sticky top-0 z-10 shadow-sm">
+                        <tr>
+                            <th class="px-5 py-3 text-center font-black uppercase tracking-widest text-[9px] w-24">ID
+                                Lote</th>
+                            <th class="px-4 py-3 text-center font-black uppercase tracking-widest text-[9px]">Semana
+                            </th>
+                            <th class="px-4 py-3 text-left font-black uppercase tracking-widest text-[9px]">Fecha de
+                                Captura</th>
+                            <th class="px-4 py-3 text-center font-black uppercase tracking-widest text-[9px]">
+                                Efectividad Global (%)</th>
+                            <th class="px-4 py-3 text-center font-black uppercase tracking-widest text-[9px]">Estado
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        {% for reg in historial %}
+                        <tr onclick="seleccionarRegistroPost('{{ reg.id_lote }}', '{{ reg.fecha_registro }}', '{{ reg.porcentaje }}', this)"
+                            class="hover:bg-amber-50/40 transition-colors cursor-pointer group">
+                            <td class="px-5 py-3.5 text-center font-black text-slate-800 group-hover:text-amber-600">#{{
+                                reg.id_lote }}</td>
+                            <td class="px-4 py-3.5 text-center font-bold text-slate-600">Sem {{ reg.semana if reg.semana
+                                else '--' }}</td>
+                            <td class="px-4 py-3.5 text-xs font-bold text-slate-600">{{ reg.fecha_registro }} <span
+                                    class="text-[10px] text-slate-400 font-medium ml-1">por {{ reg.nombre_usuario
+                                    }}</span></td>
+                            <td class="px-4 py-3.5 text-center">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-black {% if reg.porcentaje >= 80 %}text-emerald-700 bg-emerald-50 border border-emerald-200{% elif reg.porcentaje >= 50 %}text-amber-700 bg-amber-50 border border-amber-200{% else %}text-rose-700 bg-rose-50 border border-rose-200{% endif %}">
+                                    {{ reg.porcentaje }}%
+                                </span>
+                            </td>
+                            <td class="px-4 py-3.5 text-center">
+                                <span
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-sky-50 text-sky-700 text-[10px] font-extrabold uppercase rounded-lg border border-sky-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Registrado
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="px-5 py-8 text-center text-slate-400 text-sm font-medium">Aún no hay
+                                registros de Post-Parasitismo.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- ==========================================
-     TARJETA EMERGENTE (MODAL WIZARD EN 2 PASOS)
-     ========================================== -->
-<div id="modalRegistroPost" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 opacity-0">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-300 overflow-hidden" id="modalContent">
-        
-        <!-- Header del Modal -->
-        <div class="flex-shrink-0 flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-white">
+<!-- MODAL WIZARD -->
+<div id="modalRegistroPost"
+    class="hidden fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+    <div class="relative bg-white rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col max-h-[85vh] border border-slate-100 my-auto text-left transition-all duration-300"
+        id="modalContent">
+
+        <div class="flex justify-between items-center border-b border-slate-100 p-5 pb-4 shrink-0 bg-white">
             <div>
-                <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span>
-                    <span id="modalTituloPost">Paso 1: Datos Administrativos</span>
-                </h2>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Post-Parasitismo (Muestra de 10)</p>
+                <h3 id="modalTituloPost" class="font-black text-slate-800 text-lg tracking-tight">Paso 1: Datos
+                    Administrativos</h3>
+                <p class="text-[11px] text-slate-500 font-medium mt-0.5">Post-Parasitismo (Muestra de 10)</p>
             </div>
-            <button type="button" onclick="cerrarModal('modalRegistroPost')" class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-2 rounded-xl transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
+            <button type="button" onclick="cerrarModal('modalRegistroPost')"
+                class="text-slate-400 hover:text-slate-600 transition-colors font-black text-2xl leading-none">&times;</button>
         </div>
 
-        <form action="{{ url_for('prod_catopar.guardar_post') }}" method="POST" class="flex flex-col flex-1 overflow-hidden">
-            
-            <!-- PASO 1: DATOS ADMINISTRATIVOS (Ancho forzado a 400px para no estirarse) -->
-            <div id="paso1Post" class="w-full flex flex-col items-center justify-center p-6 bg-slate-50/80 h-full overflow-y-auto">
-                
-                <div class="w-[400px] max-w-full bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col gap-4">
+        <form action="{{ url_for('prod_catopar.guardar_post') }}" method="POST"
+            class="flex flex-col flex-1 overflow-hidden">
+
+            <!-- PASO 1 -->
+            <div id="paso1Post" class="flex flex-col flex-1 p-5 bg-slate-50/30 justify-center">
+                <div class="w-full bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-3.5">
                     <div class="flex flex-col">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Número de Lote (4 dígitos)</label>
-                        <input type="number" id="inputLotePost" name="lote_id" placeholder="Ej. 1024" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-3.5 py-2.5 outline-none focus:ring-2 focus:ring-cyan-500 transition-all" required>
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Lote (4
+                            dígitos)</label>
+                        <input type="number" id="inputLotePost" name="lote_id" placeholder="Ej. 1024"
+                            class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                            required>
                     </div>
                     <div class="flex flex-col">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Semana Operativa</label>
-                        <input type="number" id="inputSemanaPost" name="semana" placeholder="Ej. 42" min="1" max="53" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-3.5 py-2.5 outline-none focus:ring-2 focus:ring-cyan-500 transition-all" required>
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Semana
+                            Operativa</label>
+                        <input type="number" id="inputSemanaPost" name="semana" placeholder="Ej. 42" min="1" max="53"
+                            class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                            required>
                     </div>
                     <div class="flex flex-col">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Fecha de Captura</label>
-                        <input type="date" id="inputFechaPost" name="fecha" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-3.5 py-2.5 outline-none focus:ring-2 focus:ring-cyan-500 transition-all" required>
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Fecha de
+                            Captura</label>
+                        <input type="date" id="inputFechaPost" name="fecha"
+                            class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3 py-2.5 outline-none focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                            required>
                     </div>
-                    <div class="flex flex-col pt-3 border-t border-slate-100">
-                        <label class="text-[10px] font-black text-cyan-600 uppercase tracking-widest mb-1.5">Firma del Operador (NIP)</label>
-                        <input type="password" id="inputNipPost" name="nip" placeholder="****" class="w-full bg-cyan-50/60 border border-cyan-200 text-cyan-800 font-black tracking-widest text-center text-lg rounded-xl px-3.5 py-2.5 outline-none focus:ring-2 focus:ring-cyan-500 transition-all" required>
+                    <div class="flex flex-col pt-2 border-t border-slate-100">
+                        <label class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Firma del
+                            Operador (NIP)</label>
+                        <input type="password" id="inputNipPost" name="nip" placeholder="****"
+                            class="w-full bg-emerald-50/50 border border-emerald-200 text-emerald-800 font-black tracking-widest text-center text-sm rounded-xl px-3 py-2.5 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                            required>
                     </div>
                 </div>
 
-                <div class="w-[400px] max-w-full mt-6 flex justify-end gap-3">
-                    <button type="button" onclick="cerrarModal('modalRegistroPost')" class="flex-1 px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold rounded-xl transition-all">Cancelar</button>
-                    <button type="button" onclick="validarPaso1Post()" class="flex-1 px-6 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2">
+                <div class="mt-4 flex justify-end w-full gap-2">
+                    <button type="button" onclick="cerrarModal('modalRegistroPost')"
+                        class="w-1/3 bg-slate-100 border border-slate-200 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors text-xs">Cancelar</button>
+                    <button type="button" onclick="validarPaso1Post()"
+                        class="w-2/3 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold py-3 rounded-xl shadow-md shadow-amber-600/20 transition-all active:scale-95 flex items-center justify-center gap-1.5">
                         Siguiente Paso
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
                     </button>
                 </div>
             </div>
 
-            <!-- PASO 2: LAS 10 FILAS DE GARBANZOS (Diseño Premium Soft-UI) -->
+            <!-- PASO 2 -->
             <div id="paso2Post" class="hidden flex-col flex-1 overflow-hidden bg-slate-50/40">
-                <div class="flex-1 overflow-y-auto hide-scroll p-6">
-                    
-                    <!-- Tarjeta de encabezado del Paso 2 -->
-                    <div class="max-w-5xl mx-auto mb-5 flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-                        <div class="flex items-center gap-3.5">
-                            <div class="w-10 h-10 rounded-full bg-cyan-50 flex items-center justify-center text-cyan-600 border border-cyan-100">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-black text-slate-800">Evaluación de Muestra (10 unidades)</h3>
-                                <p class="text-[11px] font-bold text-slate-400 mt-0.5 uppercase tracking-widest">Lote Seleccionado: <span id="displayLotePostTxt" class="text-cyan-600 font-black text-xs">---</span></p>
-                            </div>
-                        </div>
+                <div class="flex-1 overflow-y-auto modal-scroll p-4 space-y-3">
+                    <div
+                        class="bg-amber-50/80 text-amber-900 px-4 py-2 rounded-xl font-bold text-xs text-center border border-amber-200/80 shadow-sm w-full mb-3">
+                        Evaluando Muestra del Lote #<span id="displayLotePostTxt"
+                            class="font-black text-amber-950 text-sm">---</span>
                     </div>
 
-                    <!-- Tabla de captura -->
-                    <div class="max-w-5xl mx-auto border border-slate-200 rounded-3xl bg-white shadow-sm overflow-hidden">
-                        <div class="overflow-x-auto w-full">
-                            <table class="w-full text-left border-collapse min-w-[700px]">
-                                <thead>
-                                    <tr class="bg-slate-50/80 border-b border-slate-200 text-[10px] uppercase tracking-widest font-black">
-                                        <th class="p-4 text-center w-16 text-slate-400">Unidad</th>
-                                        <th class="p-4 text-center text-slate-500">Ácaros</th>
-                                        <th class="p-4 text-center text-emerald-600">Completos</th>
-                                        <th class="p-4 text-center text-slate-800">Negro</th>
-                                        <th class="p-4 text-center text-purple-600">Combinado</th>
-                                        <th class="p-4 text-center text-amber-600">Ámbar</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-slate-100">
-                                    {% for i in range(1, 11) %}
-                                    <tr class="hover:bg-slate-50/80 transition-colors group">
-                                        <!-- Insignia del número de Garbanzo -->
-                                        <td class="p-3 text-center">
-                                            <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 font-black text-xs flex items-center justify-center mx-auto group-hover:bg-cyan-100 group-hover:text-cyan-700 transition-colors">
-                                                {{ i }}
-                                            </div>
-                                        </td>
-                                        
-                                        <!-- Inputs con colores temáticos sutiles para guiar visualmente al operador -->
-                                        <td class="p-2">
-                                            <input type="number" min="0" name="acaros_{{ i }}" class="w-full text-center py-2.5 px-2 rounded-xl border border-transparent bg-slate-50 hover:bg-slate-100 focus:bg-white focus:border-cyan-300 focus:ring-4 focus:ring-cyan-500/10 font-bold text-slate-700 outline-none transition-all shadow-inner placeholder:text-slate-300" required placeholder="0">
-                                        </td>
-                                        <td class="p-2">
-                                            <input type="number" min="0" name="completos_{{ i }}" class="w-full text-center py-2.5 px-2 rounded-xl border border-transparent bg-emerald-50/50 hover:bg-emerald-100/50 focus:bg-white focus:border-emerald-300 focus:ring-4 focus:ring-emerald-500/10 font-bold text-emerald-700 outline-none transition-all shadow-inner placeholder:text-emerald-300/60" required placeholder="0">
-                                        </td>
-                                        <td class="p-2">
-                                            <input type="number" min="0" name="negro_{{ i }}" class="w-full text-center py-2.5 px-2 rounded-xl border border-transparent bg-slate-100/50 hover:bg-slate-200/50 focus:bg-white focus:border-slate-400 focus:ring-4 focus:ring-slate-500/10 font-bold text-slate-800 outline-none transition-all shadow-inner placeholder:text-slate-400/50" required placeholder="0">
-                                        </td>
-                                        <td class="p-2">
-                                            <input type="number" min="0" name="combinado_{{ i }}" class="w-full text-center py-2.5 px-2 rounded-xl border border-transparent bg-purple-50/50 hover:bg-purple-100/50 focus:bg-white focus:border-purple-300 focus:ring-4 focus:ring-purple-500/10 font-bold text-purple-700 outline-none transition-all shadow-inner placeholder:text-purple-300/60" required placeholder="0">
-                                        </td>
-                                        <td class="p-2">
-                                            <input type="number" min="0" name="ambar_{{ i }}" class="w-full text-center py-2.5 px-2 rounded-xl border border-transparent bg-amber-50/50 hover:bg-amber-100/50 focus:bg-white focus:border-amber-300 focus:ring-4 focus:ring-amber-500/10 font-bold text-amber-700 outline-none transition-all shadow-inner placeholder:text-amber-300/60" required placeholder="0">
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                    <div class="space-y-2">
+                        {% for i in range(1, 11) %}
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                                <span class="text-xs font-black text-slate-700">Unidad #{{ i }}</span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-[11px]">
+                                <div>
+                                    <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Ácaros</span>
+                                    <input type="number" min="0" name="acaros_{{ i }}" placeholder="0" required
+                                        class="w-full text-center py-1.5 px-2 rounded-lg border border-slate-200 bg-slate-50 font-bold text-slate-700 outline-none focus:bg-white focus:border-amber-400">
+                                </div>
+                                <div>
+                                    <span class="text-[9px] font-bold text-emerald-600 block mb-0.5">Completos</span>
+                                    <input type="number" min="0" name="completos_{{ i }}" placeholder="0" required
+                                        class="w-full text-center py-1.5 px-2 rounded-lg border border-emerald-200 bg-emerald-50/50 font-bold text-emerald-700 outline-none focus:bg-white focus:border-emerald-400">
+                                </div>
+                                <div>
+                                    <span class="text-[9px] font-bold text-slate-600 block mb-0.5">Negro</span>
+                                    <input type="number" min="0" name="negro_{{ i }}" placeholder="0" required
+                                        class="w-full text-center py-1.5 px-2 rounded-lg border border-slate-200 bg-slate-50 font-bold text-slate-800 outline-none focus:bg-white focus:border-slate-400">
+                                </div>
+                                <div>
+                                    <span class="text-[9px] font-bold text-purple-600 block mb-0.5">Combinado</span>
+                                    <input type="number" min="0" name="combinado_{{ i }}" placeholder="0" required
+                                        class="w-full text-center py-1.5 px-2 rounded-lg border border-purple-200 bg-purple-50/50 font-bold text-purple-700 outline-none focus:bg-white focus:border-purple-400">
+                                </div>
+                                <div class="col-span-2 sm:col-span-1">
+                                    <span class="text-[9px] font-bold text-amber-600 block mb-0.5">Ámbar</span>
+                                    <input type="number" min="0" name="ambar_{{ i }}" placeholder="0" required
+                                        class="w-full text-center py-1.5 px-2 rounded-lg border border-amber-200 bg-amber-50/50 font-bold text-amber-700 outline-none focus:bg-white focus:border-amber-400">
+                                </div>
+                            </div>
                         </div>
+                        {% endfor %}
                     </div>
                 </div>
 
-                <!-- Footer del Modal Paso 2 -->
-                <div class="flex-shrink-0 px-6 py-4 border-t border-slate-100 bg-white rounded-b-3xl flex items-center justify-between gap-3 shadow-md">
-                    <button type="button" onclick="mostrarPasoPost(1)" class="px-6 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold rounded-xl transition-all flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                <div class="p-4 border-t border-slate-100 bg-white rounded-b-2xl flex space-x-2 shrink-0">
+                    <button type="button" onclick="mostrarPasoPost(1)"
+                        class="w-1/3 bg-slate-100 border border-slate-200 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors text-xs flex items-center justify-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7">
+                            </path>
+                        </svg>
                         Atrás
                     </button>
-                    <button type="submit" class="px-8 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2">
+                    <button type="submit"
+                        class="w-2/3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl shadow-md shadow-amber-600/20 transition-colors flex justify-center items-center gap-1.5 text-xs">
                         Guardar Registro
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7">
+                            </path>
+                        </svg>
                     </button>
                 </div>
             </div>
@@ -274,24 +364,13 @@
         document.getElementById('inputFechaPost').value = hoy;
 
         const modal = document.getElementById(modalId);
-        const content = document.getElementById('modalContent');
         modal.classList.remove('hidden');
-        setTimeout(() => {
-            modal.classList.remove('opacity-0');
-            modal.classList.add('opacity-100');
-            content.classList.remove('scale-95');
-            content.classList.add('scale-100');
-        }, 10);
+        document.body.appendChild(modal);
     }
 
     function cerrarModal(modalId) {
         const modal = document.getElementById(modalId);
-        const content = document.getElementById('modalContent');
-        modal.classList.remove('opacity-100');
-        modal.classList.add('opacity-0');
-        content.classList.remove('scale-100');
-        content.classList.add('scale-95');
-        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        modal.classList.add('hidden');
     }
 
     function validarPaso1Post() {
@@ -299,8 +378,8 @@
         const semana = document.getElementById('inputSemanaPost').value;
         const fecha = document.getElementById('inputFechaPost').value;
         const nip = document.getElementById('inputNipPost').value;
-        
-        if(!lote || !semana || !fecha || !nip) {
+
+        if (!lote || !semana || !fecha || !nip) {
             alert("Por favor completa todos los campos (Lote, Semana, Fecha y NIP) para continuar.");
             return;
         }
@@ -310,42 +389,44 @@
     }
 
     function mostrarPasoPost(paso) {
-        if(paso === 1) {
+        const modalContent = document.getElementById('modalContent');
+        if (paso === 1) {
+            modalContent.classList.remove('max-w-2xl');
+            modalContent.classList.add('max-w-sm');
+
             document.getElementById('paso2Post').classList.add('hidden');
             document.getElementById('paso2Post').classList.remove('flex');
-            
+
             document.getElementById('paso1Post').classList.remove('hidden');
             document.getElementById('paso1Post').classList.add('flex');
             document.getElementById('modalTituloPost').innerText = "Paso 1: Datos Administrativos";
         } else {
+            modalContent.classList.remove('max-w-sm');
+            modalContent.classList.add('max-w-2xl');
+
             document.getElementById('paso1Post').classList.add('hidden');
             document.getElementById('paso1Post').classList.remove('flex');
-            
+
             document.getElementById('paso2Post').classList.remove('hidden');
             document.getElementById('paso2Post').classList.add('flex');
             document.getElementById('modalTituloPost').innerText = "Paso 2: Evaluación Post-Parasitismo";
         }
     }
 
-    function seleccionarRegistroPost(lote, fecha, estatus, elementoFila) {
+    function seleccionarRegistroPost(lote, fecha, porcentaje, elementoFila) {
         document.getElementById('kpiLote').innerText = lote;
         document.getElementById('kpiFecha').innerText = fecha;
-        
+        document.getElementById('kpiPorcentaje').innerText = porcentaje && porcentaje !== 'None' && porcentaje !== '' ? porcentaje : '0.0';
+
         const contenedorEstatus = document.getElementById('kpiContenedorEstatus');
-        if(estatus === 'Aprobado') {
-            contenedorEstatus.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200 shadow-sm"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Aprobado</span>`;
-        } else if(estatus === 'Rechazado') {
-            contenedorEstatus.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 text-xs font-bold rounded-lg border border-red-200 shadow-sm"><span class="w-2 h-2 rounded-full bg-red-500"></span> No Viable</span>`;
-        } else {
-            contenedorEstatus.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg border border-amber-200 shadow-sm"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Pendiente</span>`;
-        }
+        contenedorEstatus.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-sky-50 text-sky-700 text-xs font-bold rounded-lg border border-sky-200 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Registrado</span>`;
 
         const filas = document.querySelectorAll('#scrollTable tbody tr');
         filas.forEach(f => {
-            f.classList.remove('bg-cyan-100/70', 'border-l-4', 'border-cyan-600');
+            f.classList.remove('bg-amber-100/70', 'border-l-4', 'border-amber-500');
         });
         if (elementoFila) {
-            elementoFila.classList.add('bg-cyan-100/70', 'border-l-4', 'border-cyan-600');
+            elementoFila.classList.add('bg-amber-100/70', 'border-l-4', 'border-amber-500');
         }
     }
 </script>

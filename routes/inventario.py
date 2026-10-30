@@ -14,15 +14,17 @@ def get_db_connection():
 @inventario_bp.route('/solicitudes')
 def listar_solicitudes():
     try:
-        conn = sqlite3.connect(r'C:\Users\maryt\OneDrive\Escritorio\Proyecto\SF_Koppert\Bd_SIO-AGRO.db')
+        conn = sqlite3.connect(
+            r'C:\Users\maryt\OneDrive\Escritorio\Proyecto\SF_Koppert\Bd_SIO-AGRO.db'
+        )
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
 
-        # Consulta uniendo Cabecera y Detalle, filtrando solo los activos
+        # 1. Consulta para los tickets activos
         cursor.execute("""
             SELECT 
                 SM.id_solicitud, 
-                SM.fecha_solicitud, 
+                strftime('%d/%m/%Y %I:%M %p', datetime(SM.fecha_solicitud)) AS fecha_solicitud, 
                 SM.estatus, 
                 U.nombre_usuario,
                 A.nombre_area,
@@ -36,9 +38,9 @@ def listar_solicitudes():
             WHERE SM.estatus IN ('Pendiente', 'Autorizado')
             ORDER BY SM.id_solicitud DESC
         """)
-        
+
         filas = cursor.fetchall()
-        
+
         # Agrupamos los materiales por Folio para la vista del analista
         tickets_dict = {}
         for fila in filas:
@@ -46,27 +48,44 @@ def listar_solicitudes():
             if folio not in tickets_dict:
                 tickets_dict[folio] = {
                     'folio_ticket': folio,
-                    'fecha_solicitud': fila['fecha_solicitud'],
+                    'fecha_solicitud': fila['fecha_solicitud']
+                    or fila['fecha_solicitud'],
                     'estatus': fila['estatus'],
                     'nombre_usuario': fila['nombre_usuario'],
                     'nombre_area': fila['nombre_area'],
-                    'materiales': []
+                    'materiales': [],
                 }
-            # Insertamos los materiales dentro del ticket correspondiente
             tickets_dict[folio]['materiales'].append({
                 'nombre': fila['nombre_material'],
-                'cantidad': fila['cantidad_solicitada']
+                'cantidad': fila['cantidad_solicitada'],
             })
-            
+
         tickets = list(tickets_dict.values())
+
+        # 2. Obtenemos el total de tickets rechazados directamente de la BD
+        cursor.execute("""
+            SELECT COUNT(*) AS total 
+            FROM SOLICITUDES_MATERIAL 
+            WHERE estatus = 'Rechazado'
+        """)
+        resultado_rechazados = cursor.fetchone()
+        total_rechazados = (
+            resultado_rechazados['total'] if resultado_rechazados else 0
+        )
+
         conn.close()
 
     except Exception as e:
         print(f"Error en inventario: {e}")
         tickets = []
+        total_rechazados = 0
 
-    return render_template('inventario/solicitudes.html', tickets=tickets)
-
+    # 3. Enviamos las variables a la plantilla HTML
+    return render_template(
+        'analista/solicitudes.html',
+        tickets=tickets,
+        total_rechazados=total_rechazados,
+    )
 @inventario_bp.route('/historial')
 def historial_solicitudes():
     try:
@@ -120,13 +139,8 @@ def historial_solicitudes():
         print(f"Error en historial inventario: {e}")
         tickets_historial = []
 
-    return render_template('inventario/historial.html', tickets_historial=tickets_historial)
+    return render_template('analista/historial.html', tickets_historial=tickets_historial)
 
-
-
-# ==========================================
-# PROCESAR BOTONES DE ACCIÓN (Autorizar/Surtir)
-# ==========================================
 # ==========================================
 # PROCESAR BOTONES DE ACCIÓN (Autorizar/Surtir)
 # ==========================================
@@ -166,5 +180,45 @@ def actualizar_ticket(folio):
             if 'conn' in locals():
                 conn.close()
 
-    # Redirigir de vuelta a la vista de solicitudes
+    # Redirigir de vuelta a la vde soista          
     return redirect(url_for('inventario.listar_solicitudes'))
+
+
+# ==========================================
+# GESTIÓN DE MATERIALES 
+# ==========================================
+
+@inventario_bp.route('/materiales')
+def gestionar_materiales():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT M.*, A.nombre_area FROM MATERIALES M LEFT JOIN CAT_AREAS A ON M.id_area = A.id_area")
+    materiales = cursor.fetchall()
+    cursor.execute("SELECT id_area, nombre_area FROM CAT_AREAS WHERE nombre_area LIKE '%Chrysopa%' OR nombre_area LIKE '%Catopar%'")
+    areas = cursor.fetchall()
+    conn.close()
+    return render_template('analista/materiales.html', materiales=materiales, areas=areas)
+
+@inventario_bp.route('/materiales/agregar', methods=['POST'])
+def agregar_material():
+    id_area = request.form.get('id_area')
+    nombre_material = request.form.get('nombre_material')
+    presentacion = request.form.get('presentacion')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO MATERIALES (id_area, nombre_material, presentacion) VALUES (?, ?, ?)", (id_area, nombre_material, presentacion))
+    conn.commit()
+    conn.close()
+    flash('Material agregado correctamente.', 'success')
+    return redirect(url_for('inventario.gestionar_materiales'))
+
+@inventario_bp.route('/materiales/eliminar/<int:id_material>', methods=['POST'])
+def eliminar_material(id_material):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM MATERIALES WHERE id_material = ?", (id_material,))
+    conn.commit()
+    conn.close()
+    flash('Material eliminado.', 'success')
+    return redirect(url_for('inventario.gestionar_materiales'))
+

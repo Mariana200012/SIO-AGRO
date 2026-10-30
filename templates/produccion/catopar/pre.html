@@ -1,16 +1,73 @@
 {% extends "produccion/base_produc.html" %}
 {% block title %}Catopar - Captura Pre-Parasitismo{% endblock %}
 
+{% block extra_css %}
+<style>
+    .table-container {
+        max-height: 500px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+
+    .table-container::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 10px;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .modal-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+    }
+
+    .modal-scroll::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .modal-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .modal-scroll::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
 {% block navbar_menu %}
 <div class="w-full max-w-full overflow-x-auto hide-scroll flex justify-start sm:justify-center px-3 py-1">
-    <div class="inline-flex items-center gap-1 p-1 bg-slate-900/80 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner flex-nowrap min-w-max">
-        <a id="activePill" href="{{ url_for('prod_catopar.pre') }}" class="px-4 py-1.5 rounded-full text-xs font-black text-white bg-gradient-to-r from-amber-500 to-amber-600 shadow-md border border-amber-400/30 scale-[1.03] transition-all cursor-default whitespace-nowrap">
+    <div
+        class="inline-flex items-center gap-1 p-1 bg-slate-900/40 rounded-full border border-slate-700/50 backdrop-blur-md shadow-inner flex-nowrap min-w-max">
+        <a id="activePill" href="{{ url_for('prod_catopar.pre') }}"
+            class="px-4 py-1.5 rounded-full text-xs font-black text-white bg-gradient-to-r from-amber-500 to-amber-600 shadow-md shadow-amber-900/40 border border-amber-400/30 scale-[1.03] transition-all cursor-default whitespace-nowrap">
             Pre-Parasitismo
         </a>
-        <a href="{{ url_for('prod_catopar.post') }}" class="px-4 py-1.5 rounded-full text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all whitespace-nowrap">
+        <a href="{{ url_for('prod_catopar.post') }}"
+            class="px-4 py-1.5 rounded-full text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
             Post-Parasitismo
         </a>
-        <a href="{{ url_for('prod_catopar.materiales') }}" class="px-4 py-1.5 rounded-full text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800/80 transition-all whitespace-nowrap">
+        <a href="{{ url_for('prod_catopar.materiales') }}"
+            class="px-4 py-1.5 rounded-full text-xs font-bold text-slate-300 hover:text-white hover:bg-slate-700/50 transition-all whitespace-nowrap">
             Materiales
         </a>
     </div>
@@ -18,207 +75,295 @@
 {% endblock %}
 
 {% block content %}
-<div class="w-full max-w-7xl mx-auto flex flex-col gap-6 pb-24 mb-12">
-    
-    <!-- ENCABEZADO -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
-        <div>
-            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Pre-Parasitismo <span class="text-amber-500 font-bold text-lg">(Catopar)</span></h1>
-            <p class="text-xs text-slate-500 font-medium mt-1">Auditoría de tamaños por garbanzo (Muestra de 21 unidades).</p>
-        </div>
-        <button onclick="abrirModal('modalRegistroPre'); mostrarPaso(1);" class="flex items-center justify-center gap-2 px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-md transition-all w-full md:w-auto">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-            Nuevo Registro
-        </button>
-    </div>
+<div class="flex-1 overflow-y-auto px-6 pt-6 pb-10 lg:px-10 bg-slate-50/50">
+    <div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
 
-    <!-- TARJETAS DE DATOS (KPIs Premium Dinámicas) -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
-        <!-- Tarjeta 1: Lote -->
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between min-h-[130px]">
-            <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Lote Seleccionado</h3>
-            <p class="text-4xl font-black text-slate-800 tracking-tight mt-auto" id="kpiLote">{{ ultimo.id_lote if ultimo else '--' }}</p>
-        </div>
-        
-        <!-- Tarjeta 2: Fecha y Hora -->
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between min-h-[130px]">
-            <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Fecha y Hora</h3>
-            <p class="text-lg font-black text-slate-600 tracking-tight mt-auto" id="kpiFecha">{{ ultimo.fecha_registro if ultimo else '--/--/----' }}</p>
-        </div>
-        
-        <!-- Tarjeta 3: Muestra -->
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between min-h-[130px]">
-            <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Muestra</h3>
-            <div class="flex items-end gap-1 mt-auto">
-                <p class="text-4xl font-black text-amber-600 tracking-tight">21</p>
-                <span class="text-sm font-bold text-slate-500 mb-1">Garb.</span>
-            </div>
-        </div>
-        
-        <!-- Tarjeta 4: Estado Dinámico -->
-        <div class="bg-slate-50 p-6 rounded-3xl shadow-inner border border-slate-200 flex flex-col justify-between min-h-[130px]">
-            <h3 class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Estado del Lote</h3>
-            <div class="mt-auto" id="kpiContenedorEstatus">
-                {% if ultimo %}
-                    {% if ultimo.estatus == 'Aprobado' %}
-                        <span id="kpiEstatusBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200 shadow-sm">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Aprobado
-                        </span>
-                    {% elif ultimo.estatus == 'Rechazado' %}
-                        <span id="kpiEstatusBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 text-xs font-bold rounded-lg border border-red-200 shadow-sm">
-                            <span class="w-2 h-2 rounded-full bg-red-500"></span> No Viable
-                        </span>
-                    {% else %}
-                        <span id="kpiEstatusBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg border border-amber-200 shadow-sm">
-                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Pendiente
-                        </span>
-                    {% endif %}
-                {% else %}
-                    <span id="kpiEstatusBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-slate-500 text-xs font-bold rounded-lg border border-slate-200 shadow-sm">
-                        <span class="w-2 h-2 rounded-full bg-slate-300"></span> Esperando lote
-                    </span>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- TABLA DE HISTORIAL -->
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm flex flex-col flex-1 overflow-hidden">
-        <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center z-10">
-            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-widest">Historial de Registros</h3>
-        </div>
-        <div class="overflow-x-auto overflow-y-auto max-h-[55vh]" id="scrollTable">
-            <table class="min-w-full text-left divide-y divide-slate-100 text-sm">
-                <thead class="sticky top-0 bg-white/95 backdrop-blur-sm z-10 shadow-sm">
-                    <tr class="text-[10px] uppercase tracking-widest text-slate-400 font-black border-b border-slate-200">
-                        <th class="px-6 py-4 text-center w-24">ID Lote</th>
-                        <th class="px-4 py-4 text-center">Semana</th>
-                        <th class="px-4 py-4">Fecha de Captura</th>
-                        <th class="px-4 py-4 text-center">CH</th>
-                        <th class="px-4 py-4 text-center text-blue-500">M</th>
-                        <th class="px-4 py-4 text-center text-amber-500">G</th>
-                        <th class="px-4 py-4 text-center">Estatus Admin</th> <!-- NUEVA COLUMNA -->
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 bg-white">
-                    {% for reg in historial %}
-                    <!-- Añadimos 'this' al final de los parámetros -->
-                    <tr onclick="seleccionarRegistro('{{ reg.id_lote }}', '{{ reg.fecha_registro }}', '{{ reg.estatus if reg.estatus else 'Pendiente' }}', this)" 
-                        class="hover:bg-amber-50/40 transition-colors cursor-pointer group">
-                        <td class="px-6 py-4 font-black text-slate-800 group-hover:text-amber-600 transition-colors">#{{ reg.id_lote }}</td>
-                        <td class="px-4 py-4 text-center font-bold text-slate-600">Sem {{ reg.semana if reg.semana else '--' }}</td>
-                        <td class="px-4 py-4 text-xs font-bold text-slate-600">{{ reg.fecha_registro }} <span class="text-[10px] text-slate-400 font-medium ml-1">por {{ reg.nombre_usuario }}</span></td>
-                        <td class="px-4 py-4 text-center font-bold text-slate-500">{{ reg.chicas if reg.chicas is not none else 0 }}</td>
-                        <td class="px-4 py-4 text-center font-bold text-blue-600 bg-blue-50/30">{{ reg.medianas if reg.medianas is not none else 0 }}</td>
-                        <td class="px-4 py-4 text-center font-bold text-amber-600 bg-amber-50/30">{{ reg.grandes if reg.grandes is not none else 0 }}</td>
-                        <td class="px-4 py-4 text-center">
-                            {% if reg.estatus == 'Aprobado' %}
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-extrabold uppercase rounded-lg border border-emerald-200">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aprobado
-                                </span>
-                            {% elif reg.estatus == 'Rechazado' %}
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-700 text-[10px] font-extrabold uppercase rounded-lg border border-red-200">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> No Viable
-                                </span>
-                            {% else %}
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 text-[10px] font-extrabold uppercase rounded-lg border border-amber-200">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pendiente
-                                </span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="7" class="px-6 py-8 text-center text-slate-500 font-medium">Aún no hay registros de Pre-Parasitismo.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- ==========================================
-     TARJETA EMERGENTE (MODAL WIZARD EN 2 PASOS)
-     ========================================== -->
-<div id="modalRegistroPre" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 opacity-0">
-    <!-- Ancho controlado a max-w-xl para el Paso 1 y max-w-4xl para el Paso 2 -->
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col transform scale-95 transition-transform duration-300 overflow-hidden" id="modalContent">
-        
-        <!-- Header Común -->
-        <div class="flex-shrink-0 flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-white">
+        <!-- ENCABEZADO -->
+        <div
+            class="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-                <h2 class="text-lg font-black text-slate-800 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                    <span id="modalTitulo">Paso 1: Datos Administrativos</span>
-                </h2>
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Registro de Pre-Parasitismo</p>
+                <div
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 border-amber-200/60 border text-[10px] font-bold tracking-widest uppercase mb-1">
+                    <div class="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
+                    Módulo Catopar
+                </div>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight mb-1">Pre-Parasitismo</h1>
+                <p class="text-xs text-slate-500 font-medium">Auditoría de tamaños por garbanzo (Muestra de 21
+                    unidades).</p>
             </div>
-            <button type="button" onclick="cerrarModal('modalRegistroPre')" class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-2 rounded-xl transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <button type="button" onclick="abrirModal('modalRegistroPre'); mostrarPaso(1);"
+                class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-3 px-6 rounded-xl shadow-sm transition-colors flex items-center gap-2 whitespace-nowrap">
+                <svg class="w-4 h-4 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Nuevo Registro
             </button>
         </div>
 
-        <form action="{{ url_for('prod_catopar.guardar_pre') }}" method="POST" class="flex flex-col flex-1 overflow-hidden">
-            
-            <!-- PASO 1: DATOS ADMINISTRATIVOS (Tamaño Estándar Compacto) -->
-            <div id="paso1" class="flex flex-col flex-1 p-6 bg-slate-50/50 justify-center">
-                <div class="w-full bg-white p-6 rounded-2xl shadow-sm border border-slate-200 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    
+        <!-- TARJETAS DE DATOS (KPIs Dinámicos) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+            <!-- 1. LOTE SELECCIONADO -->
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between min-h-[110px]">
+                <h3 class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Lote Seleccionado</h3>
+                <p class="text-3xl font-black text-slate-800 tracking-tight mt-auto" id="kpiLote">{{ ultimo.id_lote if
+                    ultimo else '--' }}</p>
+            </div>
+
+            <!-- 2. FECHA Y HORA -->
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between min-h-[110px]">
+                <h3 class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Fecha y Hora</h3>
+                <p class="text-lg font-black text-slate-600 tracking-tight mt-auto" id="kpiFecha">{{
+                    ultimo.fecha_registro if ultimo else '--/--/----' }}</p>
+            </div>
+
+            <!-- 3. PROMEDIO DEL LOTE -->
+            <div
+                class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between min-h-[110px]">
+                <h3 class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Promedio del Lote</h3>
+                <div class="flex items-end gap-1 mt-auto">
+                    <p class="text-3xl font-black text-amber-600 tracking-tight" id="kpiPromedio">
+                        {{ ultimo.promedio_grandes if ultimo and ultimo.promedio_grandes is not none else '0.0' }}
+                    </p>
+                    <span class="text-xs font-bold text-slate-500 mb-0.5">Prom.</span>
+                </div>
+            </div>
+
+            <!-- 4. ESTADO DEL LOTE -->
+            <div
+                class="bg-slate-50 p-5 rounded-2xl shadow-inner border border-slate-200 flex flex-col justify-between min-h-[110px]">
+                <h3 class="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Estado del Lote</h3>
+                <div class="mt-auto" id="kpiContenedorEstatus">
+                    {% if ultimo %}
+                    {% if ultimo.estatus == 'Aprobado' %}
+                    <span
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200 shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aprobado
+                    </span>
+                    {% elif ultimo.estatus == 'Rechazado' %}
+                    <span
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-red-700 text-xs font-bold rounded-lg border border-red-200 shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> No Viable
+                    </span>
+                    {% else %}
+                    <span
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg border border-amber-200 shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pendiente
+                    </span>
+                    {% endif %}
+                    {% else %}
+                    <span
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white text-slate-500 text-xs font-bold rounded-lg border border-slate-200 shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-slate-300"></span> Esperando lote
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TABLA DE HISTORIAL -->
+        <div
+            class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col flex-1 min-h-[400px]">
+            <div class="bg-slate-50 border-b border-slate-100 px-5 py-4 flex justify-between items-center">
+                <h2 class="text-xs font-bold text-slate-700 uppercase tracking-widest">Tus Registros</h2>
+                <span
+                    class="text-[10px] text-slate-400 font-bold uppercase tracking-widest bg-white border border-slate-200 px-2 py-1 rounded-md shadow-sm">Historial
+                    de Pre-Parasitismo</span>
+            </div>
+            <div class="overflow-x-auto overflow-y-auto max-h-[55vh]" id="scrollTable">
+                <table class="min-w-full text-left divide-y divide-slate-100 text-sm">
+                    <thead class="sticky top-0 bg-white/95 backdrop-blur-sm z-10 shadow-sm">
+                        <tr
+                            class="text-[9px] uppercase tracking-widest text-slate-400 font-black border-b border-slate-200">
+                            <th class="px-5 py-3 text-center w-24">ID Lote</th>
+                            <th class="px-4 py-3 text-center">Semana</th>
+                            <th class="px-4 py-3">Fecha de Captura</th>
+                            <th class="px-4 py-3 text-center">CH</th>
+                            <th class="px-4 py-3 text-center text-blue-500">M</th>
+                            <th class="px-4 py-3 text-center text-amber-500">G</th>
+                            <th class="px-4 py-3 text-center text-emerald-600">P</th>
+                            <th class="px-4 py-3 text-center text-purple-600">Promedio</th>
+                            <th class="px-4 py-3 text-center">Estatus Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        {% for reg in historial %}
+                        <tr onclick="seleccionarRegistro('{{ reg.id_lote }}', '{{ reg.fecha_registro }}', '{{ reg.estatus if reg.estatus else 'Pendiente' }}', '{{ reg.promedio_grandes }}', this)"
+                            class="hover:bg-amber-50/40 transition-colors cursor-pointer group">
+                            <td
+                                class="px-5 py-3.5 font-black text-slate-800 group-hover:text-amber-600 transition-colors text-center">
+                                #{{ reg.id_lote }}
+                            </td>
+                            <td class="px-4 py-3.5 text-center font-bold text-slate-600">Sem {{ reg.semana if reg.semana
+                                else '--' }}</td>
+                            <td class="px-4 py-3.5 text-xs font-bold text-slate-600">{{ reg.fecha_registro }} <span
+                                    class="text-[10px] text-slate-400 font-medium ml-1">por {{ reg.nombre_usuario
+                                    }}</span></td>
+                            <td class="px-4 py-3.5 text-center font-bold text-slate-500">{{ reg.chicas if reg.chicas is
+                                not none else 0 }}</td>
+                            <td class="px-4 py-3.5 text-center font-bold text-blue-600 bg-blue-50/30">{{ reg.medianas if
+                                reg.medianas is not none else 0 }}</td>
+                            <td class="px-4 py-3.5 text-center font-bold text-amber-600 bg-amber-50/30">{{ reg.grandes
+                                if reg.grandes is not none else 0 }}</td>
+                            <td class="px-4 py-3.5 text-center font-bold text-emerald-600 bg-emerald-50/30">{{ reg.pupas
+                                if reg.pupas is not none else 0 }}</td>
+                            <td class="px-4 py-3.5 text-center font-black text-purple-600 bg-purple-50/30">
+                                {{ reg.promedio_grandes if reg.promedio_grandes is defined and reg.promedio_grandes is
+                                not none else '0.0' }}
+                            </td>
+                            <td class="px-4 py-3.5 text-center">
+                                {% if reg.estatus == 'Aprobado' %}
+                                <span
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-extrabold uppercase rounded-lg border border-emerald-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aprobado
+                                </span>
+                                {% elif reg.estatus == 'Rechazado' %}
+                                <span
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-red-700 text-[10px] font-extrabold uppercase rounded-lg border border-red-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> No Viable
+                                </span>
+                                {% else %}
+                                <span
+                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 text-[10px] font-extrabold uppercase rounded-lg border border-amber-200">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pendiente
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="9" class="px-5 py-8 text-center text-slate-500 font-medium">Aún no hay
+                                registros de Pre-Parasitismo.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL WIZARD -->
+<div id="modalRegistroPre"
+    class="hidden fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+    <div class="relative bg-white rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden flex flex-col max-h-[85vh] border border-slate-100 my-auto text-left transition-all duration-300"
+        id="modalContent">
+
+        <div class="flex justify-between items-center border-b border-slate-100 p-5 pb-4 shrink-0 bg-white">
+            <div>
+                <h3 id="modalTitulo" class="font-black text-slate-800 text-lg tracking-tight">Paso 1: Datos
+                    Administrativos</h3>
+                <p class="text-[11px] text-slate-500 font-medium mt-0.5">Registro de Pre-Parasitismo</p>
+            </div>
+            <button type="button" onclick="cerrarModal('modalRegistroPre')"
+                class="text-slate-400 hover:text-slate-600 transition-colors font-black text-2xl leading-none">&times;</button>
+        </div>
+
+        <!-- FORMULARIO CON ID ÚNICO PARA JS -->
+        <form id="formPre" action="{{ url_for('prod_catopar.guardar_pre') }}" method="POST"
+            class="flex flex-col flex-1 overflow-hidden">
+
+            <!-- PASO 1 -->
+            <div id="paso1" class="flex flex-col flex-1 p-5 bg-slate-50/30 justify-center">
+                <div class="w-full bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 space-y-3.5">
                     <div class="flex flex-col">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Lote (4 dígitos)</label>
-                        <input type="number" id="inputLote" name="lote_id" placeholder="Ej. 1024" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-3.5 py-2.5 outline-none focus:ring-2 focus:ring-amber-500 transition-all" required>
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Lote (4
+                            dígitos)</label>
+                        <input type="number" id="inputLote" name="lote_id" placeholder="Ej. 1024"
+                            class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3.5 py-2.5 outline-none focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                            required>
                     </div>
-
                     <div class="flex flex-col">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Semana Operativa</label>
-                        <input type="number" id="inputSemana" name="semana" placeholder="Ej. 42" min="1" max="53" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-3.5 py-2.5 outline-none focus:ring-2 focus:ring-amber-500 transition-all" required>
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Semana
+                            Operativa</label>
+                        <input type="number" id="inputSemana" name="semana" placeholder="Ej. 42" min="1" max="53"
+                            class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3.5 py-2.5 outline-none focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                            required>
                     </div>
-
-                    <div class="flex flex-col sm:col-span-2">
-                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1.5">Fecha de Captura</label>
-                        <input type="date" id="inputFecha" name="fecha" class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold rounded-xl px-3.5 py-2.5 outline-none focus:ring-2 focus:ring-amber-500 transition-all" required>
+                    <div class="flex flex-col">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Fecha de
+                            Captura</label>
+                        <input type="date" id="inputFecha" name="fecha"
+                            class="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-3.5 py-2.5 outline-none focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                            required>
                     </div>
-
-                    <div class="flex flex-col sm:col-span-2 pt-3 border-t border-slate-100">
-                        <label class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1.5">Firma del Operador (NIP)</label>
-                        <input type="password" id="inputNip" name="nip" placeholder="****" class="w-full bg-emerald-50 border border-emerald-200 text-emerald-800 font-black tracking-widest text-center text-sm rounded-xl px-3.5 py-2.5 outline-none focus:ring-2 focus:ring-emerald-500 transition-all" required>
+                    <div class="flex flex-col pt-2 border-t border-slate-100">
+                        <label class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Firma del
+                            Operador (NIP)</label>
+                        <input type="password" id="inputNip" name="nip" placeholder="****"
+                            class="w-full bg-emerald-50/50 border border-emerald-200 text-emerald-800 font-black tracking-widest text-center text-sm rounded-xl px-3.5 py-2.5 outline-none focus:bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                            required>
                     </div>
                 </div>
 
-                <div class="mt-6 flex justify-end w-full gap-3">
-                    <button type="button" onclick="cerrarModal('modalRegistroPre')" class="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-sm font-bold rounded-xl transition-all">Cancelar</button>
-                    <button type="button" onclick="validarPaso1()" class="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2">
+                <div class="mt-4 flex justify-end w-full gap-2">
+                    <button type="button" onclick="cerrarModal('modalRegistroPre')"
+                        class="w-1/3 bg-slate-100 border border-slate-200 text-slate-600 font-bold py-3 rounded-xl hover:bg-slate-200 transition-colors text-xs">Cancelar</button>
+                    <button type="button" onclick="validarPaso1()"
+                        class="w-2/3 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold py-3 rounded-xl shadow-md shadow-amber-600/20 transition-all active:scale-95 flex items-center justify-center gap-1.5">
                         Siguiente Paso
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
                     </button>
                 </div>
             </div>
 
-            <!-- PASO 2: LOS 21 GARBANZOS (Se expande automáticamente a max-w-4xl en JS) -->
-            <div id="paso2" class="hidden flex-col flex-1 overflow-hidden">
-                <div class="flex-1 overflow-y-auto hide-scroll p-6 bg-slate-50/80">
-                    <div class="bg-amber-100 text-amber-800 px-4 py-2.5 rounded-xl mb-4 font-bold text-xs text-center border border-amber-200">
-                        Evaluando Muestra del Lote #<span id="displayLoteTxt" class="font-black text-amber-900 text-sm"></span>
+            <!-- PASO 2: LOS 21 GARBANZOS CON 5 COLUMNAS CADA UNO -->
+            <div id="paso2" class="hidden flex-col flex-1 overflow-hidden bg-slate-50/40">
+                <div class="flex-1 overflow-y-auto modal-scroll p-4 space-y-3">
+                    <div
+                        class="bg-amber-50 text-amber-900 px-3.5 py-2 rounded-xl font-bold text-xs text-center border border-amber-200 shadow-sm">
+                        Evaluando Muestra del Lote #<span id="displayLoteTxt"
+                            class="font-black text-amber-950 text-sm"></span>
                     </div>
 
-                    <!-- Grid de 21 Garbanzos -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    <div class="space-y-2.5">
                         {% for i in range(1, 22) %}
-                        <div class="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm hover:border-amber-400 hover:shadow-md transition-all duration-200">
-                            <label class="text-[10px] font-black text-slate-500 mb-2 block text-center uppercase tracking-widest border-b border-slate-100 pb-1.5">Garbanzo {{ i }}</label>
-                            <div class="grid grid-cols-3 gap-1.5">
+                        <div
+                            class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm hover:border-amber-300 transition-all">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1.5 mb-2">
+                                <span class="text-xs font-black text-slate-700 uppercase tracking-wider">Garbanzo {{ i
+                                    }}</span>
+                            </div>
+
+                            <!-- 5 Columnas por garbanzo: CH, M, G, P y Promedio Individual -->
+                            <div class="grid grid-cols-5 gap-1.5">
                                 <div class="flex flex-col items-center">
-                                    <span class="text-[9px] font-bold text-slate-400 mb-1">CH</span>
-                                    <input type="number" min="0" step="1" name="g{{ i }}_ch" class="input-ch w-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold rounded-lg focus:ring-2 focus:ring-slate-400 text-center py-1.5 outline-none transition-all" placeholder="0">
+                                    <span class="text-[9px] font-bold text-slate-400 mb-0.5">CH</span>
+                                    <input type="number" min="0" step="1" name="g{{ i }}_ch"
+                                        class="input-ch w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-lg text-center py-1.5 outline-none focus:bg-white focus:border-amber-400"
+                                        placeholder="0">
                                 </div>
                                 <div class="flex flex-col items-center">
-                                    <span class="text-[9px] font-bold text-blue-400 mb-1">M</span>
-                                    <input type="number" min="0" step="1" name="g{{ i }}_m" class="input-m w-full bg-blue-50/50 border border-blue-200 text-blue-700 text-sm font-bold rounded-lg focus:ring-2 focus:ring-blue-500 text-center py-1.5 outline-none transition-all" placeholder="0">
+                                    <span class="text-[9px] font-bold text-blue-500 mb-0.5">M</span>
+                                    <input type="number" min="0" step="1" name="g{{ i }}_m"
+                                        class="input-m w-full bg-blue-50/50 border border-blue-200 text-blue-700 text-xs font-bold rounded-lg text-center py-1.5 outline-none focus:bg-white focus:border-blue-400"
+                                        placeholder="0">
                                 </div>
                                 <div class="flex flex-col items-center">
-                                    <span class="text-[9px] font-bold text-amber-500 mb-1">G</span>
-                                    <input type="number" min="0" step="1" name="g{{ i }}_g" class="input-g w-full bg-amber-50/50 border border-amber-200 text-amber-700 text-sm font-bold rounded-lg focus:ring-2 focus:ring-amber-500 text-center py-1.5 outline-none transition-all" placeholder="0">
+                                    <span class="text-[9px] font-bold text-amber-500 mb-0.5">G</span>
+                                    <input type="number" min="0" step="1" name="g{{ i }}_g"
+                                        class="input-g w-full bg-amber-50/50 border border-amber-200 text-amber-700 text-xs font-bold rounded-lg text-center py-1.5 outline-none focus:bg-white focus:border-amber-400"
+                                        placeholder="0">
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <span class="text-[9px] font-bold text-emerald-600 mb-0.5">P</span>
+                                    <input type="number" min="0" step="1" name="g{{ i }}_p"
+                                        class="input-p w-full bg-emerald-50/50 border border-emerald-200 text-emerald-700 text-xs font-bold rounded-lg text-center py-1.5 outline-none focus:bg-white focus:border-emerald-400"
+                                        placeholder="0">
+                                </div>
+                                <div class="flex flex-col items-center">
+                                    <span class="text-[9px] font-bold text-purple-600 mb-0.5">Prom</span>
+                                    <div
+                                        class="garbanzo-prom w-full bg-purple-50 border border-purple-200 text-purple-700 text-xs font-black rounded-lg flex items-center justify-center py-1.5">
+                                        0.0
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -226,35 +371,52 @@
                     </div>
                 </div>
 
-                <!-- Footer Calculadora -->
-                <div class="flex-shrink-0 px-6 py-4 border-t border-slate-100 bg-white rounded-b-3xl flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div class="flex items-center gap-4 bg-slate-50 py-2 px-4 rounded-2xl border border-slate-100 w-full md:w-auto justify-center">
-                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-400 mr-2">Totales:</span>
-                        <div class="text-center px-3">
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">CH</p>
-                            <p class="text-xl font-black text-slate-700" id="count-ch">0</p>
+                <div
+                    class="flex-shrink-0 px-4 py-3 border-t border-slate-100 bg-white rounded-b-2xl flex flex-col gap-2.5 shadow-md">
+                    <div
+                        class="flex items-center justify-around bg-slate-50 py-2 px-2 rounded-xl border border-slate-100 w-full text-[10px]">
+                        <div class="text-center">
+                            <span class="text-slate-400 font-bold block">CH</span>
+                            <span class="font-black text-slate-700 text-xs" id="count-ch">0</span>
                         </div>
-                        <div class="text-center px-3 border-l border-slate-200">
-                            <p class="text-[9px] font-bold text-blue-400 uppercase tracking-widest">M</p>
-                            <p class="text-xl font-black text-blue-600" id="count-m">0</p>
+                        <div class="text-center border-l border-slate-200 pl-2">
+                            <span class="text-blue-500 font-bold block">M</span>
+                            <span class="font-black text-blue-600 text-xs" id="count-m">0</span>
                         </div>
-                        <div class="text-center px-3 border-l border-slate-200">
-                            <p class="text-[9px] font-bold text-amber-500 uppercase tracking-widest">G</p>
-                            <p class="text-xl font-black text-amber-500" id="count-g">0</p>
+                        <div class="text-center border-l border-slate-200 pl-2">
+                            <span class="text-amber-500 font-bold block">G</span>
+                            <span class="font-black text-amber-500 text-xs" id="count-g">0</span>
+                        </div>
+                        <div class="text-center border-l border-slate-200 pl-2">
+                            <span class="text-emerald-600 font-bold block">P</span>
+                            <span class="font-black text-emerald-600 text-xs" id="count-p">0</span>
+                        </div>
+                        <div class="text-center border-l border-slate-200 pl-2">
+                            <span class="text-purple-600 font-bold block">Prom.</span>
+                            <span class="font-black text-purple-600 text-xs" id="count-promedio">0.0</span>
                         </div>
                     </div>
-                    <div class="flex gap-3 w-full md:w-auto">
-                        <button type="button" onclick="mostrarPaso(1)" class="w-full md:w-auto px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold rounded-xl transition-all flex items-center gap-2 justify-center text-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                    <div class="flex gap-2 w-full">
+                        <button type="button" onclick="mostrarPaso(1)"
+                            class="w-1/3 bg-slate-100 border border-slate-200 text-slate-600 font-bold py-2.5 rounded-xl hover:bg-slate-200 transition-colors text-xs flex items-center justify-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M15 19l-7-7 7-7"></path>
+                            </svg>
                             Atrás
                         </button>
-                        <button type="submit" class="w-full md:w-auto px-7 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-md transition-all active:scale-95 whitespace-nowrap text-sm">
+                        <button type="button" onclick="enviarFormularioPre()"
+                            class="w-2/3 bg-amber-500 hover:bg-amber-600 text-white font-bold py-2.5 rounded-xl shadow-md shadow-amber-600/20 transition-all active:scale-95 text-xs flex items-center justify-center gap-1.5">
                             Guardar Registro
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
                         </button>
                     </div>
                 </div>
             </div>
-            
+
         </form>
     </div>
 </div>
@@ -268,17 +430,12 @@
         document.getElementById('inputFecha').value = hoy;
 
         modal.classList.remove('hidden');
-        setTimeout(() => {
-            modal.classList.remove('opacity-0');
-            modal.classList.add('opacity-100');
-        }, 10);
+        document.body.appendChild(modal);
     }
 
     function cerrarModal(modalId) {
         const modal = document.getElementById(modalId);
-        modal.classList.remove('opacity-100');
-        modal.classList.add('opacity-0');
-        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        modal.classList.add('hidden');
     }
 
     function validarPaso1() {
@@ -286,9 +443,9 @@
         const semana = document.getElementById('inputSemana').value;
         const fecha = document.getElementById('inputFecha').value;
         const nip = document.getElementById('inputNip').value;
-        
-        if(!lote || !semana || !fecha || !nip) {
-            alert("Por favor completa todos los campos para continuar.");
+
+        if (!lote || !semana || !fecha || !nip) {
+            alert("Por favor completa todos los campos (Lote, Semana, Fecha y NIP) para continuar.");
             return;
         }
 
@@ -298,161 +455,108 @@
 
     function mostrarPaso(paso) {
         const modalContent = document.getElementById('modalContent');
-        
-        if(paso === 1) {
-            // Reducir la tarjeta al tamaño estándar compacto
-            modalContent.classList.remove('max-w-4xl');
-            modalContent.classList.add('max-w-xl');
+
+        if (paso === 1) {
+            modalContent.classList.remove('max-w-2xl');
+            modalContent.classList.add('max-w-sm');
 
             document.getElementById('paso2').classList.add('hidden');
             document.getElementById('paso2').classList.remove('flex');
-            
+
             document.getElementById('paso1').classList.remove('hidden');
             document.getElementById('paso1').classList.add('flex');
             document.getElementById('modalTitulo').innerText = "Paso 1: Datos Administrativos";
         } else {
-            // Expandir la tarjeta para dar espacio a los 21 garbanzos
-            modalContent.classList.remove('max-w-xl');
-            modalContent.classList.add('max-w-4xl');
+            modalContent.classList.remove('max-w-sm');
+            modalContent.classList.add('max-w-2xl');
 
             document.getElementById('paso1').classList.add('hidden');
             document.getElementById('paso1').classList.remove('flex');
-            
+
             document.getElementById('paso2').classList.remove('hidden');
             document.getElementById('paso2').classList.add('flex');
             document.getElementById('modalTitulo').innerText = "Paso 2: Captura de Garbanzos";
         }
     }
 
-    // Calculadora en tiempo real
-    document.addEventListener("DOMContentLoaded", () => {
-        const inputsCH = document.querySelectorAll('.input-ch');
-        const inputsM = document.querySelectorAll('.input-m');
-        const inputsG = document.querySelectorAll('.input-g');
-
-        function actualizarConteos() {
-            let totalCH = 0, totalM = 0, totalG = 0;
-            inputsCH.forEach(inp => totalCH += parseInt(inp.value) || 0);
-            inputsM.forEach(inp => totalM += parseInt(inp.value) || 0);
-            inputsG.forEach(inp => totalG += parseInt(inp.value) || 0);
-            
-            document.getElementById('count-ch').textContent = totalCH;
-            document.getElementById('count-m').textContent = totalM;
-            document.getElementById('count-g').textContent = totalG;
-        }
-
-        const todosLosInputs = document.querySelectorAll('.input-ch, .input-m, .input-g');
-        todosLosInputs.forEach(input => {
-            input.addEventListener('input', actualizarConteos);
-        });
-    });
-</script>
-
-<script>
-    // Funciones del Modal y Wizard...
-    function abrirModal(modalId) {
-        const hoy = new Date().toISOString().split('T')[0];
-        document.getElementById('inputFecha').value = hoy;
-        const modal = document.getElementById(modalId);
-        const content = document.getElementById('modalContent');
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            modal.classList.remove('opacity-0');
-            modal.classList.add('opacity-100');
-            content.classList.remove('scale-95');
-            content.classList.add('scale-100');
-        }, 10);
-    }
-
-    function cerrarModal(modalId) {
-        const modal = document.getElementById(modalId);
-        const content = document.getElementById('modalContent');
-        modal.classList.remove('opacity-100');
-        modal.classList.add('opacity-0');
-        content.classList.remove('scale-100');
-        content.classList.add('scale-95');
-        setTimeout(() => { modal.classList.add('hidden'); }, 300);
-    }
-
-    function validarPaso1() {
+    function enviarFormularioPre() {
         const lote = document.getElementById('inputLote').value;
         const semana = document.getElementById('inputSemana').value;
         const fecha = document.getElementById('inputFecha').value;
         const nip = document.getElementById('inputNip').value;
-        
-        if(!lote || !semana || !fecha || !nip) {
-            alert("Por favor completa todos los campos (Lote, Semana, Fecha y NIP) para continuar.");
+
+        if (!lote || !semana || !fecha || !nip) {
+            alert("Faltan datos en el Paso 1 (Lote, Semana, Fecha o NIP). Por favor regresa al Paso 1.");
+            mostrarPaso(1);
             return;
         }
-        document.getElementById('displayLoteTxt').innerText = lote;
-        mostrarPaso(2);
+
+        document.getElementById('formPre').submit();
     }
 
-    function mostrarPaso(paso) {
-        if(paso === 1) {
-            document.getElementById('paso2').classList.add('hidden');
-            document.getElementById('paso2').classList.remove('flex');
-            document.getElementById('paso1').classList.remove('hidden');
-            document.getElementById('paso1').classList.add('flex');
-            document.getElementById('modalTitulo').innerText = "Paso 1: Datos Administrativos";
-        } else {
-            document.getElementById('paso1').classList.add('hidden');
-            document.getElementById('paso1').classList.remove('flex');
-            document.getElementById('paso2').classList.remove('hidden');
-            document.getElementById('paso2').classList.add('flex');
-            document.getElementById('modalTitulo').innerText = "Paso 2: Captura de Garbanzos";
-        }
-    }
-
-function seleccionarRegistro(lote, fecha, estatus, elementoFila) {
-        // 1. Reflejar datos en los KPIs superiores
+    function seleccionarRegistro(lote, fecha, estatus, promedio, elementoFila) {
+        // Actualizar tarjetas superiores (KPIs)
         document.getElementById('kpiLote').innerText = lote;
         document.getElementById('kpiFecha').innerText = fecha;
-        
+        document.getElementById('kpiPromedio').innerText = promedio && promedio !== 'None' && promedio !== '' ? promedio : '0.0';
+
+        // Actualizar estatus visual
         const contenedorEstatus = document.getElementById('kpiContenedorEstatus');
-        
-        if(estatus === 'Aprobado') {
-            contenedorEstatus.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200 shadow-sm"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Aprobado</span>`;
-        } else if(estatus === 'Rechazado') {
-            contenedorEstatus.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 text-xs font-bold rounded-lg border border-red-200 shadow-sm"><span class="w-2 h-2 rounded-full bg-red-500"></span> No Viable</span>`;
+        if (estatus === 'Aprobado') {
+            contenedorEstatus.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Aprobado</span>`;
+        } else if (estatus === 'Rechazado') {
+            contenedorEstatus.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-50 text-red-700 text-xs font-bold rounded-lg border border-red-200 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> No Viable</span>`;
         } else {
-            contenedorEstatus.innerHTML = `<span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg border border-amber-200 shadow-sm"><span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span> Pendiente</span>`;
+            contenedorEstatus.innerHTML = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg border border-amber-200 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pendiente</span>`;
         }
 
-        // 2. Control visual del color del renglón (fila seleccionada)
-        // Quitamos la clase de selección a todos los renglones de la tabla
+        // Resaltar la fila seleccionada
         const filas = document.querySelectorAll('#scrollTable tbody tr');
-        filas.forEach(f => {
-            f.classList.remove('bg-amber-100/70', 'border-l-4', 'border-amber-500');
-        });
-
-        // Añadimos un color ámbar suave y una barra lateral distintiva al renglón clickeado
+        filas.forEach(f => f.classList.remove('bg-amber-100/70', 'border-l-4', 'border-amber-500'));
         if (elementoFila) {
             elementoFila.classList.add('bg-amber-100/70', 'border-l-4', 'border-amber-500');
         }
     }
 
-    // Calculadora de Totales en Tiempo Real dentro del Modal
     document.addEventListener("DOMContentLoaded", () => {
-        const inputsCH = document.querySelectorAll('.input-ch');
-        const inputsM = document.querySelectorAll('.input-m');
-        const inputsG = document.querySelectorAll('.input-g');
+        const tarjetasGarbanzos = document.querySelectorAll('#paso2 .space-y-2.5 > div');
 
         function actualizarConteos() {
-            let totalCH = 0, totalM = 0, totalG = 0;
-            inputsCH.forEach(inp => totalCH += parseInt(inp.value) || 0);
-            inputsM.forEach(inp => totalM += parseInt(inp.value) || 0);
-            inputsG.forEach(inp => totalG += parseInt(inp.value) || 0);
-            
+            let totalCH = 0, totalM = 0, totalG = 0, totalP = 0;
+
+            tarjetasGarbanzos.forEach(tarjeta => {
+                const inpCH = tarjeta.querySelector('.input-ch');
+                const inpM = tarjeta.querySelector('.input-m');
+                const inpG = tarjeta.querySelector('.input-g');
+                const inpP = tarjeta.querySelector('.input-p');
+                const divProm = tarjeta.querySelector('.garbanzo-prom');
+
+                const valCH = parseInt(inpCH.value) || 0;
+                const valM = parseInt(inpM.value) || 0;
+                const valG = parseInt(inpG.value) || 0;
+                const valP = parseInt(inpP.value) || 0;
+
+                totalCH += valCH;
+                totalM += valM;
+                totalG += valG;
+                totalP += valP;
+
+                let sumaGarbanzo = valCH + valM + valG + valP;
+                let promIndividual = sumaGarbanzo > 0 ? (valG / 1.0).toFixed(1) : '0.0';
+                divProm.textContent = promIndividual;
+            });
+
             document.getElementById('count-ch').textContent = totalCH;
             document.getElementById('count-m').textContent = totalM;
             document.getElementById('count-g').textContent = totalG;
+            document.getElementById('count-p').textContent = totalP;
+
+            let promedioGlobal = (totalG / 21.0).toFixed(2);
+            document.getElementById('count-promedio').textContent = promedioGlobal;
         }
 
-        const todosLosInputs = document.querySelectorAll('.input-ch, .input-m, .input-g');
-        todosLosInputs.forEach(input => {
-            input.addEventListener('input', actualizarConteos);
-        });
+        const todosLosInputs = document.querySelectorAll('.input-ch, .input-m, .input-g, .input-p');
+        todosLosInputs.forEach(input => input.addEventListener('input', actualizarConteos));
     });
 </script>
 {% endblock %}

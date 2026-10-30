@@ -3,100 +3,156 @@
 {% block title %}Pase de Lista - Koppert Biofactory{% endblock %}
 
 {% block content %}
-<!-- Contenedor Estandarizado -->
-<div class="w-full max-w-6xl mx-auto flex flex-col gap-5 pb-16 mb-8">
-    
-    <!-- Botón Volver Perfectamente Alineado a la Izquierda -->
-    {% if request.endpoint != 'index' %}
-    <div class="w-full flex justify-start">
-        <a href="{{ url_for('index') }}" class="self-start inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-slate-200/70 rounded-xl text-sm font-bold text-slate-600 hover:text-emerald-700 hover:border-emerald-400 hover:bg-emerald-50 hover:shadow-md shadow-sm active:scale-95 transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 group-hover:-translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            Volver atras
+<!-- Contenedor ajustado a max-w-5xl para dar un efecto de zoom elegante manteniendo la estructura -->
+<div class="w-full max-w-5xl mx-auto flex flex-col gap-5 pt-6 pb-20 mb-12">
+
+    <!-- Botón Volver alineado perfectamente con el borde del cuadro blanco -->
+    <div class="w-full flex justify-start mb-1 z-10">
+        <a href="{{ url_for('index') }}"
+            class="inline-flex items-center justify-center sm:justify-start gap-2.5 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:text-emerald-700 hover:border-emerald-400 hover:bg-emerald-50 hover:shadow-md shadow-sm active:scale-95 transition-all group touch-manipulation">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-emerald-600 group-hover:-translate-x-1 transition-all"
+                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+                </path>
+            </svg>
+            Volver al Panel
         </a>
     </div>
-    {% endif %}
 
-    <!-- Encabezado Principal Estandarizado -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-4 sm:p-6 rounded-3xl shadow-sm border border-slate-200/70 backdrop-blur-xl gap-4">
+    <!-- ENCABEZADO -->
+    <div
+        class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
         <div>
-            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-violet-50 border border-violet-100 text-violet-700 text-[10px] font-bold tracking-widest uppercase mb-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse"></span>
-                Mi Área de Trabajo
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Pase de Lista <span
+                    class="text-emerald-600">Operadores</span></h1>
+            <p class="text-sm text-slate-500 font-medium mt-1">Control y registro de asistencia del personal asignado a
+                su área.</p>
+        </div>
+
+        <!-- BUSCADOR EN TIEMPO REAL -->
+        <div class="flex items-center justify-end gap-3 w-full md:w-auto ml-auto">
+            <div
+                class="flex items-center bg-slate-50 border border-slate-200 rounded-xl overflow-hidden shadow-sm w-full md:w-auto">
+                <div class="px-3.5 text-slate-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <input type="text" id="buscarOperador" placeholder="Buscar operador..."
+                    class="bg-transparent border-none text-sm font-bold text-slate-700 placeholder:text-slate-400 outline-none focus:ring-0 py-2.5 w-full md:w-56">
             </div>
-            <h1 class="text-xl sm:text-2xl font-black text-slate-800 tracking-tight mb-1">Pase de Lista de Operadores</h1>
-            <p class="text-xs text-slate-500 font-medium">Marque la entrada del personal asignado a su área.</p>
         </div>
     </div>
 
-    <!-- Contenedor de la Lista -->
-    <div class="overflow-x-auto overflow-y-auto max-h-[55vh]" id="scrollTable">
-        
-        <!-- Barra superior de la lista -->
-        <div class="bg-slate-50/50 px-4 sm:px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-            <h2 class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-2">
-                Personal Activo Asignado
-            </h2>
-            <span class="hidden sm:inline-block text-[10px] sm:text-xs font-normal text-slate-400 bg-white px-2 py-1 rounded-md border border-slate-200 shadow-sm">Registro Diario</span>
+    <!-- TABLA DE OPERADORES -->
+    <div
+        class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col flex-1 min-h-[420px]">
+        <div class="bg-slate-50 border-b border-slate-100 px-6 py-4.5 flex justify-between items-center">
+            <h2 class="text-xs font-bold text-slate-700 uppercase tracking-widest">Personal Activo Asignado</h2>
+            <span
+                class="text-[11px] text-slate-400 font-bold uppercase tracking-widest bg-white border border-slate-200 px-2.5 py-1 rounded-md shadow-sm">Registro
+                Diario</span>
         </div>
-        
-        <ul class="divide-y divide-slate-100">
-            
-            {% for op in operadores %}
-            <li class="p-4 sm:p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-slate-50/80 transition-colors">
-                
-                <!-- Info del Operador -->
-                <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-black border border-slate-200/70 text-sm sm:text-base">
-                        {{ op['nombre_usuario'][:2] | upper }}
-                    </div>
-                    <div>
-                        <p class="font-black text-slate-800 text-sm sm:text-base">{{ op['nombre_usuario'] }}</p>
-                        
-                        <div class="flex items-center gap-2 mt-1">
+
+        <div class="overflow-x-auto overflow-y-auto max-h-[60vh]" id="scrollTable">
+            <table class="min-w-full divide-y divide-slate-100 text-base">
+                <thead class="bg-white text-slate-400 sticky top-0 z-10 shadow-sm">
+                    <tr>
+                        <th class="px-6 py-3.5 text-left font-black uppercase tracking-widest text-[10px]">Operador</th>
+                        <th class="px-6 py-3.5 text-center font-black uppercase tracking-widest text-[10px]">Estado</th>
+                        <th class="px-6 py-3.5 text-center font-black uppercase tracking-widest text-[10px]">Hora de
+                            Entrada</th>
+                        <th class="px-6 py-3.5 text-right font-black uppercase tracking-widest text-[10px]">Acción</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 bg-white" id="tablaOperadores">
+                    {% for op in operadores %}
+                    <tr class="hover:bg-slate-50 transition-colors fila-operador"
+                        data-nombre="{{ op['nombre_usuario']|lower }}">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center gap-3.5">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold border border-slate-200 text-sm shrink-0">
+                                    {{ op['nombre_usuario'][:2] | upper }}
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-800 text-sm">{{ op['nombre_usuario'] }}</div>
+                                    <div class="text-xs text-slate-400 font-medium">Operador de Producción</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
                             {% if op['hora_entrada'] %}
-                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100" id="hora-ent-{{ op['id_usuario'] }}">
-                                    Entrada: {{ op['hora_entrada'] }}
-                                </span>
+                            <span id="badge-estado-{{ op['id_usuario'] }}"
+                                class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                PRESENTE
+                            </span>
                             {% else %}
-                                <span class="text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 hidden" id="hora-ent-{{ op['id_usuario'] }}"></span>
+                            <span id="badge-estado-{{ op['id_usuario'] }}"
+                                class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-black bg-amber-100 text-amber-800 border border-amber-200">
+                                PENDIENTE
+                            </span>
                             {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Botón de Entrada Única con Íconos -->
-                <div class="w-full sm:w-auto mt-2 sm:mt-0">
-                    {% if not op['hora_entrada'] %}
-                        <button onclick="marcarAsistencia(this, {{ op['id_usuario'] }})" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs font-black uppercase tracking-wider rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Marcar Entrada
-                        </button>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <span id="hora-ent-{{ op['id_usuario'] }}"
+                                class="text-sm font-bold {% if op['hora_entrada'] %}text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-md{% else %}text-slate-400{% endif %}">
+                                {{ op['hora_entrada'] if op['hora_entrada'] else '--:--' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                            {% if not op['hora_entrada'] %}
+                            <button onclick="marcarAsistencia(this, {{ op['id_usuario'] }})"
+                                class="inline-flex items-center gap-2 px-4 py-2 bg-[#059669] hover:bg-[#047857] text-white text-xs font-bold rounded-xl transition-all shadow-sm active:scale-95 whitespace-nowrap">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Marcar Entrada
+                            </button>
+                            {% else %}
+                            <span
+                                class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 text-xs font-bold rounded-xl cursor-default whitespace-nowrap border border-slate-200">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Registrada
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
                     {% else %}
-                        <button disabled class="w-full sm:w-auto px-5 py-2.5 bg-slate-100 text-slate-400 text-xs font-black uppercase tracking-wider rounded-xl cursor-not-allowed flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                            Entrada Registrada
-                        </button>
-                    {% endif %}
-                </div>
-            </li>
-            {% else %}
-            <!-- Mensaje si no hay operadores en el área -->
-            <li class="p-8 sm:p-12 text-center">
-                <div class="inline-flex p-4 bg-slate-50 rounded-full mb-3 border border-slate-100 shadow-inner">
-                    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                </div>
-                <p class="text-slate-600 font-bold text-sm sm:text-base">No hay operadores registrados o activos en su área.</p>
-                <p class="text-slate-400 text-xs sm:text-sm mt-1">Asegúrese de que el personal tenga el puesto "Operador" en el sistema.</p>
-            </li>
-            {% endfor %}
-
-        </ul>
+                    <tr>
+                        <td colspan="4" class="px-6 py-14 text-center">
+                            <div
+                                class="inline-flex p-4 bg-slate-50 rounded-full mb-3 border border-slate-100 shadow-inner">
+                                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4"></path>
+                                </svg>
+                            </div>
+                            <p class="text-slate-600 font-bold text-sm">No hay operadores registrados o activos en su
+                                área.</p>
+                            <p class="text-slate-400 text-xs mt-1">Asegúrese de que el personal tenga el puesto
+                                "Operador" en el sistema.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
     async function marcarAsistencia(boton, idOperador) {
         boton.disabled = true;
+        const contenidoOriginal = boton.innerHTML;
         boton.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Guardando...`;
 
         try {
@@ -104,15 +160,25 @@
             let data = await respuesta.json();
 
             if (data.status === 'success') {
-                boton.className = "w-full sm:w-auto px-5 py-2.5 bg-slate-100 text-slate-400 text-xs font-black uppercase tracking-wider rounded-xl cursor-not-allowed flex items-center justify-center gap-2";
-                boton.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Entrada Registrada`;
-                
-                if(data.estado === 'entrada') {
+                boton.className = "inline-flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-400 text-xs font-bold rounded-xl cursor-default whitespace-nowrap border border-slate-200";
+                boton.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg> Registrada`;
+
+                if (data.estado === 'entrada') {
                     let labelEntrada = document.getElementById(`hora-ent-${idOperador}`);
-                    labelEntrada.innerText = `Entrada: ${data.hora}`;
-                    labelEntrada.classList.remove('hidden');
-                    labelEntrada.classList.add('text-emerald-600', 'bg-emerald-50');
+                    if (labelEntrada) {
+                        labelEntrada.innerText = data.hora;
+                        labelEntrada.className = "text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-md";
+                    }
+
+                    let badgeEstado = document.getElementById(`badge-estado-${idOperador}`);
+                    if (badgeEstado) {
+                        badgeEstado.innerText = "PRESENTE";
+                        badgeEstado.className = "inline-flex items-center px-3 py-1 rounded-lg text-xs font-black bg-emerald-100 text-emerald-800 border border-emerald-200";
+                    }
                 }
+            } else {
+                boton.innerHTML = contenidoOriginal;
+                boton.disabled = false;
             }
         } catch (error) {
             console.error("Error:", error);
@@ -120,5 +186,14 @@
             boton.disabled = false;
         }
     }
+
+    // Buscador interactivo en tiempo real
+    document.getElementById('buscarOperador')?.addEventListener('input', function (e) {
+        const query = e.target.value.toLowerCase().trim();
+        document.querySelectorAll('.fila-operador').forEach(fila => {
+            const nombre = fila.getAttribute('data-nombre') || '';
+            fila.style.display = nombre.includes(query) ? '' : 'none';
+        });
+    });
 </script>
 {% endblock %}
